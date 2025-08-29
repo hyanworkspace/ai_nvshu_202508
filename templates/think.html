@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Think - AI Nvshu</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen overflow-hidden">
+    <!-- Background image container -->
+    <div class="absolute inset-0 w-full h-full -z-50" data-component="background">
+        <img src="{{ url_for('static', filename='images/bg 2.png') }}" 
+             alt="Background"
+             class="w-full h-full object-cover opacity-70">
+    </div>
+
+    <!-- Main content container -->
+    <div class="relative z-0 h-screen flex items-center justify-center" data-component="main-container">
+        <div class="flex max-w-[1200px] w-full gap-5 p-5" data-component="layout-row">
+            <div class="flex-1" data-component="left-panel">
+                <div class="text-2xl font-medium mb-4 text-[#333]" data-component="left-title">Observation</div>
+                <!-- 包裹容器：相对定位，增加padding确保圆形完整显示 -->
+                <div class="relative w-[100%] aspect-square flex items-center justify-center  p-[10%]" data-component="left-media-wrapper">
+                    <!-- 单一圆形容器：视频 + 装饰 + 内容 -->
+                    <div class="relative w-[90%] aspect-square rounded-full flex items-center justify-center z-10 overflow-hidden"
+                        data-component="media-circle-overlay">
+
+                    <!-- 淡黄色背景 -->
+                    <div class="absolute inset-0 rounded-full radial-fade-small"></div>
+
+                    <!-- JS 会往这里插入 video/img -->
+                    <div id="left-content" class="relative z-30 w-full h-full flex items-center justify-center"></div>
+                    </div>
+                </div>
+                  
+            </div>
+
+            <div class="flex-1" data-component="right-panel">
+                <div class="text-2xl font-medium mb-4 text-[#333]" data-component="right-title">Process Status</div>
+                <div class="min-h-[300px]" id="right-content" data-component="status-list">
+                    <!-- Status items will be added incrementally here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/think.js') }}"></script>
+</body>
+
+</html>

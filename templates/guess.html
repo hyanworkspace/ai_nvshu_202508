@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Development</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/guess.css') }}"> -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+</head>
+
+<body class="bg-black m-0 p-5 flex flex-col items-center min-h-screen" data-component="page-body">
+    <!-- Background image container -->
+    <div class="absolute inset-0 w-full h-full -z-50" data-component="background">
+        <img src="{{ url_for('static', filename='images/bg 2.png') }}" alt="Background"
+            class="w-full h-full object-cover opacity-70">
+    </div>
+
+    <!-- Header section with fixed height -->
+    <div class="h-[100px] flex items-center justify-center" data-component="header">
+        <h1 class="text-[#FFFDE9] text-3xl hidden" id="consensus-title" data-component="consensus-title">Consensus Reached!</h1>
+    </div>
+
+    <!-- Main content container -->
+    <div class="flex items-center justify-center gap-[min(40px,2vw)] w-full max-w-[1920px] px-[min(40px,2vw)]" data-component="main-content">
+        <!-- Left Circle - Speaker -->
+        <div class="flex-1 flex flex-col items-center" data-component="left-panel">
+            <div class="w-[30vw] min-w-[280px] max-w-[500px]" data-component="speaker-circle-wrapper">
+                <div class="aspect-square w-full rounded-full radial-fade-small flex items-center justify-center relative" data-component="speaker-circle">
+                    <!-- 背景中文字符 -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-8xl text-center text-black vertical-text bg-char-style" id="speaker-bg-char" data-component="speaker-bg-char" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; font-family: 'XiQue YanShuTi', serif;"></div>
+                    </div>
+                    <div class="text-4xl text-center text-black vertical-text" id="original-text" data-component="original-text" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; "></div> 
+                    <!-- 英文翻译 -->
+                    <div class="absolute bottom-16 right-25 text-s text-black opacity-70 font-medium" id="speaker-translate" data-component="speaker-translate"></div>
+                </div>
+            </div>
+            <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="speaker-label">Speaker</div>
+        </div>
+
+        <!-- Center Content -->
+        <div class="flex flex-col items-center justify-center space-y-24 relative w-full max-w-[300px]" data-component="center-panel">
+            <!-- Encoding text -->
+            <div id="encoding-text" class="absolute left-1/4 -translate-x-1/4 top-0 animate-breathing" data-component="encoding-text">
+                <div class="text-[#FFFDE9] text-2xl" data-component="encoding-title">Encoding...</div>
+                <div class="text-[#FFFDE9] text-sm opacity-60" data-component="encoding-subtitle">
+                    a character into an AI Nushu Symbol
+                </div>
+            </div>
+
+            <!-- Guessing text -->
+            <div id="guessing-text" class="absolute right-1/4 translate-x-1/4 bottom-0 animate-breathing" data-component="guessing-text" style="animation-delay: 1.5s;">
+                <div class="text-[#FFFDE9] text-2xl text-right" data-component="guessing-title">Guessing...</div>
+                <div class="text-[#FFFDE9] text-sm opacity-60 text-right" data-component="guessing-subtitle">
+                    the computational meaning
+                </div>
+            </div>
+
+            <div id="loading" class="text-[#FFFDE9] text-lg hidden" data-component="loading">Processing<br> poem...</div>
+            <div id="char-image-container" class="w-1/2 h-1/2 mb-4 flex items-center justify-center" data-component="char-image-container">
+                <!-- Character image will be displayed here -->
+                <!-- 字符信息显示 -->
+                <div class="absolute top-8 left-11 text-[#FFFDE9] text-4xl opacity-70" id="char-cn-display" data-component="char-cn-display"></div>
+                <div class="absolute bottom-14 left-10 text-[#FFFDE9] text-lg opacity-60" id="char-translate-display" data-component="char-translate-display"></div>
+                <div class="absolute bottom-0 right-4 text-[#FFFDE9] text-xs vertical-text" id="simple-el-display" data-component="simple-el-display" style="writing-mode: vertical-rl; text-orientation: upright; font-family: 'Arial Narrow', 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; font-weight: 300;"></div>
+            </div>
+            <!-- Button container with fixed spacing -->
+            <div id="button-container" class="h-1/4 flex items-center justify-center" data-component="button-container">
+                <!-- Button will be added here by JavaScript -->
+            </div>
+        </div>
+        <!-- Right Circle - Listener -->
+        <div class="flex-1 flex flex-col items-center" data-component="right-panel">
+            <div class="w-[30vw] min-w-[280px] max-w-[500px]" data-component="listener-circle-wrapper">
+                <div class="aspect-square w-full rounded-full radial-fade-listener flex items-center justify-center relative" data-component="listener-circle">
+                    <!-- 背景中文字符 -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-8xl text-center text-black vertical-text bg-char-style" id="listener-bg-char" data-component="listener-bg-char" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; font-family: 'XiQue YanShuTi', serif;"></div>
+                    </div>
+                    <!-- 诗句 -->
+                    <div class="text-4xl text-center text-black vertical-text" id="revealing-text" data-component="revealing-text" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap;"></div>
+                    <!-- 英文翻译 -->
+                    <div class="absolute bottom-16 right-25 text-s text-black opacity-70 font-medium" id="listener-translate" data-component="listener-translate"></div>
+                </div>
+            </div>
+            <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="listener-label">Listener</div>
+        </div>
+    </div>
+
+    <style>
+        /* 修改高亮样式为黑底白字 */
+        .highlight {
+            color: white !important;
+            background-color: black !important;
+            /* padding: 0 1px;      减少左右内边距 */
+            /* border-radius: 2px;  更小的圆角 */
+            display: inline-flex;
+            /* line-height: 1;      避免行高增加额外空间 */
+            /* margin: 0 -1px;      负外边距抵消相邻字符的间隙 */
+            box-shadow: 0 0 0 0.5px white; /* 更细的边框 */
+        }
+
+        /* 移除原来的下划线效果 */
+        .highlight::after {
+            display: none;
+        }
+
+        .highlight-img {
+            transition: all 0.3s ease;
+        }
+
+        .highlight-img:hover {
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        /* Chinese text font */
+        #chinese-desc,
+        .poem-chinese {
+            font-family: 'XiQue YanShuTi', var(--font-inknut), serif;
+        }
+
+        /* 图片高亮效果 - 反色+黑底白字 */
+        .highlight-img {
+            position: relative;
+            isolation: isolate; /* 创建新的堆叠上下文 */
+        }
+
+        .highlight-img::after {
+            content: "";
+            position: absolute;
+            inset: -4px; /* 扩大点击区域 */
+            background: black;
+            z-index: -1;
+            border-radius: 2px;
+        }
+
+        .highlight-img img {
+            filter: 
+                invert(1) /* 反色 */
+                brightness(1.5); /* 提高亮度使白色更明显 */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* English text font */
+        #english-desc,
+        .poem-english {
+            font-family: var(--font-inknut), serif;
+        }
+
+        @keyframes breathing {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .animate-breathing {
+            animation: breathing 3s ease-in-out infinite;
+        }
+        
+        /* 背景字符样式 */
+        .bg-char-style {
+            transition: all 0.5s ease;
+            /* filter: blur(2px); */
+            opacity: 0.2;
+            transform: scale(2.5) translateY(-0.7em);
+        }
+        
+        /* 当圆形有动画时，背景字符也跟随呼吸效果 */
+        .radial-fade-listener .bg-char-style {
+            animation: bgCharBreathing 3s ease-in-out infinite;
+        }
+        
+        @keyframes bgCharBreathing {
+            0%, 100% { 
+                opacity: 0.2; 
+                transform: scale(2.5);
+            }
+            50% { 
+                opacity: 0.2; 
+                transform: scale(2.4);
+            }
+        }
+        
+        /* 用户上传内容背景样式 */
+        #user-media-container {
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        #user-media {
+            transition: all 0.3s ease;
+        }
+        
+        /* char-image-container 字符信息显示样式 */
+        #char-cn-display {
+            text-shadow: 0 0 10px rgba(255, 253, 233, 0.5);
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        #char-translate-display {
+            text-shadow: 0 0 8px rgba(255, 253, 233, 0.3);
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        #simple-el-display {
+            text-shadow: 0 0 10px rgba(255, 253, 233, 0.5);
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        #simple-el-display img {
+            filter: brightness(1.2) contrast(1.1);
+        }
+    </style>
+
+    <!-- Hidden input for media URL -->
+    <input type="hidden" id="media-url" value="{{ media_url or '' }}">
+    
+    <script src="{{ url_for('static', filename='js/guess.js') }}"></script>
+</body>
+
+</html>

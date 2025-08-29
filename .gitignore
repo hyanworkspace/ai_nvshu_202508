@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+
+# Environment variables
+.env
+
+# Logs
+*.log
+app.log
+
+# Uploads (user uploaded files)
+uploads/*
+
+# VS Code
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+
+# Models folder (large files)
+models/
