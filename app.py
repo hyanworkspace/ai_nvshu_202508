@@ -334,15 +334,15 @@ def generate_char():
         
         if app.debug:
             char_pos, simple_el, repr_token, guess_char = load_dict_from_file('knowledge_tmp/tmp.pkl')
-            # guess_char_eng = [translate_text(x, 'zh-CN', 'en') for x in guess_char]
+            guess_char_eng = [translate_text(x, 'zh-CN', 'en') for x in guess_char]
             guess_poems = [poem[:char_pos] + i + poem[char_pos+1:] for i in guess_char]
-            guess_char_eng = [translate_text(x, 'zh-CN', 'en') for x in guess_poems]
+            guess_poems_eng = [translate_text(x, 'zh-CN', 'en') for x in guess_poems]
             char_pos = 4
             char_translate = 'translateHere'
             char_cn = poem[char_pos]
         else:
             try:
-                char_cn, char_pos, simple_el, repr_token, guess_char, guess_char_eng = create_nvshu_from_poem(poem)
+                char_cn, char_pos, simple_el, repr_token, guess_char, guess_char_eng, guess_poems_eng = create_nvshu_from_poem(poem)
                 print("Completed create_nvshu_from_poem")
             except Exception as e:
                 return jsonify(*handle_ai_function_error(e, "女书字符生成"))
@@ -387,6 +387,7 @@ def generate_char():
             'char_img_path': img_path_pixelated, 
             'guess_char': guess_char,
             'guess_char_eng': guess_char_eng,
+            'guess_poems_eng': guess_poems_eng,
             'media_url': media_path
         })
     except Exception as e:

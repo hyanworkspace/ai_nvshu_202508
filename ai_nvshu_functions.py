@@ -345,12 +345,10 @@ def create_nvshu_from_poem(poem):
         if feedback is None or len(feedback) < 2:
             raise RuntimeError("无法生成有效的女书字符反馈")
         
-        # # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, list of guess(translated in eng)
-        # return feedback[0], poem.index(feedback[0]), machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess]
-        # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, 带有替换字的五言诗的翻译
+        # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, list of guess(translated in eng), 带有替换字的五言诗的翻译
         idx = poem.index(feedback[0])
         guess_poems = [poem[:idx] + i + poem[idx+1:] for i in list_of_guess]
-        return feedback[0], idx, machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in guess_poems]
+        return feedback[0], idx, machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess], [translate_text(x, 'zh-cn', 'en').lower() for x in guess_poems]
     except Exception as e:
         # 提供更详细的错误信息
         error_msg = f"生成女书字符失败: {str(e)}"

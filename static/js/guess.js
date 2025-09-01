@@ -195,7 +195,8 @@ function updateEncodingTextDisplay() {
 function startAutomaticRevelation() {
     const pos = charData.char_pos;
     const guessChars = charData.guess_char;
-    const guessCharsEng = charData.guess_char_eng //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
+    const guessCharsEng = charData.guess_char_eng
+    const guessPoemsEng = charData.guess_poems_eng //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
     const poem_list = replaceData.poem_in_list;
     const revealingText = document.getElementById('revealing-text'); // 这个时候的 revealing-text 是已经格式化后的，没有标点符号
     
