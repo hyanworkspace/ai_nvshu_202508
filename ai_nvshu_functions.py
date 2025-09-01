@@ -345,9 +345,12 @@ def create_nvshu_from_poem(poem):
         if feedback is None or len(feedback) < 2:
             raise RuntimeError("无法生成有效的女书字符反馈")
         
-        # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, list of guess(translated in eng)
-        return feedback[0], poem.index(feedback[0]), machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess]
-    
+        # # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, list of guess(translated in eng)
+        # return feedback[0], poem.index(feedback[0]), machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess]
+        # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, 带有替换字的五言诗的翻译
+        idx = poem.index(feedback[0])
+        guess_poems = [poem[:idx] + i + poem[idx+1:] for i in list_of_guess]
+        return feedback[0], idx, machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in guess_poems]
     except Exception as e:
         # 提供更详细的错误信息
         error_msg = f"生成女书字符失败: {str(e)}"
@@ -377,16 +380,7 @@ def get_char_translate(char_cn, poem, poem_eng):
     except Exception as e:
         # 如果AI服务失败，使用简单的字符映射
         print(f"AI翻译失败: {str(e)}")
-        simple_char_translations = {
-            '书': 'book', '奇': 'strange', '女': 'woman', '字': 'character', '文': 'text',
-            '美': 'beautiful', '花': 'flower', '月': 'moon', '爱': 'love', '心': 'heart',
-            '春': 'spring', '秋': 'autumn', '冬': 'winter', '夏': 'summer', '夜': 'night',
-            '日': 'day', '山': 'mountain', '水': 'river', '风': 'wind', '雨': 'rain',
-            '红': 'red', '黑': 'black', '白': 'white', '绿': 'green', '蓝': 'blue',
-            '舞': 'dance', '动': 'move', '姿': 'posture', '背': 'back', '景': 'scene',
-            '中': 'middle', '巾': 'scarf', '裙': 'skirt', '紫': 'purple', '霞': 'sunset'
-        }
-        return simple_char_translations.get(char_cn, char_cn)
+        return char_cn
     
 def find_content_boundaries(img_array, background_value=217, tolerance=2):
     """找到字的实际内容边界，返回上下实际内容的位置"""
@@ -606,121 +600,3 @@ def create_combined_nvshu_image(repr_3dim, black=False, trim_wsp=True):
 
     # 返回相对路径
     return output_path
-
-    # """将3个女书字符图片拼接成一个大图，并缩小左右留白"""
-    # # 假设所有图片都是相同尺寸
-    # if black:
-    #     image_dir = 'knowledge_base/nvshu_comp_black'  # 存放女书字符图片的目录
-    # else:
-    #     image_dir = 'knowledge_base/nvshu_comp'
-    # images = []
-    # trimmed_images = []
-    # content_boundaries = []
-    # left_bounds = []
-    # right_bounds = []
-
-    # # 加载每个数字对应的图片
-    # for num in repr_3dim:
-    #     # print(num)
-    #     image_path = os.path.join(image_dir, f'{int(num)}.png')
-    #     if os.path.exists(image_path):
-    #         img = Image.open(image_path)
-    #         images.append(img)
-    #         trimmed_img = trim_whitespace(img, num, black=black)
-    #         trimmed_images.append(trimmed_img)
-    #         # 获取每个字的实际内容边界
-    #         img_array = np.array(trimmed_img)
-    #         if trim_wsp:
-    #             if black:
-    #                 if num == 0:
-    #                     top, bottom = find_content_boundaries(img_array, background_value=15)
-    #                 else:
-    #                     top, bottom = find_content_boundaries(img_array, background_value=16)
-    #             else:
-    #                 top, bottom = find_content_boundaries(img_array, background_value=217)
-    #             # 计算左右边界
-    #             # 只在trim_wsp时做
-    #             # 只考虑alpha>0的像素
-    #             if len(img_array.shape) == 3 and img_array.shape[2] == 4:
-    #                 alpha = img_array[:, :, 3]
-    #                 mask = alpha > 0
-    #             else:
-    #                 # 没有alpha通道，直接用非背景色
-    #                 if img_array.ndim == 3 and img_array.shape[2] >= 3:
-    #                     if black:
-    #                         mask = np.any(img_array[:, :, :3] < 250, axis=2)
-    #                     else:
-    #                         mask = np.any(img_array[:, :, :3] > 10, axis=2)
-    #                 else:
-    #                     # 灰度图像处理
-    #                     if black:
-    #                         mask = img_array < 250
-    #                     else:
-    #                         mask = img_array > 10
-    #             cols = np.any(mask, axis=0)
-    #             if np.any(cols):
-    #                 left = np.argmax(cols)
-    #                 right = len(cols) - 1 - np.argmax(cols[::-1])
-    #             else:
-    #                 left, right = 0, img_array.shape[1] - 1
-    #             left_bounds.append(left)
-    #             right_bounds.append(right)
-    #         if top is not None and bottom is not None:
-    #             content_boundaries.append((top, bottom))
-
-    # if not trimmed_images:
-    #     return None
-
-    # # 计算所有图片的最小left和最大right，实现整体左右裁剪
-    # if trim_wsp and left_bounds and right_bounds:
-    #     min_left = min(left_bounds)
-    #     max_right = max(right_bounds)
-    #     # 为了避免太贴边，可以保留少量padding
-    #     padding = 4  # 可调整
-    #     min_left = max(0, min_left - padding)
-    #     # max_right本来就是索引，+1变成宽度
-    #     # 但PIL crop右边是非包含的，所以+1
-    #     # 但不能超过图片宽度
-    #     # 以第一张图片宽度为准
-    #     img_width = trimmed_images[0].size[0]
-    #     max_right = min(img_width - 1, max_right + padding)
-    #     # 对每个图片做左右裁剪
-    #     cropped_images = []
-    #     for img in trimmed_images:
-    #         cropped = img.crop((min_left, 0, max_right + 1, img.size[1]))
-    #         cropped_images.append(cropped)
-    #     trimmed_images = cropped_images
-    #     width = max_right + 1 - min_left
-    # else:
-    #     # 获取单个图片的尺寸
-    #     width, _ = images[0].size
-
-    # # 计算总高度（加上字符间距）
-    # spacing = 20  # 字符间距，可以调整
-    # total_height = sum(img.size[1] for img in trimmed_images) + spacing * (len(trimmed_images) - 1)
-
-    # # 创建新图片
-    # combined_image = Image.new('RGBA', (width, total_height), (0, 0, 0, 0))
-
-    # # 拼接图片
-    # current_y = 0
-    # for img in trimmed_images:
-    #     # 计算水平居中位置
-    #     x_offset = 0
-    #     combined_image.paste(img, (x_offset, current_y))
-    #     current_y += img.size[1] + spacing
-    # # 保存临时文件
-    # if black:
-    #     if trim_wsp:
-    #         output_path = os.path.join('static/nvshu_images', f'combined_{"-".join(map(str, repr_3dim))}_vertical_black_trim.png')
-    #     else:
-    #         output_path = os.path.join('static/nvshu_images', f'combined_{"-".join(map(str, repr_3dim))}_vertical_black.png')
-    # else:
-    #     if trim_wsp:
-    #         output_path = os.path.join('static/nvshu_images', f'combined_{"-".join(map(str, repr_3dim))}_vertical_trim.png')
-    #     else:
-    #         output_path = os.path.join('static/nvshu_images', f'combined_{"-".join(map(str, repr_3dim))}_vertical.png')
-    # combined_image.save(output_path)
-
-    # # 返回相对路径
-    # return output_path
