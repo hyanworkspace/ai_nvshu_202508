@@ -45,7 +45,7 @@ def before_request():
 
 @app.route('/')
 def index():
-    return render_template('see.html')
+    return render_template('landingpage.html')
 
 @app.route('/see')
 def see():
@@ -437,6 +437,10 @@ def save_storage_preference():
 def dictionary():
     return render_template('dictionary.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/get_dictionary')
 def get_dictionary():
     try:
@@ -492,6 +496,6 @@ def cleanup_old_files():
 atexit.register(cleanup_old_files)
 
 if __name__ == '__main__':
-    # app.run(debug=True)
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(debug=False)
 

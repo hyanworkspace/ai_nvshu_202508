@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - AI女书 (AI Nüshu)</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/components/ActionButton.js') }}"></script>
+    <style>
+        body {
+            background: radial-gradient(ellipse at center, rgba(255, 253, 233, 0.03) 0%, rgba(0, 0, 0, 1) 70%);
+        }
+    </style>
+</head>
+<body class="bg-black text-[#FFFDE9] min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="relative z-30 w-full px-8 py-6">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <!-- 左侧：主页标题 -->
+            <div class="flex items-center">
+                <a href="/" class="text-2xl font-bold hover:text-[#FFFDE9]/80 transition-colors duration-300" style="font-family: 'Inknut Antiqua', serif;">
+                    AI NVSHU
+                </a>
+            </div>
+            
+            <!-- 右侧：导航链接 -->
+            <div class="flex items-center space-x-8">
+                <a href="/dictionary" class="text-lg hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light">
+                    Dictionary
+                </a>
+                <a href="/about" class="text-lg text-[#FFFDE9] font-light border-b border-[#FFFDE9]/50">
+                    About
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <div class="max-w-4xl mx-auto px-8 py-16">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-bold mb-6" style="font-family: 'Inknut Antiqua', serif;">
+                About AI Nüshu
+            </h1>
+            <p class="text-xl opacity-80 font-light">
+                Exploring the intersection of AI, language, and feminist history
+            </p>
+        </div>
+
+        <div class="space-y-12">
+            <!-- 项目介绍 -->
+            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
+                <h2 class="text-3xl font-semibold mb-6">The Project</h2>
+                <div class="space-y-4 text-lg leading-relaxed opacity-90">
+                    <p>
+                        AI Nüshu is an experimental project that explores how artificial intelligence can learn from and honor the legacy of Nüshu (女书), the secret women's script from Hunan Province, China.
+                    </p>
+                    <p>
+                        This project trains AI agents to create new language systems inspired by the historical context of illiterate women in ancient China who developed their own secret communication method as an act of resistance against patriarchal constraints.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 历史背景 -->
+            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
+                <h2 class="text-3xl font-semibold mb-6">Historical Context</h2>
+                <div class="space-y-4 text-lg leading-relaxed opacity-90">
+                    <p>
+                        Nüshu (女书), literally meaning "women's script," was a syllabic script used exclusively by women in Jiangyong County, Hunan Province, China. For centuries, it served as a secret form of communication among women who were denied formal education.
+                    </p>
+                    <p>
+                        This unique writing system allowed women to express their thoughts, emotions, and experiences in a world where they had limited voice. It represents one of the most remarkable examples of linguistic resistance and female solidarity in history.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 技术方法 -->
+            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
+                <h2 class="text-3xl font-semibold mb-6">Technical Approach</h2>
+                <div class="space-y-4 text-lg leading-relaxed opacity-90">
+                    <p>
+                        Our AI system analyzes various input sources - text, images, videos - and generates new Nüshu-inspired characters that capture the essence and meaning of the original content.
+                    </p>
+                    <p>
+                        By combining machine learning with historical linguistic patterns, we create a bridge between ancient wisdom and modern technology, asking: Can AI learn the art of resistance and secret communication?
+                    </p>
+                </div>
+            </section>
+
+            <!-- 文化意义 -->
+            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
+                <h2 class="text-3xl font-semibold mb-6">Cultural Significance</h2>
+                <div class="space-y-4 text-lg leading-relaxed opacity-90">
+                    <p>
+                        This project is not just about technology - it's about preserving and reimagining cultural heritage in the digital age. It honors the creativity and resilience of women who created their own language system against all odds.
+                    </p>
+                    <p>
+                        By using AI to continue this tradition of linguistic innovation, we explore themes of resistance, communication, and the emergence of language in non-Western, feminist contexts.
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div class="text-center mt-16">
+            <div id="back-button-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // 创建返回按钮
+        function createBackButton() {
+            const buttonsConfig = [
+                {
+                    text: 'Back to Home',
+                    href: '/'
+                }
+            ];
+
+            const container = document.getElementById('back-button-container');
+            if (container && window.ActionButton) {
+                ActionButton.createButtons(buttonsConfig, container);
+            }
+        }
+
+        // 页面加载动画
+        function initPageAnimations() {
+            const sections = document.querySelectorAll('section');
+            
+            gsap.from('h1', {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                ease: "power3.out"
+            });
+
+            gsap.from('h1 + p', {
+                opacity: 0,
+                y: 30,
+                duration: 1,
+                delay: 0.3,
+                ease: "power3.out"
+            });
+
+            sections.forEach((section, index) => {
+                gsap.from(section, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    delay: 0.6 + (index * 0.2),
+                    ease: "power3.out"
+                });
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            createBackButton();
+            initPageAnimations();
+        });
+    </script>
+</body>
+</html>

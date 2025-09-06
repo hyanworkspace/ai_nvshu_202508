@@ -1,0 +1,102 @@
+/* Nvshu rain reusable background */
+
+/* Base page background to match landing page */
+body {
+    overflow-x: hidden;
+    /* background: radial-gradient(ellipse at center, rgba(255, 253, 233, 0.03) 0%, rgba(0, 0, 0, 1) 70%); */
+}
+
+/* Animated soft light layers */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 253, 233, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 253, 233, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 253, 233, 0.02) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -2;
+    animation: background-pulse 10s ease-in-out infinite;
+}
+
+@keyframes background-pulse {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Nvshu matrix-rain container */
+.nvshu-rain-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.nvshu-column {
+    position: absolute;
+    top: -300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: matrix-rain linear infinite;
+    z-index: 2;
+}
+
+.nvshu-column .char-img {
+    display: block;
+    width: 30px;
+    height: auto;
+    margin-bottom: 10px;
+    opacity: 0.8;
+    filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 8px rgba(255, 253, 233, 0.4));
+    animation: char-fade 1.5s ease-in-out infinite alternate;
+}
+
+.nvshu-column .char-img:first-child {
+    opacity: 1;
+    filter: brightness(2) contrast(1.5) drop-shadow(0 0 15px rgba(255, 253, 233, 0.8));
+    width: 35px;
+}
+
+.nvshu-column .char-img:nth-child(2) { opacity: 0.9; width: 32px; }
+.nvshu-column .char-img:nth-child(3) { opacity: 0.7; }
+.nvshu-column .char-img:nth-child(4) { opacity: 0.5; }
+.nvshu-column .char-img:nth-child(n+5) { opacity: 0.3; }
+
+@keyframes matrix-rain {
+    0% {
+        transform: translateY(-200px);
+        opacity: 0;
+    }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% {
+        transform: translateY(calc(100vh + 200px));
+        opacity: 0;
+    }
+}
+
+@keyframes char-fade {
+    0% { opacity: 0.1; }
+    100% { opacity: 1; }
+}
+
+/* Speed variation like landing page */
+.nvshu-column:nth-child(2n) { animation-duration: 12s; }
+.nvshu-column:nth-child(3n) { animation-duration: 8s; }
+.nvshu-column:nth-child(4n) { animation-duration: 15s; }
+.nvshu-column:nth-child(5n) { animation-duration: 10s; }
+
+

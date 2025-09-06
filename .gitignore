@@ -37,3 +37,6 @@ venv.bak/
 
 # Models folder (large files)
 models/
+/__pycache__
+uploads/.DS_Store
+/__pycache__

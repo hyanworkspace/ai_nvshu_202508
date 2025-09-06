@@ -6,23 +6,14 @@
     <title>AI 女书</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/nvshu_rain.css') }}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body data-component="page-body">
-    <div class="relative w-screen h-screen bg-black text-white overflow-hidden" data-component="page-container">
-        <!-- Background image container -->
-        <div class="absolute inset-0 w-screen h-screen" data-component="background">
-            <img src="{{ url_for('static', filename='images/bg1.png') }}" 
-                 alt="Background"
-                 class="w-full h-full object-cover">
-        </div>
-
-        <!-- Nvshu overlay image with blend mode -->
-        <div class="absolute inset-0 w-screen h-screen" data-component="nvshu-overlay">
-            <img src="{{ url_for('static', filename='images/nvshu1.png') }}"
-                 alt="Nvshu Pattern"
-                 class="w-full h-full object-contain mix-blend-difference">
-        </div>
+    <!-- Reusable Nvshu background -->
+    <div id="nvshu-rain" class="nvshu-rain-container"></div>
+    <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden" data-component="page-container">
 
         <!-- Main content -->
         <div class="relative z-10 h-full w-full flex flex-row items-center justify-center" data-component="main-content">
@@ -80,20 +71,7 @@
 
 
     <!-- 确认页面 -->
-    <div class="fixed inset-0 bg-black text-white overflow-hidden font-inknut hidden" id="confirmationPage" data-component="confirmation-page">
-        <!-- Background image container -->
-        <div class="absolute inset-0 w-screen h-screen" data-component="confirmation-background">
-            <img src="{{ url_for('static', filename='images/bg1.png') }}"
-                 alt="Background"
-                 class="w-full h-full object-cover">
-        </div>
-
-        <!-- Nvshu overlay image with blend mode -->
-        <div class="absolute inset-0 w-screen h-screen" data-component="confirmation-nvshu-overlay">
-            <img src="{{ url_for('static', filename='images/NvshuBG1.png') }}"
-                 alt="Nvshu Pattern Background"
-                 class="w-full h-full object-contain mix-blend-difference">
-        </div>
+    <div class="fixed inset-0 bg-transparent text-white overflow-hidden font-inknut hidden" id="confirmationPage" data-component="confirmation-page">
 
         <!-- Main content -->
         <div class="relative z-10 h-full w-full flex flex-col items-center justify-center" data-component="confirmation-main-content">
@@ -176,5 +154,6 @@
 
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/see.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/NvshuRain.js') }}"></script>
 </body>
 </html>
