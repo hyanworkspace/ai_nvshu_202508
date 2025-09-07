@@ -13,7 +13,16 @@ const recordPreview = document.getElementById('recordPreview');
 const startRecordBtn = document.getElementById('startRecordBtn');
 const stopRecordBtn = document.getElementById('stopRecordBtn');
 const recordControls = document.querySelector('.record-controls');
-const mainContent = document.querySelector('.main-content');
+const mainContent = document.querySelector('[data-component="main-content"]');
+const uploadLoader = document.getElementById('uploadLoader');
+const recordLoader = document.getElementById('recordLoader');
+const globalLoader = document.getElementById('globalLoader');
+const uploadSuccess = document.getElementById('uploadSuccess');
+const uploadPreview = document.getElementById('uploadPreview');
+const uploadVideoPreview = document.getElementById('uploadVideoPreview');
+
+function showEl(el) { if (el) el.classList.remove('hidden'); }
+function hideEl(el) { if (el) el.classList.add('hidden'); }
 
 // 录制相关变量
 let videoStream = null;
@@ -295,9 +304,7 @@ function showConfirmationPageFromRecord(blob, originalBlob) {
         imgPreview.style.display = 'none';
     }
     
-    hideMainContent();
-    confirmationPage.classList.remove('hidden');
-    confirmationPage.style.display = 'flex';
+    transitionToConfirmation();
 }
 
 // 上传选项点击事件
@@ -326,9 +333,21 @@ fileInput.addEventListener('change', async (e) => {
             
             // 添加文件类型信息到FormData
             formData.append('file_type', fileType);
-            
-            // 上传文件
-            await uploadFile(formData);
+
+            // 上传文件 - 显示旋转动画和border进度
+            showEl(uploadLoader);
+            // 重置border动画
+            const progressBorder = uploadLoader.querySelector('.progress-border');
+            if (progressBorder) {
+                progressBorder.style.animation = 'none';
+                setTimeout(() => {
+                    progressBorder.style.animation = 'progressBorder 1s ease-in-out forwards';
+                }, 10);
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒旋转动画
+            const result = await uploadFile(formData);
+            hideEl(uploadLoader);
+            await showUploadSuccessAndTransition(result.file_url, fileType);
             
         } catch (error) {
             console.error('File validation error:', error);
@@ -368,9 +387,133 @@ function showConfirmationPageFromUpload(url, fileType = 'video') {
         }
     }
     
-    hideMainContent();
+    transitionToConfirmation();
+}
+
+// 显示上传成功并直接过渡到确认页面
+async function showUploadSuccessAndTransition(url, fileType) {
+    return new Promise((resolve) => {
+        // 显示上传成功的预览
+        showEl(uploadSuccess);
+
+        if (fileType === 'image') {
+            uploadPreview.src = url;
+            uploadPreview.style.display = 'block';
+            uploadVideoPreview.style.display = 'none';
+        } else {
+            uploadVideoPreview.src = url;
+            uploadVideoPreview.style.display = 'block';
+            uploadPreview.style.display = 'none';
+        }
+
+        // 获取上传圆形容器
+        const uploadCircle = document.getElementById('uploadOption');
+
+        if (typeof gsap !== 'undefined' && uploadCircle) {
+            // 圆形容器移动到中间的动画
+            gsap.to(uploadCircle, {
+                duration: 1.0, // 稍微缩短移动时间
+                x: () => {
+                    const container = document.querySelector('[data-component="main-content"]');
+                    const containerRect = container.getBoundingClientRect();
+                    const circleRect = uploadCircle.getBoundingClientRect();
+                    return (containerRect.width / 2) - (circleRect.left + circleRect.width / 2);
+                },
+                y: () => {
+                    const container = document.querySelector('[data-component="main-content"]');
+                    const containerRect = container.getBoundingClientRect();
+                    const circleRect = uploadCircle.getBoundingClientRect();
+                    return (containerRect.height / 2) - (circleRect.top + circleRect.height / 2);
+                },
+                scale: 1.1,
+                ease: 'power2.inOut',
+                onComplete: () => {
+                    // 短暂停顿后开始过渡到确认页面
+                    setTimeout(() => {
+                        transitionToConfirmationWithPreview(url, fileType);
+                        resolve();
+                    }, 300); // 进一步减少延迟时间，让过渡更流畅
+                }
+            });
+
+            // 同时淡出录制圆形容器
+            const recordCircle = document.getElementById('recordOption');
+            if (recordCircle) {
+                gsap.to(recordCircle, {
+                    duration: 0.8,
+                    opacity: 0,
+                    scale: 0.8,
+                    ease: 'power2.inOut'
+                });
+            }
+        } else {
+            // Fallback for no GSAP
+            setTimeout(() => {
+                transitionToConfirmationWithPreview(url, fileType);
+                resolve();
+            }, 1500);
+        }
+    });
+}
+
+// 从预览状态直接过渡到确认页面
+function transitionToConfirmationWithPreview(url, fileType) {
+    // 隐藏主内容
+    const mainContainer = document.querySelector('[data-component="main-content"]');
+    if (mainContainer) {
+        if (typeof gsap !== 'undefined') {
+            gsap.to(mainContainer, { opacity: 0, duration: 0.3, ease: 'power2.out', onComplete: () => {
+                mainContainer.style.display = 'none';
+            }});
+        } else {
+            mainContainer.style.display = 'none';
+        }
+    }
+
+    // 设置确认页面的预览
+    const videoPreview = document.getElementById('videoPreview');
+    const imgPreview = document.getElementById('imagePreview');
+
+    if (fileType === 'image') {
+        videoPreview.style.display = 'none';
+        if (!imgPreview) {
+            const newImgPreview = document.createElement('img');
+            newImgPreview.id = 'imagePreview';
+            newImgPreview.className = 'w-full h-full absolute inset-0 rounded-full object-cover';
+            videoPreview.parentNode.insertBefore(newImgPreview, videoPreview);
+        }
+        document.getElementById('imagePreview').src = url;
+        document.getElementById('imagePreview').style.display = 'block';
+    } else {
+        videoPreview.src = url;
+        videoPreview.style.display = 'block';
+        if (imgPreview) {
+            imgPreview.style.display = 'none';
+        }
+    }
+
+    // 显示确认页面
     confirmationPage.classList.remove('hidden');
     confirmationPage.style.display = 'flex';
+
+    if (typeof gsap !== 'undefined') {
+        const circle = document.querySelector('[data-component="preview-circle"]');
+        gsap.fromTo(confirmationPage, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.inOut' });
+        if (circle) {
+            // 从默认的scale-110状态开始动画，确保与上传容器大小一致
+            gsap.fromTo(circle, { scale: 0.8, opacity: 0.8 }, { scale: 1.1, opacity: 1, duration: 0.8, ease: 'power3.out' });
+        }
+    }
+
+    // 延迟隐藏上传成功预览，确保确认页面完全显示
+    setTimeout(() => {
+        hideEl(uploadSuccess);
+        // 同时确保确认页面的容器保持正确的缩放状态
+        const circle = document.querySelector('[data-component="preview-circle"]');
+        if (circle && typeof gsap !== 'undefined') {
+            gsap.set(circle, { scale: 1.1 }); // 确保最终缩放状态
+        }
+    }, 800); // 调整延迟时间与整体节奏匹配
 }
 
 confirmBtn.addEventListener('click', () => {
@@ -398,7 +541,8 @@ agreeBtn.addEventListener('click', () => {
         sessionStorage.setItem('agreedToPrivacy', 'true');
         
         if (currentMode === 'record') {
-            uploadRecordedVideos(recordedVideo, originalRecordedVideo);
+            showEl(globalLoader);
+            uploadRecordedVideos(recordedVideo, originalRecordedVideo).finally(() => hideEl(globalLoader));
         } else if (currentMode === 'upload' && video_url) {
             confirm_video(video_url);
         } else {
@@ -499,16 +643,15 @@ async function uploadFile(formData) {
         if (response.ok && result.success !== false) {
             video_url = result.file_url;
             console.log(`Upload successful: ${video_url}`);
-            showConfirmationPageFromUpload(result.file_url, uploadedFileType);
             fileInput.value = ''; // 清空文件选择
+            return result; // 返回结果供后续处理
         } else {
             const errorMsg = result.error || result.message || 'Unknown error occurred';
             throw new Error(`Upload failed: ${errorMsg}`);
         }
     } catch (err) {
         console.error('Upload error details:', err);
-        alert(`Upload failed: ${err.message}`);
-        fileInput.value = ''; // 清空文件选择
+        throw err; // 重新抛出错误，让调用方处理
     }
 }
 
@@ -527,6 +670,9 @@ reUploadBtn.addEventListener('click', () => {
     const mainContainer = document.querySelector('.flex.flex-row.items-center.justify-center');
     if (mainContainer) {
         mainContainer.style.display = 'flex';
+        if (typeof gsap !== 'undefined') {
+            gsap.fromTo(mainContainer, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+        }
     }
 
     const videoPreview = document.getElementById('videoPreview');
@@ -583,7 +729,7 @@ function preventDefaults(e) {
 }
 
 // 改进的拖放处理函数
-function handleDrop(e) {
+async function handleDrop(e) {
     const dt = e.dataTransfer;
     const files = dt.files;
     
@@ -605,7 +751,20 @@ function handleDrop(e) {
             formData.append('session_id', document.cookie.match(/session_id=([^;]+)/)?.[1] || '');
             formData.append('file_type', fileType);
 
-            uploadFile(formData);
+            // 上传文件 - 显示旋转动画和border进度
+            showEl(uploadLoader);
+            // 重置border动画
+            const progressBorder = uploadLoader.querySelector('.progress-border');
+            if (progressBorder) {
+                progressBorder.style.animation = 'none';
+                setTimeout(() => {
+                    progressBorder.style.animation = 'progressBorder 1s ease-in-out forwards';
+                }, 10);
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒旋转动画
+            const result = await uploadFile(formData);
+            hideEl(uploadLoader);
+            await showUploadSuccessAndTransition(result.file_url, fileType);
             
         } catch (error) {
             console.error('Drop validation error:', error);
@@ -628,12 +787,41 @@ function confirm_video(url_, original_url = null) {
     }
     
     console.log('Redirecting to:', redirectUrl);
-    window.location.href = redirectUrl;
+    // Subtle page fade before navigation
+    if (typeof gsap !== 'undefined') {
+        gsap.to(document.body, { opacity: 0.7, duration: 0.5, ease: 'power2.out', onComplete: () => { window.location.href = redirectUrl; } });
+    } else {
+        window.location.href = redirectUrl;
+    }
 }
 
 function hideMainContent() {
     const mainContainer = document.querySelector('.flex.flex-row.items-center.justify-center');
-    if (mainContainer) {
+    if (!mainContainer) return;
+    if (typeof gsap !== 'undefined') {
+        gsap.to(mainContainer, { opacity: 0, y: 10, duration: 0.5, ease: 'power2.out', onComplete: () => {
+            mainContainer.style.display = 'none';
+        }});
+    } else {
         mainContainer.style.display = 'none';
+    }
+}
+
+function transitionToConfirmation() {
+    hideMainContent();
+    confirmationPage.classList.remove('hidden');
+    confirmationPage.style.display = 'flex';
+    if (typeof gsap !== 'undefined') {
+        const circle = document.querySelector('[data-component="preview-circle"]');
+        gsap.fromTo(confirmationPage, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.inOut' });
+        if (circle) {
+            gsap.fromTo(circle, { scale: 0.96, opacity: 0.8 }, { scale: 1, opacity: 1, duration: 0.8, ease: 'power3.out' });
+        }
+        const videoPreview = document.getElementById('videoPreview');
+        const imgPreview = document.getElementById('imagePreview');
+        const target = imgPreview && imgPreview.style.display === 'block' ? imgPreview : videoPreview;
+        if (target) {
+            gsap.fromTo(target, { scale: 1.03, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.0, ease: 'power3.out' });
+        }
     }
 }

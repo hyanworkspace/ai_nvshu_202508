@@ -24,6 +24,45 @@ CORS(app, resources={r"/upload": {"origins": "*"}})
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['DICTIONARY_PATH'] = Config.DICTIONARY_PATH
 app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 50MB
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 禁用静态资源缓存（开发环境）
+
+# 在模板中注入 DEBUG 标志（仅开发时自动刷新使用）
+@app.context_processor
+def inject_debug_flag():
+    return {"DEBUG": app.debug}
+
+# 开发环境下的文件变更版本号端点，用于前端轮询自动刷新
+def _latest_mtime(paths):
+    latest = 0.0
+    for base in paths:
+        if not os.path.exists(base):
+            continue
+        if os.path.isfile(base):
+            try:
+                latest = max(latest, os.path.getmtime(base))
+            except Exception:
+                pass
+            continue
+        for root, _, files in os.walk(base):
+            for f in files:
+                try:
+                    m = os.path.getmtime(os.path.join(root, f))
+                    if m > latest:
+                        latest = m
+                except Exception:
+                    continue
+    return int(latest * 1000)
+
+@app.route('/__dev_version')
+def dev_version():
+    if not app.debug:
+        return jsonify({"v": 0}), 404
+    v = _latest_mtime(["templates", "static/css", "static/js"])  # 需要可再加其他目录
+    resp = jsonify({"v": v})
+    # 禁用缓存，确保轮询拿到最新
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return resp
 
 # 确保上传目录存在
 if not os.path.exists(Config.UPLOAD_FOLDER):
@@ -496,6 +535,6 @@ def cleanup_old_files():
 atexit.register(cleanup_old_files)
 
 if __name__ == '__main__':
+    # 使用 Flask 内置的调试重载器
     app.run(host='0.0.0.0', port=5001, debug=True)
-    # app.run(debug=False)
 

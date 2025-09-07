@@ -14,5 +14,24 @@
         {% block content %}{% endblock %}
     </div>
     {% block extra_js %}{% endblock %}
+    {% if DEBUG %}
+    <script>
+    (function(){
+      let lastV = 0;
+      async function poll(){
+        try{
+          const r = await fetch('/__dev_version', {cache:'no-store'});
+          if(r.ok){
+            const {v} = await r.json();
+            if(lastV && v > lastV){ location.reload(); return; }
+            lastV = v;
+          }
+        }catch(e){}
+        setTimeout(poll, 700);
+      }
+      poll();
+    })();
+    </script>
+    {% endif %}
 </body>
 </html>

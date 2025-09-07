@@ -9,10 +9,273 @@
     <link href="{{ url_for('static', filename='css/nvshu_rain.css') }}" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Match landing page background */
+        body {
+            overflow-x: hidden;
+            background: radial-gradient(ellipse at center, rgba(255, 253, 233, 0.03) 0%, rgba(0, 0, 0, 1) 70%);
+        }
+
+        /* Background video container and tint */
+        .bg-video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) sepia(1) saturate(2) hue-rotate(350deg) brightness(0.65) contrast(1.1);
+        }
+        .bg-video-tint {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at center, rgba(255, 253, 233, 0.12) 0%, rgba(255, 253, 233, 0.06) 45%, rgba(0, 0, 0, 0.55) 100%),
+                linear-gradient(0deg, rgba(255, 253, 233, 0.08), rgba(255, 253, 233, 0.08));
+            pointer-events: none;
+        }
+        /* Override rain sizes to match landing page */
+        .nvshu-column .char-img { width: 60px; }
+        .nvshu-column .char-img:first-child { width: 70px; }
+
+        /* Simple spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 253, 233, 0.3);
+            border-top-color: rgba(255, 253, 233, 0.9);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Progress border animation */
+        .progress-border {
+            stroke-linecap: round;
+            animation: progressBorder 1s ease-in-out forwards;
+        }
+        @keyframes progressBorder {
+            0% {
+                stroke-dashoffset: 301.6;
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+        }
+
+        /*
+         * ===========================================
+         * Nüshu Button Component System
+         * ===========================================
+         *
+         * Usage:
+         * <button class="nvshu-btn nvshu-btn--{variant} nvshu-btn--{size}">Button Text</button>
+         *
+         * Base class: nvshu-btn
+         *
+         * Variants:
+         * - Default (no modifier): Main action buttons
+         * - nvshu-btn--secondary: Less prominent actions
+         * - nvshu-btn--landing: Special landing page buttons with glow effects
+         * - nvshu-btn--glow: Add glow effect to any button
+         *
+         * Sizes:
+         * - nvshu-btn--sm: Small buttons (36px height)
+         * - nvshu-btn--lg: Large buttons (56px height)
+         * Default: Medium (48px height)
+         *
+         * States:
+         * - nvshu-btn--loading: Shows loading spinner
+         * - :disabled: Disabled state
+         *
+         * Examples:
+         * <button class="nvshu-btn">Default Button</button>
+         * <button class="nvshu-btn nvshu-btn--secondary nvshu-btn--sm">Small Secondary</button>
+         * <button class="nvshu-btn nvshu-btn--landing">Landing Page Button</button>
+         * <button class="nvshu-btn nvshu-btn--loading" disabled>Loading...</button>
+         *
+         * ===========================================
+         */
+        .nvshu-btn {
+            /* Base styles */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 2.5rem;
+            border-radius: 30px;
+            border: 3px dashed rgba(255, 251, 233, 0.8);
+            background: rgba(255, 251, 233, 0.4);
+            color: rgb(255, 251, 233);
+            font-family: 'Inknut Antiqua', serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nvshu-btn:hover {
+            background: rgba(255, 251, 233, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 251, 233, 0.3);
+            border-color: rgba(255, 251, 233, 1);
+        }
+
+        .nvshu-btn:active {
+            transform: translateY(0px);
+            box-shadow: 0 4px 15px rgba(255, 251, 233, 0.2);
+        }
+
+        .nvshu-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 251, 233, 0.5);
+        }
+
+        /* Button variants */
+        .nvshu-btn--secondary {
+            background: rgba(255, 251, 233, 0.2);
+            border-color: rgba(255, 251, 233, 0.6);
+        }
+
+        .nvshu-btn--secondary:hover {
+            background: rgba(255, 251, 233, 0.4);
+            border-color: rgba(255, 251, 233, 0.9);
+        }
+
+        /* Button sizes */
+        .nvshu-btn--sm {
+            padding: 0.375rem 1.5rem;
+            font-size: 0.875rem;
+            min-height: 36px;
+        }
+
+        .nvshu-btn--lg {
+            padding: 0.75rem 3rem;
+            font-size: 1.125rem;
+            min-height: 56px;
+        }
+
+        /* Button states */
+        .nvshu-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nvshu-btn:disabled:hover {
+            background: rgba(255, 251, 233, 0.4);
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading state */
+        .nvshu-btn--loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .nvshu-btn--loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid rgba(255, 251, 233, 0.3);
+            border-top-color: rgba(255, 251, 233, 0.9);
+            border-radius: 50%;
+            animation: button-spin 0.8s linear infinite;
+        }
+
+        @keyframes button-spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Glow effect for special buttons */
+        .nvshu-btn--glow {
+            box-shadow: 0 0 20px rgba(255, 251, 233, 0.4);
+        }
+
+        .nvshu-btn--glow:hover {
+            box-shadow: 0 0 30px rgba(255, 251, 233, 0.6);
+        }
+
+        /* Landing page special button variant */
+        .nvshu-btn--landing {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 251, 233, 0.4);
+            color: rgb(255, 251, 233);
+            box-shadow: 0 0 0 rgba(255, 251, 233, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .nvshu-btn--landing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 251, 233, 0.2), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .nvshu-btn--landing:hover::before {
+            left: 100%;
+        }
+
+        .nvshu-btn--landing:hover {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 251, 233, 0.6);
+            box-shadow: 0 20px 40px rgba(255, 251, 233, 0.2);
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .nvshu-btn--landing .glow-effect {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(255, 251, 233, 0.1) 0%, transparent 70%);
+            border-radius: 0.5rem;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+        }
+
+        .nvshu-btn--landing:hover .glow-effect {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    </style>
 </head>
 <body data-component="page-body">
     <!-- Reusable Nvshu background -->
     <div id="nvshu-rain" class="nvshu-rain-container"></div>
+    <!-- Background video to match landing page -->
+    <div class="bg-video-container">
+        <video autoplay muted loop playsinline preload="auto" poster="{{ url_for('static', filename='images/bg1.png') }}">
+            <source src="{{ url_for('static', filename='1nv.mp4') }}" type="video/mp4">
+        </video>
+        <div class="bg-video-tint"></div>
+    </div>
     <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden" data-component="page-container">
 
         <!-- Main content -->
@@ -24,6 +287,10 @@
                     <div class="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(255,251,233,0.9)_70%,rgba(255,251,233,0)_100%)] flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105" data-component="recording-circle-container">
                         <!-- Inner dotted circle -->
                         <div class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border" data-component="dotted-border"></div>
+                        <!-- Recording loader overlay -->
+                        <div id="recordLoader" class="hidden absolute inset-0 rounded-full bg-black/30 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                            <div class="spinner"></div>
+                        </div>
                         <div class="mb-1 w-[min(100px,20%)] h-[min(100px,20%)] relative" data-component="camera-icon-container">
                             <img src="{{ url_for('static', filename='images/cameraIcon.png') }}"
                                  alt="Camera icon"
@@ -37,8 +304,8 @@
                         
                         <!-- 录制控制按钮 -->
                         <div class="record-controls hidden absolute bottom-5 z-20 flex gap-2" data-component="record-controls">
-                            <button id="startRecordBtn" class="bg-primary/80 hover:bg-primary text-black px-4 py-2 rounded-full text-sm" data-component="start-record-btn">Start Recording</button>
-                            <button id="stopRecordBtn" class="hidden bg-red-500/80 hover:bg-red-500 text-white px-4 py-2 rounded-full text-sm" data-component="stop-record-btn">Stop Recording</button>
+                            <button id="startRecordBtn" class="nvshu-btn nvshu-btn--sm !bg-black/80 !text-white hover:!bg-black !border-black/60 hover:!border-black" data-component="start-record-btn">Start Recording</button>
+                            <button id="stopRecordBtn" class="nvshu-btn nvshu-btn--sm nvshu-btn--secondary !bg-red-500/80 !text-white hover:!bg-red-500 !border-red-400 hover:!border-red-300" data-component="stop-record-btn">Stop Recording</button>
                         </div>
                     </div>
                 </div>
@@ -48,6 +315,19 @@
                     <div class="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(255,251,233,0.9)_70%,rgba(255,251,233,0)_100%)] flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105" data-component="upload-circle-container">
                         <!-- Inner dotted circle -->
                         <div class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border" data-component="upload-dotted-border"></div>
+                        <!-- Upload loader overlay with progress border -->
+                        <div id="uploadLoader" class="hidden absolute inset-0 rounded-full bg-black/30 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                            <div class="spinner"></div>
+                            <!-- Progress border animation -->
+                            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,253,233,0.3)" stroke-width="2" stroke-dasharray="301.6" stroke-dashoffset="301.6" class="progress-border" />
+                            </svg>
+                        </div>
+                        <!-- Upload success overlay with preview -->
+                        <div id="uploadSuccess" class="hidden absolute inset-0 rounded-full bg-white/95 z-20 flex items-center justify-center overflow-hidden">
+                            <img id="uploadPreview" class="w-full h-full object-cover" style="display: none;">
+                            <video id="uploadVideoPreview" class="w-full h-full object-cover" style="display: none;" autoplay muted loop></video>
+                        </div>
                         <div class="mb-1 w-[min(100px,20%)] h-[min(100px,20%)] relative" data-component="upload-icon-container">
                             <img src="{{ url_for('static', filename='images/uploadImageIcon.png') }}"
                                  alt="Upload icon"
@@ -76,13 +356,13 @@
         <!-- Main content -->
         <div class="relative z-10 h-full w-full flex flex-col items-center justify-center" data-component="confirmation-main-content">
             <!-- Privacy statement -->
-            <p class="text-center text-[min(1.2rem,1.6vw)] mb-6 text-[rgb(255,251,233)]" data-component="privacy-statement">
+            <p class="text-center text-[min(1.2rem,1.6vw)] mb-12 text-[rgb(255,251,233)]" data-component="privacy-statement">
                 By uploading, you agree to our Privacy & Data Usage Statement
             </p>
 
             <!-- Preview Circle -->
             <div class="relative w-[25vw] max-w-[640px] mb-10" id="previewContainer" data-component="preview-container">
-                <div class="aspect-square w-full rounded-full bg-[rgba(255,251,233,0.9)] flex items-center justify-center overflow-hidden" data-component="preview-circle">
+                <div class="aspect-square w-full rounded-full bg-[rgba(255,251,233,0.9)] flex items-center justify-center overflow-hidden transform scale-110" data-component="preview-circle">
                     <!-- Inner dotted circle -->
                     <div class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border" data-component="preview-dotted-border"></div>
 
@@ -95,12 +375,12 @@
             <!-- Action buttons -->
             <div class="flex flex-row justify-between w-full max-w-[40vw] mt-4" data-component="action-buttons">
                 <div data-component="re-upload-button-container">
-                    <button id="reUploadBtn" class="w-full max-w-[20vw] px-10 py-2 rounded-[30px] border-[3px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut" style="padding: 0.1rem 1rem; width: 100%;" data-component="re-upload-btn">
+                    <button id="reUploadBtn" class="nvshu-btn nvshu-btn--secondary w-full max-w-[20vw]" data-component="re-upload-btn">
                         Re-Upload
                     </button>
                 </div>
                 <div data-component="confirm-button-container">
-                    <button id="confirmBtn" class="w-full max-w-[20vw] px-10 py-2 rounded-[30px] border-[3px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut" style="padding: 0.1rem 1rem; width: 100%;" data-component="confirm-btn">
+                    <button id="confirmBtn" class="nvshu-btn nvshu-btn--primary w-full max-w-[20vw]" data-component="confirm-btn">
                         Confirm
                     </button>
                 </div>
@@ -154,6 +434,142 @@
 
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/see.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/components/NvshuRain.js') }}"></script>
+    <!-- Global page loader (used during post-confirm uploads) -->
+    <div id="globalLoader" class="hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+        <div class="flex flex-col items-center">
+            <div class="spinner"></div>
+            <div class="mt-4 text-[#FFFDE9] text-sm">Uploading...</div>
+        </div>
+    </div>
+    <script>
+    // Nvshu character rain (aligned with landing page)
+    const nvshuImages = [
+        'combined_10-0-23_vertical_trim.png',
+        'combined_16-3-22_vertical_trim.png',
+        'combined_21-1-20_vertical_trim.png',
+        'combined_23-0-23_vertical_trim.png',
+        'combined_14-8-17_vertical_trim.png',
+        'combined_19-3-21_vertical_trim.png',
+        'combined_22-1-17_vertical_trim.png',
+        'combined_17-0-20_vertical_trim.png',
+        'combined_20-8-22_vertical_trim.png',
+        'combined_12-6-23_vertical_trim.png',
+        'combined_18-1-14_vertical_trim.png',
+        'combined_23-1-23_vertical_trim.png',
+        'combined_16-5-21_vertical_trim.png',
+        'combined_13-9-15_vertical_trim.png',
+        'combined_14-2-11_vertical_trim.png',
+        'combined_16-0-16_vertical_trim.png',
+        'combined_15-2-23_vertical_trim.png',
+        'combined_11-0-23_vertical_trim.png',
+        'combined_13-2-23_vertical_trim.png',
+        'combined_13-4-23_vertical_trim.png',
+        'combined_14-0-16_vertical_trim.png',
+        'combined_16-4-1_vertical_trim.png',
+        'combined_17-0-18_vertical_trim.png',
+        'combined_19-0-23_vertical_trim.png',
+        'combined_20-0-21_vertical_trim.png',
+        'combined_20-8-16_vertical_trim.png',
+        'combined_21-0-16_vertical_trim.png',
+        'combined_21-1-16_vertical_trim.png',
+        'combined_21-2-14_vertical_trim.png',
+        'combined_21-8-19_vertical_trim.png',
+        'combined_22-0-15_vertical_trim.png',
+        'combined_22-0-9_vertical_trim.png',
+        'combined_22-1-23_vertical_trim.png',
+        'combined_22-8-13_vertical_trim.png',
+        'combined_23-0-11_vertical_trim.png',
+        'combined_23-0-13_vertical_trim.png',
+        'combined_23-1-16_vertical_trim.png',
+        'combined_23-2-17_vertical_trim.png',
+        'combined_23-2-23_vertical_trim.png',
+        'combined_23-4-23_vertical_trim.png',
+        'combined_23-8-23_vertical_trim.png',
+        'combined_4-5-16_vertical_trim.png',
+        'combined_5-3-23_vertical_trim.png',
+        'combined_7-23-3_vertical_trim.png'
+    ];
+
+    function createNvshuColumn(x, index) {
+        const column = document.createElement('div');
+        column.className = 'nvshu-column';
+
+        const duration = gsap.utils.random(8, 15);
+        const delay = gsap.utils.random(0, 4);
+
+        column.style.cssText = `
+            left: ${x}px;
+            animation-duration: ${duration}s;
+            animation-delay: ${delay}s;
+            z-index: 2;
+        `;
+
+        const length = 1;
+        for (let i = 0; i < length; i++) {
+            const imgElement = document.createElement('img');
+            imgElement.className = 'char-img';
+            imgElement.src = `/static/nvshu_images/${nvshuImages[Math.floor(Math.random() * nvshuImages.length)]}`;
+            imgElement.style.animationDelay = (i * 0.1) + 's';
+            imgElement.onerror = function() { this.style.display = 'none'; };
+            column.appendChild(imgElement);
+        }
+
+        const container = document.getElementById('nvshu-rain');
+        if (container) {
+            container.appendChild(column);
+            const totalDuration = (duration + delay) * 1000;
+            setTimeout(() => {
+                if (column.parentNode) {
+                    column.parentNode.removeChild(column);
+                    createNvshuColumn(x, index);
+                }
+            }, totalDuration);
+        }
+    }
+
+    function initNvshuRain() {
+        const container = document.getElementById('nvshu-rain');
+        if (!container) return;
+        const screenWidth = window.innerWidth;
+        const columnWidth = 200;
+        const numColumns = Math.floor(screenWidth / columnWidth);
+        container.innerHTML = '';
+        for (let i = 0; i < numColumns; i++) {
+            const x = i * columnWidth + Math.random() * 90 - 15;
+            setTimeout(() => { createNvshuColumn(x, i); }, i * 150);
+        }
+    }
+
+    function createLightParticles() {
+        const container = document.getElementById('nvshu-rain');
+        if (!container) return;
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'absolute w-1 h-1 bg-[#FFFDE9] rounded-full opacity-20 pointer-events-none';
+            particle.style.left = gsap.utils.random(0, 100) + '%';
+            particle.style.top = gsap.utils.random(0, 100) + '%';
+            particle.style.boxShadow = '0 0 10px rgba(255, 253, 233, 0.5)';
+            container.appendChild(particle);
+            gsap.to(particle, { y: -window.innerHeight, duration: gsap.utils.random(20, 40), ease: 'none', repeat: -1, delay: gsap.utils.random(0, 10) });
+            gsap.to(particle, { opacity: gsap.utils.random(0.1, 0.4), duration: gsap.utils.random(2, 4), repeat: -1, yoyo: true, ease: 'power2.inOut' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof gsap === 'undefined') return;
+        setTimeout(() => { initNvshuRain(); }, 500);
+        setTimeout(() => { createLightParticles(); }, 1000);
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const container = document.getElementById('nvshu-rain');
+                if (container) container.innerHTML = '';
+                initNvshuRain();
+                createLightParticles();
+            }, 300);
+        });
+    });
+    </script>
 </body>
 </html>

@@ -1,0 +1,192 @@
+/*
+ * ===========================================
+ * Nüshu Button Component System
+ * ===========================================
+ *
+ * A reusable button component system for the Nüshu project
+ *
+ * Usage:
+ * <button class="nvshu-btn nvshu-btn--{variant} nvshu-btn--{size}">Button Text</button>
+ *
+ * Base class: nvshu-btn
+ *
+ * Variants:
+ * - Default (no modifier): Main action buttons
+ * - nvshu-btn--secondary: Less prominent actions
+ * - nvshu-btn--landing: Special landing page buttons with glow effects
+ * - nvshu-btn--glow: Add glow effect to any button
+ *
+ * Sizes:
+ * - nvshu-btn--sm: Small buttons (36px height)
+ * - nvshu-btn--lg: Large buttons (56px height)
+ * Default: Medium (48px height)
+ *
+ * States:
+ * - nvshu-btn--loading: Shows loading spinner
+ * - :disabled: Disabled state
+ *
+ * Examples:
+ * <button class="nvshu-btn">Default Button</button>
+ * <button class="nvshu-btn nvshu-btn--secondary nvshu-btn--sm">Small Secondary</button>
+ * <button class="nvshu-btn nvshu-btn--landing">Landing Page Button</button>
+ * <button class="nvshu-btn nvshu-btn--loading" disabled>Loading...</button>
+ *
+ * ===========================================
+ */
+
+.nvshu-btn {
+    /* Base styles */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 2.5rem;
+    border-radius: 30px;
+    border: 3px dashed rgba(255, 251, 233, 0.8);
+    background: rgba(255, 251, 233, 0.4);
+    color: rgb(255, 251, 233);
+    font-family: 'Inknut Antiqua', serif;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+    min-height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nvshu-btn:hover {
+    background: rgba(255, 251, 233, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 251, 233, 0.3);
+    border-color: rgba(255, 251, 233, 1);
+}
+
+.nvshu-btn:active {
+    transform: translateY(0px);
+    box-shadow: 0 4px 15px rgba(255, 251, 233, 0.2);
+}
+
+.nvshu-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 251, 233, 0.5);
+}
+
+/* Button variants */
+.nvshu-btn--secondary {
+    background: rgba(255, 251, 233, 0.2);
+    border-color: rgba(255, 251, 233, 0.6);
+}
+
+.nvshu-btn--secondary:hover {
+    background: rgba(255, 251, 233, 0.4);
+    border-color: rgba(255, 251, 233, 0.9);
+}
+
+/* Button sizes */
+.nvshu-btn--sm {
+    padding: 0.375rem 1.5rem;
+    font-size: 0.875rem;
+    min-height: 36px;
+}
+
+.nvshu-btn--lg {
+    padding: 0.75rem 3rem;
+    font-size: 1.125rem;
+    min-height: 56px;
+}
+
+/* Button states */
+.nvshu-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.nvshu-btn:disabled:hover {
+    background: rgba(255, 251, 233, 0.4);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Loading state */
+.nvshu-btn--loading {
+    position: relative;
+    color: transparent;
+}
+
+.nvshu-btn--loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid rgba(255, 251, 233, 0.3);
+    border-top-color: rgba(255, 251, 233, 0.9);
+    border-radius: 50%;
+    animation: nvshu-button-spin 0.8s linear infinite;
+}
+
+@keyframes nvshu-button-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Glow effect for special buttons */
+.nvshu-btn--glow {
+    box-shadow: 0 0 20px rgba(255, 251, 233, 0.4);
+}
+
+.nvshu-btn--glow:hover {
+    box-shadow: 0 0 30px rgba(255, 251, 233, 0.6);
+}
+
+/* Landing page special button variant */
+.nvshu-btn--landing {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 251, 233, 0.4);
+    color: rgb(255, 251, 233);
+    box-shadow: 0 0 0 rgba(255, 251, 233, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.nvshu-btn--landing::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 251, 233, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+.nvshu-btn--landing:hover::before {
+    left: 100%;
+}
+
+.nvshu-btn--landing:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 251, 233, 0.6);
+    box-shadow: 0 20px 40px rgba(255, 251, 233, 0.2);
+    transform: translateY(-8px) scale(1.02);
+}
+
+.nvshu-btn--landing .glow-effect {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 251, 233, 0.1) 0%, transparent 70%);
+    border-radius: 0.5rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.nvshu-btn--landing:hover .glow-effect {
+    opacity: 1;
+    transform: scale(1.1);
+}

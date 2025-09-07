@@ -65,7 +65,7 @@
         
         .nvshu-column .char-img {
             display: block;
-            width: 30px;
+            width: 60px;
             height: auto;
             margin-bottom: 10px;
             opacity: 0.8;
@@ -76,12 +76,12 @@
         .nvshu-column .char-img:first-child {
             opacity: 1;
             filter: brightness(2) contrast(1.5) drop-shadow(0 0 15px rgba(255, 253, 233, 0.8));
-            width: 35px;
+            width: 70px;
         }
         
         .nvshu-column .char-img:nth-child(2) {
             opacity: 0.9;
-            width: 32px;
+            width: 64px;
         }
         
         .nvshu-column .char-img:nth-child(3) {
@@ -166,7 +166,7 @@
             position: absolute;
             inset: 0;
             background: radial-gradient(circle, rgba(255, 253, 233, 0.1) 0%, transparent 70%);
-            border-radius: 1rem;
+            border-radius: 0.5rem;
             opacity: 0;
             transform: scale(0.8);
             transition: all 0.3s ease;
@@ -180,7 +180,7 @@
         /* 增强按钮效果 */
         .action-button {
             box-shadow: 0 8px 32px rgba(255, 253, 233, 0.1);
-            border: 2px solid rgba(255, 253, 233, 0.3);
+            border: 2px dashed rgba(255, 253, 233, 0.3);
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(255, 253, 233, 0.05));
         }
         
@@ -221,28 +221,61 @@
         .nvshu-column:nth-child(5n) {
             animation-duration: 10s;
         }
+        
+        /* 背景视频容器与滤镜（黄调单色） */
+        .bg-video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* 位于字符雨(1)之下，内容(>10)之下 */
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) sepia(1) saturate(2) hue-rotate(350deg) brightness(0.65) contrast(1.1);
+        }
+        .bg-video-tint {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at center, rgba(255, 253, 233, 0.12) 0%, rgba(255, 253, 233, 0.06) 45%, rgba(0, 0, 0, 0.55) 100%),
+                linear-gradient(0deg, rgba(255, 253, 233, 0.08), rgba(255, 253, 233, 0.08));
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="bg-black text-[#FFFDE9] min-h-screen">
     <!-- 女书字符雨背景 -->
     <div id="nvshu-rain" class="nvshu-rain-container"></div>
+    <!-- 背景视频（黄调风格化） -->
+    <div class="bg-video-container">
+        <video autoplay muted loop playsinline preload="auto" poster="{{ url_for('static', filename='images/bg1.png') }}">
+            <source src="{{ url_for('static', filename='1nv.mp4') }}" type="video/mp4">
+        </video>
+        <div class="bg-video-tint"></div>
+    </div>
     
     <!-- 导航栏 -->
-    <nav class="relative z-30 w-full px-8 py-6  text-[#FFFDE9]">
-        <div class="flex justify-between items-center max-w-7xl mx-auto bg-gradient-to-t from-black/90 to-black/30 border-2 border-[#FFFDE9]/30 rounded-2xl p-4">
+    <nav class="relative z-30 w-full px-6 py-4  text-[#FFFDE9]">
+        <div class="flex justify-between items-center max-w-6xl mx-auto bg-gradient-to-t from-black/90 to-black/30 border border-dashed border-[#FFFDE9]/40 rounded-lg p-3 shadow-lg shadow-[#FFFDE9]/10">
             <!-- 左侧：主页标题 -->
             <div class="flex items-center">
-                <a href="/" class="text-xl  font-bold hover:text-[#FFFDE9]/80 transition-colors duration-300" style="font-family: 'Inknut Antiqua', serif;">
+                <a href="/" class="text-lg font-bold hover:text-[#FFFDE9]/80 transition-colors duration-300" style="font-family: 'Inknut Antiqua', serif;">
                     AI NVSHU
                 </a>
             </div>
-            
+
             <!-- 右侧：导航链接 -->
-            <div class="flex items-center space-x-8">
-                <a href="/dictionary" class="text-lg hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light">
+            <div class="flex items-center space-x-6">
+                <a href="/dictionary" class="text-sm hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light">
                     Dictionary
                 </a>
-                <a href="/about" class="text-lg hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light">
+                <a href="/about" class="text-sm hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light">
                     About
                 </a>
             </div>
@@ -250,54 +283,54 @@
     </nav>
     
     <!-- 主内容 -->
-    <div class="relative z-20 min-h-screen flex flex-col items-center justify-center px-8 -mt-20">
+    <div id="landing-root" class="relative z-20 min-h-screen flex flex-col items-end justify-center px-6 -mt-20 max-w-6xl mx-auto">
         <!-- 主标题 -->
-        <div id="main-title" class="text-center mb-8 opacity-0">
-            <h1 class="text-6xl md:text-7xl font-bold mb-4" style="font-family: 'Inknut Antiqua', serif;">
-                AI女书
+        <div id="main-title" class="text-center mb-6 opacity-0">
+            <h1 class="text-4xl md:text-5xl font-bold mb-3" style="font-family: 'Inknut Antiqua', serif;">
+                AI Nüshu
             </h1>
-            <div class="text-4xl md:text-5xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
+            <!-- <div class="text-2xl md:text-3xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
                 (AI Nüshu)
-            </div>
+            </div> -->
         </div>
 
         <!-- 副标题 -->
-        <p id="subtitle" class="text-xl md:text-2xl text-center mb-12 opacity-90 font-light tracking-wide opacity-0">
+        <!-- <p id="subtitle" class="text-lg md:text-xl text-center mb-10 font-light tracking-wide opacity-0">
             Share a source to Generate an AI Nvshu character
-        </p>
+        </p> -->
 
         <!-- 操作按钮 -->
-        <div id="buttons" class="flex flex-col md:flex-row gap-8 mb-16 opacity-0">
-            <a href="/see" class="action-button relative block px-8 py-6 bg-black/20 border-2 border-[#FFFDE9]/30 rounded-2xl text-[#FFFDE9] text-center min-w-[250px] group">
+        <div id="buttons" class="flex flex-col md:flex-row gap-6 mb-12 opacity-0">
+            <a href="/see" class="action-button relative block px-6 py-4 bg-black/20 border border-dashed border-[#FFFDE9]/40 rounded-lg text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
                 <div class="glow-effect"></div>
                 <div class="relative z-10">
-                    <div class="text-sm opacity-80 font-light">Start Creating</div>
+                    <div class="text-xs opacity-80 font-light tracking-wider">Explore</div>
                 </div>
             </a>
-            
-            <!-- <a href="/dictionary" class="action-button relative block px-8 py-6 bg-black/20 border-2 border-[#FFFDE9]/30 rounded-2xl text-[#FFFDE9] text-center min-w-[250px] group">
+
+            <!-- <a href="/dictionary" class="action-button relative block px-6 py-4 bg-black/20 border border-[#FFFDE9]/40 rounded-lg text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
                 <div class="glow-effect"></div>
                 <div class="relative z-10">
-                    <div class="text-sm opacity-80 font-light">Nüshu Dictionary</div>
+                    <div class="text-xs opacity-80 font-light tracking-wider">Nüshu Dictionary</div>
                 </div>
             </a> -->
         </div>
 
         <!-- 项目描述 -->
-        <div id="description" class="max-w-4xl text-center bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20 opacity-0 hover:bg-black/40 hover:border-[#FFFDE9]/30 transition-all duration-500"</div>
-            <h2 class="text-3xl font-semibold mb-6 text-[#FFFDE9]">
+        <div id="description" class="max-w-lg text-start bg-black/40 backdrop-blur-sm p-6 rounded-lg border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5">
+            <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">
                 Nüshu (女书)
             </h2>
-            <div class="space-y-4 text-lg leading-relaxed opacity-90">
+            <div class="space-y-3 text-sm leading-relaxed opacity-90">
                 <p>
                     Nüshu (女书), Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.
                 </p>
-                
+
                 <p>
                     Can AI learn from ancient Chinese women and create their own secret language?
                 </p>
                 <p>
-                    This project trains AI agents to imitate illiterate women in ancient China to create a new language system, 
+                    This project trains AI agents to imitate illiterate women in ancient China to create a new language system,
                     symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.
                 </p>
             </div>
@@ -371,7 +404,7 @@
             `;
             
             // 随机生成字符串长度
-            const length = Math.floor(Math.random() * 8) + 6; // 6-14个字符
+            const length = 1;
             
             for (let i = 0; i < length; i++) {
                 const imgElement = document.createElement('img');
@@ -416,7 +449,7 @@
             }
             
             const screenWidth = window.innerWidth;
-            const columnWidth = 60; // 每列的宽度，为图片留更多空间
+            const columnWidth = 200; // 每列的宽度，为放大两倍的图片留更多空间
             const numColumns = Math.floor(screenWidth / columnWidth);
             
             console.log('Screen width:', screenWidth, 'Creating', numColumns, 'nvshu image rain columns');
@@ -425,7 +458,7 @@
             container.innerHTML = '';
             
             for (let i = 0; i < numColumns; i++) {
-                const x = i * columnWidth + Math.random() * 30 - 15; // 添加一些随机偏移
+                const x = i * columnWidth + Math.random() * 90 - 15; // 添加一些随机偏移
                 setTimeout(() => {
                     createNvshuColumn(x, i);
                 }, i * 150); // 错开创建时间
@@ -527,28 +560,122 @@
         }
 
         // 按钮点击效果
+        function loadSeePageSPA() {
+            if (document.getElementById('see-spa-root')) {
+                // Already loaded; just show
+                const landingRoot = document.getElementById('landing-root');
+                gsap.to(landingRoot, { opacity: 0, duration: 0.7, ease: 'power2.out', onComplete: () => {
+                    landingRoot.style.display = 'none';
+                    const seeRoot = document.getElementById('see-spa-root');
+                    seeRoot.style.display = 'block';
+                    gsap.fromTo(seeRoot, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.inOut' });
+                }});
+                history.pushState({page: 'see'}, '', '/see');
+                return;
+            }
+
+            const landingRoot = document.getElementById('landing-root');
+            gsap.to(landingRoot, { opacity: 0, duration: 0.4, ease: 'power2.out', onComplete: async () => {
+                try {
+                    const res = await fetch('/see', { credentials: 'same-origin' });
+                    const html = await res.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    const pageContainer = doc.querySelector('[data-component="page-container"]');
+                    const confirmationPage = doc.getElementById('confirmationPage');
+                    const privacyPolicy = doc.getElementById('privacyPolicy');
+                    const videoRecorder = doc.getElementById('videoRecorder');
+
+                    const seeRoot = document.createElement('div');
+                    seeRoot.id = 'see-spa-root';
+                    seeRoot.style.display = 'none';
+                    seeRoot.style.position = 'relative';
+                    seeRoot.style.zIndex = 20; // above background
+
+                    if (pageContainer) seeRoot.appendChild(pageContainer);
+                    if (videoRecorder) seeRoot.appendChild(videoRecorder);
+                    if (confirmationPage) seeRoot.appendChild(confirmationPage);
+                    if (privacyPolicy) seeRoot.appendChild(privacyPolicy);
+
+                    document.body.appendChild(seeRoot);
+
+                    // Dynamically load see.js after DOM is in place
+                    const script = document.createElement('script');
+                    script.src = '/static/js/see.js';
+                    script.onload = () => {
+                        landingRoot.style.display = 'none';
+                        seeRoot.style.display = 'block';
+                        gsap.fromTo(seeRoot, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.inOut' });
+                        history.pushState({page: 'see'}, '', '/see');
+
+                        // Attach drag & drop listeners (DOMContentLoaded in see.js won't fire in SPA)
+                        try {
+                            const uploadCircle = document.getElementById('uploadOption');
+                            if (uploadCircle && typeof preventDefaults === 'function' && typeof handleDrop === 'function') {
+                                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                                    uploadCircle.addEventListener(eventName, preventDefaults, false);
+                                    document.body.addEventListener(eventName, preventDefaults, false);
+                                });
+                                uploadCircle.addEventListener('drop', handleDrop, false);
+                            }
+                        } catch (e) { console.warn('Attach drag-drop failed:', e); }
+                    };
+                    document.body.appendChild(script);
+                } catch (err) {
+                    console.error('Failed to load /see:', err);
+                    // Fallback to full navigation
+                    window.location.href = '/see';
+                }
+            }});
+        }
+
+        // Handle back/forward navigation
+        window.addEventListener('popstate', () => {
+            if (location.pathname === '/') {
+                const seeRoot = document.getElementById('see-spa-root');
+                const landingRoot = document.getElementById('landing-root');
+                if (seeRoot && landingRoot) {
+                    gsap.to(seeRoot, { opacity: 0, duration: 0.3, ease: 'power2.inOut', onComplete: () => {
+                        seeRoot.style.display = 'none';
+                        landingRoot.style.display = 'block';
+                        gsap.fromTo(landingRoot, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+                    }});
+                }
+            }
+        });
+
         document.querySelectorAll('.action-button').forEach(button => {
             button.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                gsap.to(button, {
-                    scale: 0.95,
-                    duration: 0.1,
-                    ease: "power2.out",
-                    yoyo: true,
-                    repeat: 1,
-                    onComplete: () => {
-                        // 页面转场动画
-                        gsap.to(document.body, {
-                            opacity: 0,
-                            duration: 0.5,
-                            ease: "power2.inOut",
-                            onComplete: () => {
-                                window.location.href = button.href;
-                            }
-                        });
-                    }
-                });
+                const href = button.getAttribute('href') || '';
+                if (href === '/see') {
+                    e.preventDefault();
+                    gsap.to(button, {
+                        scale: 0.95,
+                        duration: 0.1,
+                        ease: 'power2.out',
+                        yoyo: true,
+                        repeat: 1,
+                        onComplete: loadSeePageSPA
+                    });
+                } else {
+                    e.preventDefault();
+                    gsap.to(button, {
+                        scale: 0.95,
+                        duration: 0.1,
+                        ease: 'power2.out',
+                        yoyo: true,
+                        repeat: 1,
+                        onComplete: () => {
+                            gsap.to(document.body, {
+                                opacity: 0,
+                                duration: 0.8,
+                                ease: 'power2.inOut',
+                                onComplete: () => { window.location.href = button.href; }
+                            });
+                        }
+                    });
+                }
             });
         });
 
@@ -601,4 +728,23 @@
         });
     </script>
 </body>
+{% if DEBUG %}
+<script>
+(function(){
+  let lastV = 0;
+  async function poll(){
+    try{
+      const r = await fetch('/__dev_version', {cache:'no-store'});
+      if(r.ok){
+        const {v} = await r.json();
+        if(lastV && v > lastV){ location.reload(); return; }
+        lastV = v;
+      }
+    }catch(e){}
+    setTimeout(poll, 700);
+  }
+  poll();
+})();
+</script>
+{% endif %}
 </html>
