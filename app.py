@@ -90,6 +90,10 @@ def index():
 def see():
     return render_template('see.html')
 
+@app.route('/texteffectdemo')
+def texteffectdemo():
+    return render_template('texteffectdemo.html')
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():

@@ -57,6 +57,20 @@ body {
   padding: 0;
   min-height: 100vh;
   font-family: var(--font-stack);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-optical-sizing: auto;
+}
+body::after {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+height: 100%;
+width: 100%;
+background-image: repeating-linear-gradient(transparent, transparent 2px, #7070703d 3px);
+background-size: auto 100%;
+pointer-events: none;
 }
 
 a {
@@ -188,4 +202,52 @@ body.agreed-style .right-panel {
 .vertical-text {
   writing-mode: vertical-rl;
   text-orientation: upright;
+}
+
+/* Text Effect 4 - Hover Animation Styles */
+.hover-effect .word {
+  white-space: nowrap;
+}
+
+.hover-effect .char {
+  position: relative;
+}
+
+.hover-effect {
+  font-kerning: none;
+  position: relative;
+  white-space: nowrap;
+}
+
+.hover-effect--bg,
+.hover-effect--bg-south {
+  --anim: 0;
+}
+
+.hover-effect--bg::after,
+.hover-effect--bg-south::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 3px);
+  top: 0;
+  background-color: rgba(229, 222, 204, 0.1);
+  mix-blend-mode: none;
+  backdrop-filter: blur(5px);
+  transform-origin: 0% 50%;
+  transform: scaleX(var(--anim));
+}
+
+.hover-effect--bg-south::after {
+  z-index: -1;
+  left: -8px;
+  right: -8px;
+  top: -8px;
+  bottom: -8px;
+  border-radius: 2px;
+  height: auto;
+  width: auto;
+  transform-origin: 50% 100%;
+  transform: scaleY(var(--anim));
 }

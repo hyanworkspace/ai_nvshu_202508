@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/nvshu_rain.css') }}" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Match landing page background */
@@ -115,7 +115,7 @@
             justify-content: center;
             padding: 0.5rem 2.5rem;
             border-radius: 30px;
-            border: 3px dashed rgba(255, 251, 233, 0.8);
+            border: 1px dashed rgba(255, 251, 233, 0.8);
             background: rgba(255, 251, 233, 0.4);
             color: rgb(255, 251, 233);
             font-family: 'Inknut Antiqua', serif;
@@ -276,7 +276,10 @@
         </video>
         <div class="bg-video-tint"></div>
     </div>
-    <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden" data-component="page-container">
+    <!-- Include Header Component -->
+    {% include 'components/header.html' %}
+
+    <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden pt-20" data-component="page-container">
 
         <!-- Main content -->
         <div class="relative z-10 h-full w-full flex flex-row items-center justify-center" data-component="main-content">
@@ -320,7 +323,7 @@
                             <div class="spinner"></div>
                             <!-- Progress border animation -->
                             <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,253,233,0.3)" stroke-width="2" stroke-dasharray="301.6" stroke-dashoffset="301.6" class="progress-border" />
+                                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-dasharray="301.6" stroke-dashoffset="301.6" class="progress-border" />
                             </svg>
                         </div>
                         <!-- Upload success overlay with preview -->
@@ -394,7 +397,7 @@
         <div class="absolute inset-0 bg-black bg-opacity-50" data-component="modal-backdrop"></div>
         
         <!-- 弹窗内容 -->
-        <div class="relative z-10 w-[600px] bg-[rgba(0,0,0,0.8)] rounded-[30px] border-[3px] border-dashed border-[rgb(255,251,233)] overflow-hidden" data-component="modal-content">
+        <div class="relative z-10 w-[600px] bg-[rgba(0,0,0,0.8)] rounded-[30px] border-[1px] border-dashed border-[rgb(255,251,233)] overflow-hidden" data-component="modal-content">
             <!-- 标题和内容区域 -->
             <div class="max-h-[300px] overflow-y-auto px-8 py-6 text-[rgb(255,251,233)] custom-scrollbar" data-component="modal-body">
                 <h3 class="text-xl font-medium mb-4" data-component="modal-title">Privacy & Data Usage Statement</h3>
@@ -405,7 +408,7 @@
             
             <!-- 按钮容器 -->
             <div class="border-t border-[rgb(255,251,233)] border-opacity-20 px-8 py-4 flex justify-center" data-component="modal-footer">
-                <button id="agreeBtn" class="w-full max-w-[20vw] px-10 py-2 rounded-[30px] border-[3px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut" style="padding: 0.1rem 1rem;" data-component="agree-btn">
+                <button id="agreeBtn" class="w-full max-w-[20vw] px-10 py-2 rounded-[30px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut" style="padding: 0.1rem 1rem;" data-component="agree-btn">
                     Yes, I agree!
                 </button>
             </div>

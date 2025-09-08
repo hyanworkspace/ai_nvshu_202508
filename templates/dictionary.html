@@ -27,27 +27,8 @@
             class="w-full h-full object-cover opacity-70">
     </div>
 
-    <!-- 导航栏 -->
-    <nav class="relative z-30 w-full px-8 py-6">
-        <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <!-- 左侧：主页标题 -->
-            <div class="flex items-center">
-                <a href="/" class="text-2xl font-bold hover:text-[#FFFDE9]/80 transition-colors duration-300" style="font-family: 'Inknut Antiqua', serif;">
-                    AI NVSHU
-                </a>
-            </div>
-            
-            <!-- 右侧：导航链接 -->
-            <div class="flex items-center space-x-8">
-                <a href="/dictionary" class="text-lg text-[#FFFDE9] font-light border-b border-[#FFFDE9]/50">
-                    Dictionary
-                </a>
-                <a href="/about" class="text-lg hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light">
-                    About
-                </a>
-            </div>
-        </div>
-    </nav>
+    <!-- Include Header Component -->
+    {% include 'components/header.html' %}
 
     <div class="max-w-[1800px] mx-auto px-8" data-component="main-container">
         <div class="text-center mb-12" data-component="header-section">
