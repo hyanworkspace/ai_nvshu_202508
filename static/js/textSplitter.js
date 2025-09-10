@@ -77,3 +77,4 @@ export class TextSplitter {
     return this.splitText.chars;
   }
 }
+

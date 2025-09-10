@@ -5,10 +5,10 @@ const init = () => {
   document.querySelectorAll('.hover-effect').forEach(item => {
     const animator = new TextAnimator(item);
     item.addEventListener('mouseenter', () => {
-      animator.animate();
+      animator.handleHover();
     });
     item.addEventListener('mouseleave', () => {
-      animator.animateBack();
+      animator.handleHoverLeave();
     });
   });
 };

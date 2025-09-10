@@ -12,6 +12,8 @@ export class TextAnimator {
     }
     this.textElement = textElement;
     this.originalChars = []; // Store the original characters
+    this.isAnimating = false; // Flag to prevent multiple simultaneous animations
+    this.hoverTimeout = null; // Timeout for debouncing
     this.splitText();
   }
 
@@ -25,8 +27,15 @@ export class TextAnimator {
   }
 
   animate() {
+    // Prevent multiple simultaneous animations
+    if (this.isAnimating) {
+      return;
+    }
+
+    this.isAnimating = true;
     // Reset any ongoing animations
     this.reset();
+
     // Query all individual characters in the line for animation.
     const chars = this.splitter.getChars();
     chars.forEach((char, position) => {
@@ -44,22 +53,59 @@ export class TextAnimator {
         opacity: 1
       });
     });
+
     gsap.fromTo(this.textElement, {
       '--anim': 0
     }, {
       duration: 1,
       ease: 'expo',
-      '--anim': 1
+      '--anim': 1,
+      onComplete: () => {
+        this.isAnimating = false; // Reset animation flag when complete
+      }
     });
   }
 
   animateBack() {
+    // Clear any pending hover timeout
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+
     gsap.killTweensOf(this.textElement); // Ensure no ongoing animations
     gsap.to(this.textElement, {
       duration: .6,
       ease: 'power4',
-      '--anim': 0
+      '--anim': 0,
+      onComplete: () => {
+        this.isAnimating = false; // Reset animation flag
+      }
     });
+  }
+
+  // Debounced hover handler to prevent rapid firing at edges
+  handleHover() {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+    }
+
+    this.hoverTimeout = setTimeout(() => {
+      this.animate();
+      this.hoverTimeout = null;
+    }, 50); // 50ms debounce delay
+  }
+
+  // Debounced hover leave handler
+  handleHoverLeave() {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+    }
+
+    this.hoverTimeout = setTimeout(() => {
+      this.animateBack();
+      this.hoverTimeout = null;
+    }, 50); // 50ms debounce delay
   }
 
   reset() {
@@ -73,3 +119,4 @@ export class TextAnimator {
     gsap.set(this.textElement, {'--anim': 0});
   }
 }
+
