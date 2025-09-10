@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('No media URL provided');
         return;
     }
+    
+    // 页面入场动画
+    initPageAnimation();
 
     // Initialize left panel with media
     const leftContent = document.getElementById('left-content');
@@ -44,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     leftContent.appendChild(mediaElement);
     
+    // 启动媒体呼吸效果
+    startMediaBreathingEffect();
 
     // Start the process
     describeVideo(origmediaUrl);
@@ -151,12 +156,48 @@ function addStatusItem(text, isActive = false, isCompleted = false, toggleConten
 
 function toggleDetails(contentId, button) {
     const content = document.getElementById(contentId);
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        button.textContent = 'Hide details';
+    const isHidden = content.style.display === 'none' || !content.style.display;
+    
+    if (typeof gsap !== 'undefined') {
+        if (isHidden) {
+            // 显示详情
+            content.style.display = 'block';
+            gsap.fromTo(content, 
+                { opacity: 0, height: 0, y: -10 },
+                { 
+                    opacity: 1, 
+                    height: 'auto', 
+                    y: 0,
+                    duration: 0.4,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        button.textContent = 'Hide details';
+                    }
+                }
+            );
+        } else {
+            // 隐藏详情
+            gsap.to(content, {
+                opacity: 0,
+                height: 0,
+                y: -10,
+                duration: 0.3,
+                ease: 'power2.in',
+                onComplete: () => {
+                    content.style.display = 'none';
+                    button.textContent = 'Show details';
+                }
+            });
+        }
     } else {
-        content.style.display = 'none';
-        button.textContent = 'Show details';
+        // 降级到简单的显示/隐藏
+        if (isHidden) {
+            content.style.display = 'block';
+            button.textContent = 'Hide details';
+        } else {
+            content.style.display = 'none';
+            button.textContent = 'Show details';
+        }
     }
 }
 
@@ -467,3 +508,108 @@ async function generatePoem(description, poems) {
 //         console.error('Error:', error);
 //     }
 // }
+
+// ====================== 页面动画效果 ======================
+
+// 页面入场动画
+function initPageAnimation() {
+    const mainContainer = document.getElementById('mainContainer');
+    const leftPanel = document.querySelector('[data-component="left-panel"]');
+    const rightPanel = document.querySelector('[data-component="right-panel"]');
+    
+    if (typeof gsap !== 'undefined') {
+        // 主容器fade in
+        gsap.to(mainContainer, { 
+            opacity: 1, 
+            duration: 0.6, 
+            ease: 'power2.out' 
+        });
+        
+        // 左右面板依次出现
+        gsap.fromTo(leftPanel, 
+            { opacity: 0, x: -50, scale: 0.95 },
+            { 
+                opacity: 1, 
+                x: 0, 
+                scale: 1,
+                duration: 0.8,
+                ease: 'power2.out',
+                delay: 0.3
+            }
+        );
+        
+        gsap.fromTo(rightPanel, 
+            { opacity: 0, x: 50, scale: 0.95 },
+            { 
+                opacity: 1, 
+                x: 0, 
+                scale: 1,
+                duration: 0.8,
+                ease: 'power2.out',
+                delay: 0.5
+            }
+        );
+    } else {
+        mainContainer.style.opacity = '1';
+    }
+}
+
+// 媒体呼吸效果 
+function startMediaBreathingEffect() {
+    const mediaCircle = document.getElementById('mediaCircle');
+    
+    if (typeof gsap !== 'undefined' && mediaCircle) {
+        // 呼吸效果动画
+        gsap.to(mediaCircle, {
+            scale: 1.05,
+            duration: 2,
+            ease: 'power2.inOut',
+            yoyo: true,
+            repeat: -1
+        });
+        
+        // 轻微的发光效果
+        gsap.to(mediaCircle, {
+            boxShadow: '0 0 30px rgba(255, 253, 233, 0.4)',
+            duration: 3,
+            ease: 'power2.inOut',
+            yoyo: true,
+            repeat: -1
+        });
+    }
+}
+
+// 停止媒体呼吸效果
+function stopMediaBreathingEffect() {
+    const mediaCircle = document.getElementById('mediaCircle');
+    
+    if (typeof gsap !== 'undefined' && mediaCircle) {
+        gsap.killTweensOf(mediaCircle);
+        gsap.to(mediaCircle, {
+            scale: 1,
+            boxShadow: 'none',
+            duration: 0.5,
+            ease: 'power2.out'
+        });
+    }
+}
+
+// 文字区域等待动画
+function startTextLoadingAnimation(element) {
+    if (typeof gsap !== 'undefined' && element) {
+        // 添加加载点动画
+        element.innerHTML = '<div class="loading-dots">Processing<span class="dot-1">.</span><span class="dot-2">.</span><span class="dot-3">.</span></div>';
+        
+        // 点的动画
+        gsap.to('.dot-1', { opacity: 0.3, duration: 0.5, ease: 'power2.inOut', repeat: -1, yoyo: true });
+        gsap.to('.dot-2', { opacity: 0.3, duration: 0.5, ease: 'power2.inOut', repeat: -1, yoyo: true, delay: 0.2 });
+        gsap.to('.dot-3', { opacity: 0.3, duration: 0.5, ease: 'power2.inOut', repeat: -1, yoyo: true, delay: 0.4 });
+    }
+}
+
+// 停止文字加载动画
+function stopTextLoadingAnimation() {
+    if (typeof gsap !== 'undefined') {
+        gsap.killTweensOf('.dot-1, .dot-2, .dot-3');
+    }
+}

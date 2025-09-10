@@ -24,6 +24,57 @@ const uploadVideoPreview = document.getElementById('uploadVideoPreview');
 function showEl(el) { if (el) el.classList.remove('hidden'); }
 function hideEl(el) { if (el) el.classList.add('hidden'); }
 
+// 改进的显示/隐藏函数，带过渡效果
+function showElWithTransition(el, duration = 0.3, onComplete = null) {
+    if (!el) return;
+    
+    el.classList.remove('hidden');
+    el.style.display = 'flex';
+    
+    if (typeof gsap !== 'undefined') {
+        gsap.fromTo(el, 
+            { opacity: 0, scale: 0.95, y: 10 }, 
+            { 
+                opacity: 1, 
+                scale: 1, 
+                y: 0, 
+                duration: duration, 
+                ease: 'power2.out',
+                onComplete: onComplete 
+            }
+        );
+    } else {
+        el.style.opacity = '1';
+        if (onComplete) onComplete();
+    }
+}
+
+function hideElWithTransition(el, duration = 0.3, onComplete = null) {
+    if (!el) return;
+    
+    if (typeof gsap !== 'undefined') {
+        gsap.to(el, {
+            opacity: 0,
+            scale: 0.95,
+            y: -10,
+            duration: duration,
+            ease: 'power2.in',
+            onComplete: () => {
+                el.classList.add('hidden');
+                el.style.display = 'none';
+                if (onComplete) onComplete();
+            }
+        });
+    } else {
+        el.style.opacity = '0';
+        setTimeout(() => {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+            if (onComplete) onComplete();
+        }, duration * 1000);
+    }
+}
+
 // 录制相关变量
 let videoStream = null;
 let mediaRecorder = null;
@@ -335,7 +386,7 @@ fileInput.addEventListener('change', async (e) => {
             formData.append('file_type', fileType);
 
             // 上传文件 - 显示旋转动画和border进度
-            showEl(uploadLoader);
+            showElWithTransition(uploadLoader, 0.3);
             // 重置border动画
             const progressBorder = uploadLoader.querySelector('.progress-border');
             if (progressBorder) {
@@ -541,7 +592,7 @@ agreeBtn.addEventListener('click', () => {
         sessionStorage.setItem('agreedToPrivacy', 'true');
         
         if (currentMode === 'record') {
-            showEl(globalLoader);
+            showElWithTransition(globalLoader, 0.3);
             uploadRecordedVideos(recordedVideo, originalRecordedVideo).finally(() => hideEl(globalLoader));
         } else if (currentMode === 'upload' && video_url) {
             confirm_video(video_url);
@@ -752,7 +803,7 @@ async function handleDrop(e) {
             formData.append('file_type', fileType);
 
             // 上传文件 - 显示旋转动画和border进度
-            showEl(uploadLoader);
+            showElWithTransition(uploadLoader, 0.3);
             // 重置border动画
             const progressBorder = uploadLoader.querySelector('.progress-border');
             if (progressBorder) {
@@ -787,9 +838,31 @@ function confirm_video(url_, original_url = null) {
     }
     
     console.log('Redirecting to:', redirectUrl);
-    // Subtle page fade before navigation
+    // Enhanced page fade out before navigation
     if (typeof gsap !== 'undefined') {
-        gsap.to(document.body, { opacity: 0.7, duration: 0.5, ease: 'power2.out', onComplete: () => { window.location.href = redirectUrl; } });
+        const currentPage = document.querySelector('#confirmationPage:not(.hidden), #mainPageContainer:not([style*="display: none"])');
+        const tl = gsap.timeline({
+            onComplete: () => { window.location.href = redirectUrl; }
+        });
+        
+        // 先让当前可见内容fade out
+        if (currentPage) {
+            tl.to(currentPage, { 
+                opacity: 0, 
+                scale: 0.95, 
+                y: -20, 
+                duration: 0.4, 
+                ease: 'power2.in' 
+            });
+        }
+        
+        // 然后整个body fade out
+        tl.to(document.body, { 
+            opacity: 0.3, 
+            duration: 0.3, 
+            ease: 'power2.out' 
+        }, "-=0.2");
+        
     } else {
         window.location.href = redirectUrl;
     }
@@ -808,20 +881,86 @@ function hideMainContent() {
 }
 
 function transitionToConfirmation() {
-    hideMainContent();
+    hideMainContentWithTransition(() => {
+        showConfirmationPageWithTransition();
+    });
+}
+
+function hideMainContentWithTransition(onComplete = null) {
+    const mainContainer = document.getElementById('mainPageContainer');
+    if (!mainContainer) {
+        if (onComplete) onComplete();
+        return;
+    }
+    
+    if (typeof gsap !== 'undefined') {
+        gsap.to(mainContainer, { 
+            opacity: 0, 
+            scale: 0.98, 
+            y: -20, 
+            duration: 0.4, 
+            ease: 'power2.in',
+            onComplete: () => {
+                mainContainer.style.display = 'none';
+                if (onComplete) onComplete();
+            }
+        });
+    } else {
+        mainContainer.style.display = 'none';
+        if (onComplete) onComplete();
+    }
+}
+
+function showConfirmationPageWithTransition() {
     confirmationPage.classList.remove('hidden');
     confirmationPage.style.display = 'flex';
+    
     if (typeof gsap !== 'undefined') {
         const circle = document.querySelector('[data-component="preview-circle"]');
-        gsap.fromTo(confirmationPage, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.inOut' });
+        const buttons = document.querySelector('[data-component="action-buttons"]');
+        const statement = document.querySelector('[data-component="privacy-statement"]');
+        
+        // 整个页面fade in
+        gsap.fromTo(confirmationPage, 
+            { opacity: 0 }, 
+            { opacity: 1, duration: 0.5, ease: 'power2.out' }
+        );
+        
+        // 预览圆形的动画
         if (circle) {
-            gsap.fromTo(circle, { scale: 0.96, opacity: 0.8 }, { scale: 1, opacity: 1, duration: 0.8, ease: 'power3.out' });
+            gsap.fromTo(circle, 
+                { scale: 0.8, opacity: 0, y: 30 }, 
+                { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: 'back.out(1.7)', delay: 0.2 }
+            );
         }
+        
+        // 隐私声明动画
+        if (statement) {
+            gsap.fromTo(statement, 
+                { opacity: 0, y: 20 }, 
+                { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.4 }
+            );
+        }
+        
+        // 按钮动画
+        if (buttons) {
+            gsap.fromTo(buttons, 
+                { opacity: 0, y: 30 }, 
+                { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.6 }
+            );
+        }
+        
+        // 预览内容动画
         const videoPreview = document.getElementById('videoPreview');
         const imgPreview = document.getElementById('imagePreview');
         const target = imgPreview && imgPreview.style.display === 'block' ? imgPreview : videoPreview;
         if (target) {
-            gsap.fromTo(target, { scale: 1.03, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.0, ease: 'power3.out' });
+            gsap.fromTo(target, 
+                { scale: 1.03, opacity: 0 }, 
+                { scale: 1, opacity: 1, duration: 1.0, ease: 'power3.out', delay: 0.3 }
+            );
         }
+    } else {
+        confirmationPage.style.opacity = '1';
     }
 }

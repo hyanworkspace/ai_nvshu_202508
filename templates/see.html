@@ -90,7 +90,7 @@
     <!-- Include Header Component -->
     {% include 'components/header.html' %}
 
-    <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden pt-20" data-component="page-container">
+    <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden pt-20" data-component="page-container" id="mainPageContainer">
 
         <!-- Main content -->
         <div class="relative z-10 h-full w-full flex flex-row items-center justify-center" data-component="main-content">
@@ -165,7 +165,7 @@
 
 
     <!-- 确认页面 -->
-    <div class="fixed inset-0 bg-transparent text-white overflow-hidden font-inknut hidden" id="confirmationPage" data-component="confirmation-page">
+    <div class="fixed inset-0 bg-transparent text-white overflow-hidden font-inknut hidden opacity-0" id="confirmationPage" data-component="confirmation-page">
 
         <!-- Main content -->
         <div class="relative z-10 h-full w-full flex flex-col items-center justify-center" data-component="confirmation-main-content">
@@ -208,7 +208,7 @@
         <div class="absolute inset-0 bg-black bg-opacity-50" data-component="modal-backdrop"></div>
         
         <!-- 弹窗内容 -->
-        <div class="relative z-10 w-[600px] bg-[rgba(0,0,0,0.8)] rounded-[30px] border-[1px] border-dashed border-[rgb(255,251,233)] overflow-hidden" data-component="modal-content">
+        <div class="relative z-10 w-[600px] bg-[rgba(0,0,0,0.8)] rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] overflow-hidden" data-component="modal-content">
             <!-- 标题和内容区域 -->
             <div class="max-h-[300px] overflow-y-auto px-8 py-6 text-[rgb(255,251,233)] custom-scrollbar" data-component="modal-body">
                 <h3 class="text-xl font-medium mb-4" data-component="modal-title">Privacy & Data Usage Statement</h3>
@@ -218,9 +218,9 @@
             </div>
             
             <!-- 按钮容器 -->
-            <div class="border-t border-[rgb(255,251,233)] border-opacity-20 px-8 py-4 flex justify-center" data-component="modal-footer">
-                <button id="agreeBtn" class="w-full max-w-[20vw] px-10 py-2 rounded-[30px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut" style="padding: 0.1rem 1rem;" data-component="agree-btn">
-                    Yes, I agree!
+            <div class="border-t border-[rgb(255,251,233)] border-opacity-20 px-8 py-4 flex justify-center items-center" data-component="modal-footer">
+                <button id="agreeBtn" class="w-full max-w-[8vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style="padding: 0.1rem 1rem;" data-component="agree-btn">
+                    Yes, I agree
                 </button>
             </div>
         </div>
@@ -370,6 +370,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // 页面加载时的入场动画
+        initPageEntranceAnimation();
+        
         if (typeof gsap === 'undefined') return;
         setTimeout(() => { initNvshuRain(); }, 500);
         setTimeout(() => { createLightParticles(); }, 1000);
@@ -384,6 +387,52 @@
             }, 300);
         });
     });
+    
+    // 页面入场动画
+    function initPageEntranceAnimation() {
+        const mainContainer = document.getElementById('mainPageContainer');
+        const circlesContainer = document.querySelector('[data-component="circles-container"]');
+        
+        if (typeof gsap !== 'undefined' && mainContainer) {
+            // 设置初始状态
+            gsap.set(mainContainer, { opacity: 0 });
+            
+            // 主容器fade in
+            gsap.to(mainContainer, { 
+                opacity: 1, 
+                duration: 0.8, 
+                ease: 'power2.out',
+                delay: 0.2
+            });
+            
+            // 两个圆形依次出现
+            if (circlesContainer) {
+                const circles = circlesContainer.querySelectorAll('[data-component="video-recording-circle"], [data-component="file-upload-circle"]');
+                gsap.set(circles, { opacity: 0, scale: 0.9, y: 30 });
+                circles.forEach((circle, index) => {
+                    gsap.to(circle, { 
+                        opacity: 1, 
+                        scale: 1, 
+                        y: 0,
+                        duration: 0.6,
+                        ease: 'back.out(1.7)',
+                        delay: 0.5 + (index * 0.2)
+                    });
+                });
+            }
+        } else if (mainContainer) {
+            // 如果没有GSAP，直接显示
+            mainContainer.style.opacity = '1';
+        }
+    }
+    
+    // 确保页面加载后立即执行动画，不仅仅是DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPageEntranceAnimation);
+    } else {
+        // 如果页面已经加载完成（从其他页面跳转过来的情况）
+        initPageEntranceAnimation();
+    }
     </script>
 </body>
 </html>
