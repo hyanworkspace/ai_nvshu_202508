@@ -82,6 +82,7 @@ async function typeWriter(element, texts) {
     }
 }
 
+
 async function typeWriterSimultaneously(chineseElement, englishElement, chineseText, englishText) {
     // 清空现有内容
     chineseElement.innerHTML = '';
@@ -142,9 +143,9 @@ function addStatusItem(text, isActive = false, isCompleted = false, toggleConten
         const toggleId = 'toggle-' + Date.now();
         statusItem.innerHTML += `
             <button class="toggle-button" onclick="toggleDetails('${toggleId}', this)">
-                Show details
+                Hide details
             </button>
-            <div id="${toggleId}" class="toggle-content" style="display: none;">
+            <div id="${toggleId}" class="toggle-content" style="display: block;">
                 ${toggleContent}
             </div>
         `;
@@ -156,7 +157,7 @@ function addStatusItem(text, isActive = false, isCompleted = false, toggleConten
 
 function toggleDetails(contentId, button) {
     const content = document.getElementById(contentId);
-    const isHidden = content.style.display === 'none' || !content.style.display;
+    const isHidden = content.style.display === 'none';
     
     if (typeof gsap !== 'undefined') {
         if (isHidden) {
@@ -212,9 +213,9 @@ function updateStatusItem(item, text, isCompleted = true, toggleContent = null) 
         const toggleId = 'toggle-' + Date.now();
         item.innerHTML += `
             <button class="toggle-button" onclick="toggleDetails('${toggleId}', this)">
-                Show details
+                Hide details
             </button>
-            <div id="${toggleId}" class="toggle-content" style="display: none;">
+            <div id="${toggleId}" class="toggle-content" style="display: block;">
                 ${toggleContent}
             </div>
         `;
