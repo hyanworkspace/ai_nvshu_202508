@@ -499,7 +499,7 @@ def search_dictionary():
         return jsonify({}), 400
     try:
         dictionary = load_dict_from_file(app.config['DICTIONARY_PATH'])
-        # 简单搜索实现 - 匹配包含搜索词的中文字符
+        # 简单搜索实现 - 只匹配包含搜索词的中文字符
         results = {k: v for k, v in dictionary.items() if search_term in k.lower()}
         return jsonify(results)
     except Exception as e:
@@ -512,9 +512,10 @@ def add_to_dictionary():
         from dict_io import add_to_dictionary
         char = session.get('char')
         char_3dim = session.get('char_3dim')
+        char_translate = session.get('char_translate')
         
         if char and char_3dim:
-            add_to_dictionary(char, char_3dim)
+            add_to_dictionary(char, char_3dim, char_translate)
             return jsonify({'status': 'success'})
         else:
             return jsonify({'status': 'error', 'message': 'Missing character data'}), 400

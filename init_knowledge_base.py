@@ -18,8 +18,8 @@ sys.path.append('.')
 from utils import *
 
 
-tmp_dir = '/Users/hyan/Devoff/artworks/nvshu/ai_nvshu/knowledge_tmp'
-consolidated_dir = '/Users/hyan/Devoff/artworks/nvshu/ai_nvshu/knowledge_base'
+tmp_dir = '/Users/slv/Dev/ai_nvshu_202508/knowledge_tmp'
+consolidated_dir = '/Users/slv/Dev/ai_nvshu_202508/knowledge_base'
 init_word_num = 20
 
 # -----------------------------------------------------------------------
@@ -200,8 +200,7 @@ EL_mappings_ = load_dict_from_file(f'{consolidated_dir}/EL_vectors.pkl')
 word_vectors_ = load_dict_from_file(f'{consolidated_dir}/word_vectors.pkl')
 simple_el_dict_ = load_dict_from_file(f'{tmp_dir}/simple.pkl')
 
-# # 顺便 init 一下 dictionary，
-# # 其实不用
+# # 顺便 init 一下 dictionary，这样方便后续的调用
 # dict = {}
 # for char in list(simple_el_dict_.keys()):
 #     dict[char] = {

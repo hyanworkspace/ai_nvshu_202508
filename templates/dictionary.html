@@ -82,6 +82,12 @@
             transform: translateY(-2px);
         }
         
+        .dictionary-card:hover .card-translation {
+            opacity: 1;
+            transform: translateY(-2px);
+            color: rgba(255, 253, 233, 0.9);
+        }
+        
         /* 卡片内部元素的过渡效果 */
         .card-char {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -100,6 +106,14 @@
             opacity: 0.8;
             position: relative;
             z-index: 2;
+        }
+        
+        .card-translation {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.7;
+            position: relative;
+            z-index: 2;
+            font-style: italic;
         }
         
         /* 搜索框和按钮的增强效果 */
@@ -242,7 +256,24 @@
             
             // Render characters with animations
             charsToShow.forEach((char, index) => {
-                const dimensions = dictToRender[char];
+                const charData = dictToRender[char];
+                
+                // 兼容新旧字典格式
+                let dimensions, translation;
+                if (Array.isArray(charData)) {
+                    // 旧格式：直接是数组
+                    dimensions = charData;
+                    translation = char; // 默认翻译为字符本身
+                } else if (typeof charData === 'object' && charData !== null) {
+                    // 新格式：对象包含 char_3dim 和 char_translate
+                    dimensions = charData.char_3dim || [];
+                    translation = charData.char_translate || char;
+                } else {
+                    // 异常情况，使用默认值
+                    dimensions = [];
+                    translation = char;
+                }
+                
                 const imagePath = getImagePath(dimensions);
                 
                 const characterElement = document.createElement('div');
@@ -251,7 +282,8 @@
                     <div class="flex flex-col items-center gap-1 w-full">
                         <div class="card-char text-lg font-xique text-xl">${char}</div>
                         <img src="${imagePath}" alt="Nüshu character for ${char}" class="card-image w-20 h-20 object-contain" loading="lazy">
-                        <div class="card-dimensions text-xs opacity-80">${dimensions.join('-')}</div>
+                        <div class="card-dimensions text-xs opacity-80">${dimensions.length > 0 ? dimensions.join('-') : 'N/A'}</div>
+                        <div class="card-translation text-xs opacity-70 text-center mt-1" style="max-width: 100%; word-wrap: break-word;">${translation}</div>
                     </div>
                 `;
                 
@@ -401,7 +433,10 @@
                 } else {
                     filteredDictionary = Object.fromEntries(
                         Object.entries(currentDictionary)
-                            .filter(([char]) => char.toLowerCase().includes(searchTerm))
+                            .filter(([char, charData]) => {
+                                // 只搜索中文字符
+                                return char.toLowerCase().includes(searchTerm);
+                            })
                     );
                 }
                 

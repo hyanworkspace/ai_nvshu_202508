@@ -348,7 +348,9 @@ def create_nvshu_from_poem(poem):
         # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, list of guess(translated in eng), 带有替换字的五言诗的翻译
         idx = poem.index(feedback[0])
         guess_poems = [poem[:idx] + i + poem[idx+1:] for i in list_of_guess]
-        return feedback[0], idx, machine_A.knowledge.simple_el_dict[feedback[0]], list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess], [translate_text(x, 'zh-cn', 'en').lower() for x in guess_poems]
+        # 获取字符的3维向量，兼容新旧字典格式
+        char_3dim = get_char_3dim(feedback[0])
+        return feedback[0], idx, char_3dim, list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess], [translate_text(x, 'zh-cn', 'en').lower() for x in guess_poems]
     except Exception as e:
         # 提供更详细的错误信息
         error_msg = f"生成女书字符失败: {str(e)}"
@@ -442,7 +444,9 @@ def replace_with_simple_el(message):
     for i in true_indices:
         # print(i)
         if message[i] not in ['，', '。', '！', '？', '\n']:
-            el_message[i] = simple_el_dict[message[i]]
+            # 使用新的函数获取3维向量
+            char_3dim = get_char_3dim(message[i])
+            el_message[i] = char_3dim
             replaced_indices.append(i)
 
     return el_message, ''.join([str(char) for char in el_message]), replaced_indices

@@ -57,15 +57,27 @@ class Machine:
         # 检查这个向量是否已经在simple_el_dict字典中
         max_attempts = 20  # 设定最大尝试次数
         attempts = 0  # 初始化尝试次数计数器
+        
+        # 获取所有现有的3维向量进行比较
+        existing_vectors = []
+        for value in self.knowledge.simple_el_dict.values():
+            if isinstance(value, dict):
+                existing_vectors.append(value.get('char_3dim', []))
+            else:
+                existing_vectors.append(value)
+        
         while any([np.array_equal(transformed_vector, existing_vector)
-            for existing_vector in self.knowledge.simple_el_dict.values()]) and attempts < max_attempts:
+            for existing_vector in existing_vectors]) and attempts < max_attempts:
                 # 如果已经在字典中，直接随机生成一个新的三维向量（每个元素在0-23之间 包括23）
                 transformed_vector = [random.randint(0, 23) for _ in range(3)]
                 attempts += 1
 
-        # 将降维后的向量添加到simple_el_dict字典中
+        # 将降维后的向量添加到simple_el_dict字典中，使用新的字典格式
         #print(f"=====end add_to_simple_el_dict=======")
-        self.knowledge.simple_el_dict[original_char] = transformed_vector
+        self.knowledge.simple_el_dict[original_char] = {
+            'char_3dim': transformed_vector,
+            'char_translate': original_char  # 默认翻译为字符本身
+        }
 
 
     def transform_with_pca(self, vector):
@@ -219,7 +231,13 @@ class Machine:
         # 将EL字的向量降维，并添加到simple_el_dict字典中
         #print(f"降维完毕...")
         self.add_to_simple_el_dict(original_char, el_vector)
-        logging.info(f"EL：{original_char}，降维后：{self.knowledge.simple_el_dict[original_char]}")
+        # 获取降维后的向量用于日志输出
+        char_data = self.knowledge.simple_el_dict[original_char]
+        if isinstance(char_data, dict):
+            char_3dim = char_data.get('char_3dim', [])
+        else:
+            char_3dim = char_data
+        logging.info(f"EL：{original_char}，降维后：{char_3dim}")
         #print(f"~~~~~~~~~~~~ End create_el_char ~~~~~~~~~~~~~~~~~~")
         return el_vector
 
