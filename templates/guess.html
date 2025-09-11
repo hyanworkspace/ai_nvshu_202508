@@ -92,6 +92,18 @@
     </div>
 
     <style>
+        /* 防止页面加载时的闪烁 */
+        [data-component="main-content"] {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        [data-component="background"] {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        
         /* 修改高亮样式为黑底白字 */
         .highlight {
             color: white !important;

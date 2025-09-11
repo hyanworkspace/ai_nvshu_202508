@@ -9,9 +9,65 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}"> -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
 </head>
 
 <body class="bg-black min-h-screen" data-component="page-body">
+    <style>
+        /* 防止页面加载时的闪烁 */
+        [data-component="main-container"] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        [data-component="background"] {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        
+        /* 确保页面在JavaScript加载前不显示内容 */
+        .js-loading [data-component="main-container"] {
+            visibility: hidden;
+        }
+        
+        /* 平滑的按钮交互 */
+        [data-component="save-button"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 253, 233, 0.3);
+        }
+        
+        /* 输入框焦点效果 */
+        [data-component="name-input"]:focus {
+            transform: scale(1.02);
+            transition: transform 0.2s ease;
+        }
+        
+        /* 视频容器的呼吸效果 */
+        [data-component="video-circle"] video {
+            transition: all 0.3s ease;
+        }
+        
+        /* 字符图片的微妙动画 */
+        [data-component="char-image"] {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 10px rgba(255, 253, 233, 0.3));
+        }
+        
+        [data-component="char-image"]:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px rgba(255, 253, 233, 0.5));
+        }
+        
+        /* 维度显示的微妙效果 */
+        [data-component="dimensions-display"] {
+            transition: opacity 0.3s ease;
+        }
+        
+        [data-component="dimensions-display"]:hover {
+            opacity: 1 !important;
+        }
+    </style>
     <!-- Background image container -->
     <div class="absolute inset-0 w-full h-full -z-50" data-component="background">
         <img src="{{ url_for('static', filename='images/bg 2.png') }}" alt="Background"
@@ -50,7 +106,7 @@
             </div>
 
             <!-- 显示char_3dim -->
-            <div class="pt-20 mt-2 text-center text-[#FFFDE9] text-sm mt-4 opacity-50" data-component="dimensions-display">
+            <div class="pt-20 text-center text-[#FFFDE9] text-sm mt-4 opacity-50" data-component="dimensions-display">
                 {% if char_3dim %}
                 <p data-component="dimensions-text">{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}</p>
                 {% else %}

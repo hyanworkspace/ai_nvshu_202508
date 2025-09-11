@@ -91,8 +91,97 @@ function formatChinesePoem(text) {
 }
 
 
+// 页面入场动画
+function initGuessPageAnimation() {
+    const mainContent = document.querySelector('[data-component="main-content"]');
+    const header = document.querySelector('[data-component="header"]');
+    const background = document.querySelector('[data-component="background"]');
+    const leftPanel = document.querySelector('[data-component="left-panel"]');
+    const rightPanel = document.querySelector('[data-component="right-panel"]');
+    const centerPanel = document.querySelector('[data-component="center-panel"]');
+    
+    // 初始设置所有元素为透明/偏移
+    if (mainContent) {
+        mainContent.style.opacity = '0';
+        mainContent.style.transform = 'translateY(30px)';
+    }
+    
+    if (typeof gsap !== 'undefined') {
+        const tl = gsap.timeline({ delay: 0.2 });
+        
+        // 背景淡入
+        tl.fromTo(background, 
+            { opacity: 0 },
+            { opacity: 0.7, duration: 0.8, ease: "power2.out" }
+        )
+        // 主内容容器淡入
+        .fromTo(mainContent,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+            "-=0.6"
+        )
+        // Header 淡入
+        .fromTo(header,
+            { opacity: 0, y: -20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+            "-=0.8"
+        )
+        // 左右面板交错进入
+        .fromTo(leftPanel,
+            { opacity: 0, x: -40, scale: 0.95 },
+            { opacity: 1, x: 0, scale: 1, duration: 0.8, ease: "back.out(1.7)" },
+            "-=0.7"
+        )
+        .fromTo(rightPanel,
+            { opacity: 0, x: 40, scale: 0.95 },
+            { opacity: 1, x: 0, scale: 1, duration: 0.8, ease: "back.out(1.7)" },
+            "-=0.6"
+        )
+        // 中央面板特殊进入效果
+        .fromTo(centerPanel,
+            { opacity: 0, scale: 0.8 },
+            { opacity: 1, scale: 1, duration: 1, ease: "elastic.out(1, 0.5)" },
+            "-=0.5"
+        )
+        // 圆形容器的呼吸效果启动
+        .call(() => {
+            // 启动左右圆形的微妙动画
+            const speakerCircle = document.querySelector('[data-component="speaker-circle"]');
+            const listenerCircle = document.querySelector('[data-component="listener-circle"]');
+            
+            if (speakerCircle) {
+                gsap.to(speakerCircle, {
+                    boxShadow: '0 0 20px rgba(255, 253, 233, 0.2)',
+                    duration: 2,
+                    ease: 'power2.inOut',
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
+            
+            if (listenerCircle && listenerCircle.classList.contains('radial-fade-listener')) {
+                gsap.to(listenerCircle, {
+                    boxShadow: '0 0 25px rgba(255, 253, 233, 0.3)',
+                    duration: 2.5,
+                    ease: 'power2.inOut',
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
+        });
+    } else {
+        // 降级处理：没有GSAP时的简单显示
+        if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.transform = 'translateY(0)';
+        }
+    }
+}
+
 // 1. 获取原始诗句
 document.addEventListener('DOMContentLoaded', async () => {
+    // 首先执行页面入场动画
+    initGuessPageAnimation();
     if (!poem) {
         alert('No poem provided');
         return;
@@ -568,12 +657,63 @@ function displayCharacterImage() {
         // 添加生成结果按钮
         const button = document.createElement('button');
         button.id = 'generate-result-btn';
-        button.className = 'w-full max-w-[20vw] px-10 py-2 rounded-[30px] border-[2px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut mt-auto';
+        button.className = 'w-full max-w-[20vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"';
         button.style.padding = '0.1rem 1rem';
         button.textContent = 'Generate Result';
         button.addEventListener('click', () => {
-            // 跳转到结果页面
-            window.location.href = '/get_result';
+            // 添加淡出效果后跳转到结果页面
+            const body = document.body;
+            const mainContent = document.querySelector('[data-component="main-content"]');
+            const header = document.querySelector('[data-component="header"]');
+            
+            // 创建加载提示
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.5s ease;
+            `;
+            
+            const loadingText = document.createElement('div');
+            loadingText.style.cssText = `
+                color: #FFFDE9;
+                font-size: 1.5rem;
+                text-align: center;
+                font-family: var(--font-inknut), serif;
+            `;
+            loadingText.innerHTML = 'Generating Result...<br><span style="font-size: 1rem; opacity: 0.7;">Creating your Nüshu character</span>';
+            
+            loadingOverlay.appendChild(loadingText);
+            body.appendChild(loadingOverlay);
+            
+            // 淡出动画
+            gsap.timeline()
+                .to([mainContent, header], {
+                    opacity: 0,
+                    y: -20,
+                    duration: 0.6,
+                    ease: "power2.inOut"
+                })
+                .to(loadingOverlay, {
+                    opacity: 1,
+                    duration: 0.3,
+                    ease: "power2.inOut"
+                }, "-=0.3")
+                .call(() => {
+                    // 延迟一点时间让用户看到加载状态，然后跳转
+                    setTimeout(() => {
+                        window.location.href = '/get_result';
+                    }, 500);
+                });
         });
         
         // 将按钮添加到专门的按钮容器中

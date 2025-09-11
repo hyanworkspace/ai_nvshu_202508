@@ -19,11 +19,115 @@
              class="w-full h-full object-cover opacity-70">
     </div>
 
+    <style>
+        /* 防止页面加载时的闪烁 */
+        [data-component="main-container"] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        [data-component="background"] {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        
+        /* 媒体圆形的微妙动画效果 */
+        [data-component="media-circle-overlay"] {
+            transition: all 0.3s ease;
+        }
+        
+        [data-component="media-circle-overlay"]:hover {
+            transform: scale(1.02);
+        }
+        
+        /* 状态项的平滑过渡 */
+        .status-item {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        
+        .status-item.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .status-item.completed {
+            opacity: 0.9;
+            transform: translateX(0);
+        }
+        
+        /* 切换按钮的悬停效果 */
+        .toggle-button:hover {
+            background-color: rgba(255, 253, 233, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        /* 语言部分的打字机效果优化 */
+        .language-section {
+            transition: opacity 0.5s ease;
+        }
+        
+        /* 诗句显示的优化 */
+        .poem {
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        
+        /* 描述文字的优化 */
+        .description {
+            transition: all 0.3s ease;
+        }
+        
+        /* 标题的入场准备 */
+        [data-component="left-title"], 
+        [data-component="right-title"] {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 媒体包装器的入场准备 */
+        [data-component="left-media-wrapper"] {
+            opacity: 0;
+            transform: scale(0.8) rotate(-2deg);
+            transition: all 0.3s ease;
+        }
+        
+        /* 面板的入场准备 */
+        [data-component="left-panel"], 
+        [data-component="right-panel"] {
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        [data-component="left-panel"] {
+            transform: translateX(-60px) scale(0.9);
+        }
+        
+        [data-component="right-panel"] {
+            transform: translateX(60px) scale(0.9);
+        }
+        
+        /* 提升交互体验 */
+        .status-item:hover {
+            transform: translateX(5px);
+            background-color: rgba(255, 253, 233, 0.05);
+        }
+        
+        /* 媒体圆形的悬停效果 */
+        [data-component="media-circle-overlay"]:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(255, 253, 233, 0.3);
+        }
+    </style>
+
     <!-- Main content container -->
     <div class="relative z-0 h-screen flex items-center justify-center opacity-0" data-component="main-container" id="mainContainer">
         <div class="flex max-w-[1400px] w-full gap-8 p-5" data-component="layout-row">
-            <div class="flex-[2]" data-component="left-panel">
-                <div class="text-2xl font-medium mb-4 text-[#333]" data-component="left-title">Observation</div>
+            <div class="flex-[1.5]" data-component="left-panel">
+                <div class="text-2xl font-medium mb-4 text-[rgb(255,251,233)]" data-component="left-title">Observation</div>
                 <!-- 包裹容器：相对定位，增加padding确保圆形完整显示 -->
                 <div class="relative w-[100%] aspect-square flex items-center justify-center p-[5%]" data-component="left-media-wrapper">
                     <!-- 单一圆形容器：视频 + 装饰 + 内容 -->
@@ -41,7 +145,7 @@
             </div>
 
             <div class="flex-1" data-component="right-panel">
-                <div class="text-2xl font-medium mb-4 text-[#333]" data-component="right-title">Process Status</div>
+                <div class="text-2xl font-medium mb-4 text-[rgb(255,251,233)]" data-component="right-title">Process Status</div>
                 <div class="min-h-[300px]" id="right-content" data-component="status-list">
                     <!-- Status items will be added incrementally here -->
                 </div>

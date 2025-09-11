@@ -6,6 +6,7 @@
     <title>Nüshu Dictionary</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
+    <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,6 +20,146 @@
             },
         }
     </script>
+    <style>
+        /* 页面初始加载状态 */
+        [data-component="main-container"] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        [data-component="background"] {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        
+        /* 字典卡片基础样式和hover效果 */
+        .dictionary-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+        }
+        
+        .dictionary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 253, 233, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .dictionary-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(255, 253, 233, 0.2);
+            border-color: rgba(255, 253, 233, 0.8);
+            background-color: rgba(255, 251, 233, 0.15);
+        }
+        
+        .dictionary-card:hover::before {
+            left: 100%;
+        }
+        
+        .dictionary-card:hover .card-char {
+            transform: scale(1.2);
+            text-shadow: 0 0 10px rgba(255, 253, 233, 0.6);
+        }
+        
+        .dictionary-card:hover .card-image {
+            transform: scale(1.1) rotate(2deg);
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 253, 233, 0.4));
+        }
+        
+        .dictionary-card:hover .card-dimensions {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        
+        /* 卡片内部元素的过渡效果 */
+        .card-char {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-image {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-dimensions {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.8;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 搜索框和按钮的增强效果 */
+        [data-component="search-input"] {
+            transition: all 0.3s ease;
+        }
+        
+        [data-component="search-input"]:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 253, 233, 0.3);
+            border-color: rgba(255, 253, 233, 1);
+        }
+        
+        [data-component="prev-button"], 
+        [data-component="next-button"] {
+            transition: all 0.3s ease;
+        }
+        
+        [data-component="prev-button"]:hover:not(:disabled), 
+        [data-component="next-button"]:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 253, 233, 0.2);
+        }
+        
+        /* 页面标题和副标题的动画准备 */
+        [data-component="page-title"] {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        
+        [data-component="page-subtitle"] {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        
+        [data-component="controls-section"] {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        /* 加载状态的呼吸效果 */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        /* 网格容器的动画准备 */
+        [data-component="dictionary-grid"] {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    </style>
 </head>
 <body class="bg-black text-[#FFFDE9] min-h-screen font-inknut" data-component="page-body">
     <!-- Background image container -->
@@ -99,27 +240,121 @@
             document.getElementById('prev-page').disabled = currentPage <= 1;
             document.getElementById('next-page').disabled = currentPage >= totalPages;
             
-            // Render characters
-            charsToShow.forEach(char => {
+            // Render characters with animations
+            charsToShow.forEach((char, index) => {
                 const dimensions = dictToRender[char];
                 const imagePath = getImagePath(dimensions);
                 
                 const characterElement = document.createElement('div');
-                characterElement.className = 'border-2 border-dashed border-[#FFFDE9] rounded-lg p-2 flex flex-col items-center bg-[rgba(255,251,233,0.1)]';
+                characterElement.className = 'dictionary-card border-2 border-dashed border-[#FFFDE9] rounded-lg p-2 flex flex-col items-center bg-[rgba(255,251,233,0.1)]';
                 characterElement.innerHTML = `
                     <div class="flex flex-col items-center gap-1 w-full">
-                        <div class="text-lg font-xique text-xl">${char}</div>
-                        <img src="${imagePath}" alt="Nüshu character for ${char}" class="w-20 h-20 object-contain" loading="lazy">
-                        <div class="text-xs opacity-80">${dimensions.join('-')}</div>
+                        <div class="card-char text-lg font-xique text-xl">${char}</div>
+                        <img src="${imagePath}" alt="Nüshu character for ${char}" class="card-image w-20 h-20 object-contain" loading="lazy">
+                        <div class="card-dimensions text-xs opacity-80">${dimensions.join('-')}</div>
                     </div>
                 `;
                 
                 grid.appendChild(characterElement);
+                
+                // Add staggered entrance animation
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(characterElement, {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.6,
+                        ease: "back.out(1.7)",
+                        delay: index * 0.05 // Staggered delay
+                    });
+                } else {
+                    // Fallback for no GSAP
+                    characterElement.style.opacity = '1';
+                    characterElement.style.transform = 'translateY(0) scale(1)';
+                }
             });
+        }
+
+        // Page entrance animation
+        function initPageAnimation() {
+            const background = document.querySelector('[data-component="background"]');
+            const mainContainer = document.querySelector('[data-component="main-container"]');
+            const pageTitle = document.querySelector('[data-component="page-title"]');
+            const pageSubtitle = document.querySelector('[data-component="page-subtitle"]');
+            const controlsSection = document.querySelector('[data-component="controls-section"]');
+            const dictionaryGrid = document.querySelector('[data-component="dictionary-grid"]');
+            
+            if (typeof gsap !== 'undefined') {
+                const tl = gsap.timeline({ delay: 0.2 });
+                
+                // 1. Background fade in
+                tl.to(background, {
+                    opacity: 0.7,
+                    duration: 0.8,
+                    ease: "power2.out"
+                })
+                
+                // 2. Main container fade in and slide up
+                .to(mainContainer, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                }, "-=0.6")
+                
+                // 3. Title animations
+                .to(pageTitle, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: "back.out(1.7)"
+                }, "-=0.6")
+                .to(pageSubtitle, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: "power2.out"
+                }, "-=0.4")
+                
+                // 4. Controls section
+                .to(controlsSection, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: "power2.out"
+                }, "-=0.3")
+                
+                // 5. Dictionary grid container
+                .to(dictionaryGrid, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: "power2.out"
+                }, "-=0.2");
+                
+            } else {
+                // Fallback without GSAP
+                background.style.opacity = '0.7';
+                mainContainer.style.opacity = '1';
+                mainContainer.style.transform = 'translateY(0)';
+                pageTitle.style.opacity = '1';
+                pageTitle.style.transform = 'translateY(0)';
+                pageSubtitle.style.opacity = '1';
+                pageSubtitle.style.transform = 'translateY(0)';
+                controlsSection.style.opacity = '1';
+                controlsSection.style.transform = 'translateY(0)';
+                dictionaryGrid.style.opacity = '1';
+                dictionaryGrid.style.transform = 'translateY(0)';
+            }
         }
 
         // Function to load dictionary from server
         async function loadDictionary() {
+            const grid = document.getElementById('dictionary-grid');
+            
+            // Show loading state with pulse animation
+            grid.innerHTML = '<div class="text-center col-span-full py-8 loading-pulse">Loading dictionary...</div>';
+            
             try {
                 const response = await fetch('/get_dictionary');
                 if (!response.ok) {
@@ -128,36 +363,93 @@
                 currentDictionary = await response.json();
                 filteredDictionary = {};
                 currentPage = 1;
-                renderCurrentPage();
+                
+                // Add a slight delay to show loading state
+                setTimeout(() => {
+                    renderCurrentPage();
+                }, 300);
+                
             } catch (error) {
                 console.error('Error loading dictionary:', error);
-                document.getElementById('dictionary-grid').innerHTML = 
+                grid.innerHTML = 
                     '<div class="text-center col-span-full py-8 text-red-400">Failed to load dictionary. Please try again later.</div>';
             }
         }
 
-        // Search functionality
+        // Enhanced search functionality with animation
+        let searchTimeout;
         document.getElementById('search-input').addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim().toLowerCase();
+            const grid = document.getElementById('dictionary-grid');
             
-            if (searchTerm === '') {
-                filteredDictionary = {};
-            } else {
-                filteredDictionary = Object.fromEntries(
-                    Object.entries(currentDictionary)
-                        .filter(([char]) => char.toLowerCase().includes(searchTerm))
-                );
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            // Add loading state
+            if (typeof gsap !== 'undefined') {
+                gsap.to(grid, {
+                    opacity: 0.5,
+                    duration: 0.2,
+                    ease: "power2.inOut"
+                });
             }
             
-            currentPage = 1;
-            renderCurrentPage();
+            // Debounce search
+            searchTimeout = setTimeout(() => {
+                if (searchTerm === '') {
+                    filteredDictionary = {};
+                } else {
+                    filteredDictionary = Object.fromEntries(
+                        Object.entries(currentDictionary)
+                            .filter(([char]) => char.toLowerCase().includes(searchTerm))
+                    );
+                }
+                
+                currentPage = 1;
+                
+                // Fade back in and render
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(grid, {
+                        opacity: 1,
+                        duration: 0.3,
+                        ease: "power2.out",
+                        onComplete: renderCurrentPage
+                    });
+                } else {
+                    renderCurrentPage();
+                }
+            }, 300);
         });
 
-        // Pagination controls
+        // Enhanced pagination controls with animation
+        function animatedPageChange(callback) {
+            const grid = document.getElementById('dictionary-grid');
+            
+            if (typeof gsap !== 'undefined') {
+                // Fade out current content
+                gsap.to(grid.children, {
+                    opacity: 0,
+                    y: -20,
+                    scale: 0.95,
+                    duration: 0.3,
+                    ease: "power2.inOut",
+                    stagger: 0.02,
+                    onComplete: () => {
+                        callback();
+                        // Content will fade in via renderCurrentPage animations
+                    }
+                });
+            } else {
+                callback();
+            }
+        }
+        
         document.getElementById('prev-page').addEventListener('click', () => {
             if (currentPage > 1) {
-                currentPage--;
-                renderCurrentPage();
+                animatedPageChange(() => {
+                    currentPage--;
+                    renderCurrentPage();
+                });
             }
         });
 
@@ -166,13 +458,23 @@
             const totalPages = Math.ceil(Object.keys(dictToRender).length / ITEMS_PER_PAGE);
             
             if (currentPage < totalPages) {
-                currentPage++;
-                renderCurrentPage();
+                animatedPageChange(() => {
+                    currentPage++;
+                    renderCurrentPage();
+                });
             }
         });
 
         // Initialize the dictionary when page loads
-        document.addEventListener('DOMContentLoaded', loadDictionary);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start page entrance animation
+            initPageAnimation();
+            
+            // Load dictionary after a short delay
+            setTimeout(() => {
+                loadDictionary();
+            }, 800);
+        });
     </script>
 </body>
 </html>

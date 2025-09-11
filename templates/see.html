@@ -44,6 +44,35 @@
         /* Override rain sizes to match landing page */
         .nvshu-column .char-img { width: 60px; }
         .nvshu-column .char-img:first-child { width: 70px; }
+        
+        /* 页面过渡优化 */
+        #confirmationPage, #mainPageContainer {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 背景视频和女书雨的过渡效果 */
+        .bg-video-container {
+            transition: opacity 0.8s ease;
+        }
+        
+        .nvshu-rain {
+            transition: opacity 0.6s ease;
+        }
+        
+        /* 按钮交互增强 */
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 253, 233, 0.3);
+        }
+        
+        /* 预览容器的微妙动画 */
+        #previewContainer {
+            transition: all 0.3s ease;
+        }
+        
+        #previewContainer:hover {
+            transform: scale(1.01);
+        }
 
         /* Simple spinner */
         .spinner {

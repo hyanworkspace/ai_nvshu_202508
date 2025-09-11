@@ -345,17 +345,80 @@ function showConfirmationPageFromRecord(blob, originalBlob) {
     uploadedFileType = 'video';
     
     const videoUrl = URL.createObjectURL(blob);
-    const videoPreview = document.getElementById('videoPreview');
     
-    videoPreview.src = videoUrl;
-    videoPreview.style.display = 'block';
+    // 预加载确认页面的视频内容
+    preloadConfirmationMedia(videoUrl, 'video');
     
-    const imgPreview = document.getElementById('imagePreview');
-    if (imgPreview) {
-        imgPreview.style.display = 'none';
+    // 使用平滑的转场到确认页面
+    smoothTransitionToConfirmation(videoUrl, 'video');
+}
+
+// 平滑转场到确认页面（用于录制视频）
+function smoothTransitionToConfirmation(url, fileType) {
+    const mainContainer = document.querySelector('[data-component="main-content"]');
+    const videoRecorder = document.getElementById('videoRecorder');
+    
+    if (typeof gsap !== 'undefined') {
+        const tl = gsap.timeline();
+        
+        // 1. 淡出录制界面和主容器
+        tl.to([mainContainer, videoRecorder], {
+            opacity: 0,
+            scale: 0.95,
+            duration: 0.5,
+            ease: 'power2.inOut',
+            onComplete: () => {
+                mainContainer.style.display = 'none';
+                hideEl(videoRecorder);
+            }
+        })
+        
+        // 2. 显示确认页面并设置媒体
+        .call(() => {
+            confirmationPage.classList.remove('hidden');
+            confirmationPage.style.display = 'flex';
+            confirmationPage.style.opacity = '0';
+            
+            // 显示预加载的视频
+            const videoPreview = document.getElementById('videoPreview');
+            const imgPreview = document.getElementById('imagePreview');
+            
+            videoPreview.style.display = 'block';
+            if (imgPreview) imgPreview.style.display = 'none';
+        })
+        
+        // 3. 确认页面淡入
+        .to(confirmationPage, {
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power2.out'
+        })
+        
+        // 4. 预览圆形动画
+        .fromTo('[data-component="preview-circle"]', 
+            { scale: 0.9, opacity: 0.8 },
+            { 
+                scale: 1.1, 
+                opacity: 1, 
+                duration: 0.7, 
+                ease: 'back.out(1.7)'
+            }, "-=0.4"
+        );
+        
+    } else {
+        // Fallback without GSAP
+        mainContainer.style.display = 'none';
+        hideEl(videoRecorder);
+        
+        confirmationPage.classList.remove('hidden');
+        confirmationPage.style.display = 'flex';
+        confirmationPage.style.opacity = '1';
+        
+        const videoPreview = document.getElementById('videoPreview');
+        const imgPreview = document.getElementById('imagePreview');
+        videoPreview.style.display = 'block';
+        if (imgPreview) imgPreview.style.display = 'none';
     }
-    
-    transitionToConfirmation();
 }
 
 // 上传选项点击事件
@@ -457,13 +520,29 @@ async function showUploadSuccessAndTransition(url, fileType) {
             uploadPreview.style.display = 'none';
         }
 
+        // 预设确认页面的媒体内容，避免后续重新加载
+        preloadConfirmationMedia(url, fileType);
+
         // 获取上传圆形容器
         const uploadCircle = document.getElementById('uploadOption');
+        const recordCircle = document.getElementById('recordOption');
 
         if (typeof gsap !== 'undefined' && uploadCircle) {
-            // 圆形容器移动到中间的动画
-            gsap.to(uploadCircle, {
-                duration: 1.0, // 稍微缩短移动时间
+            const tl = gsap.timeline();
+            
+            // 1. 同时淡出录制圆形容器
+            if (recordCircle) {
+                tl.to(recordCircle, {
+                    duration: 0.6,
+                    opacity: 0,
+                    scale: 0.8,
+                    ease: 'power2.inOut'
+                }, 0);
+            }
+            
+            // 2. 圆形容器移动到中间并稍微放大
+            tl.to(uploadCircle, {
+                duration: 0.8,
                 x: () => {
                     const container = document.querySelector('[data-component="main-content"]');
                     const containerRect = container.getBoundingClientRect();
@@ -477,94 +556,130 @@ async function showUploadSuccessAndTransition(url, fileType) {
                     return (containerRect.height / 2) - (circleRect.top + circleRect.height / 2);
                 },
                 scale: 1.1,
-                ease: 'power2.inOut',
-                onComplete: () => {
-                    // 短暂停顿后开始过渡到确认页面
-                    setTimeout(() => {
-                        transitionToConfirmationWithPreview(url, fileType);
-                        resolve();
-                    }, 300); // 进一步减少延迟时间，让过渡更流畅
-                }
+                ease: 'power2.inOut'
+            }, 0.2)
+            
+            // 3. 直接无缝过渡到确认页面，不重新加载媒体
+            .call(() => {
+                seamlessTransitionToConfirmation(url, fileType);
+                resolve();
             });
-
-            // 同时淡出录制圆形容器
-            const recordCircle = document.getElementById('recordOption');
-            if (recordCircle) {
-                gsap.to(recordCircle, {
-                    duration: 0.8,
-                    opacity: 0,
-                    scale: 0.8,
-                    ease: 'power2.inOut'
-                });
-            }
+            
         } else {
             // Fallback for no GSAP
             setTimeout(() => {
-                transitionToConfirmationWithPreview(url, fileType);
+                preloadConfirmationMedia(url, fileType);
+                seamlessTransitionToConfirmation(url, fileType);
                 resolve();
-            }, 1500);
+            }, 1000);
         }
     });
 }
 
-// 从预览状态直接过渡到确认页面
-function transitionToConfirmationWithPreview(url, fileType) {
-    // 隐藏主内容
-    const mainContainer = document.querySelector('[data-component="main-content"]');
-    if (mainContainer) {
-        if (typeof gsap !== 'undefined') {
-            gsap.to(mainContainer, { opacity: 0, duration: 0.3, ease: 'power2.out', onComplete: () => {
-                mainContainer.style.display = 'none';
-            }});
-        } else {
-            mainContainer.style.display = 'none';
-        }
-    }
-
-    // 设置确认页面的预览
+// 预加载确认页面的媒体内容
+function preloadConfirmationMedia(url, fileType) {
     const videoPreview = document.getElementById('videoPreview');
-    const imgPreview = document.getElementById('imagePreview');
+    let imgPreview = document.getElementById('imagePreview');
 
     if (fileType === 'image') {
-        videoPreview.style.display = 'none';
+        // 为图片创建预览元素（如果不存在）
         if (!imgPreview) {
-            const newImgPreview = document.createElement('img');
-            newImgPreview.id = 'imagePreview';
-            newImgPreview.className = 'w-full h-full absolute inset-0 rounded-full object-cover';
-            videoPreview.parentNode.insertBefore(newImgPreview, videoPreview);
+            imgPreview = document.createElement('img');
+            imgPreview.id = 'imagePreview';
+            imgPreview.className = 'w-full h-full absolute inset-0 rounded-full object-cover';
+            videoPreview.parentNode.insertBefore(imgPreview, videoPreview);
         }
-        document.getElementById('imagePreview').src = url;
-        document.getElementById('imagePreview').style.display = 'block';
+        imgPreview.src = url; // 预加载图片
+        imgPreview.style.display = 'none'; // 先隐藏，等转场时显示
+        videoPreview.style.display = 'none';
     } else {
-        videoPreview.src = url;
-        videoPreview.style.display = 'block';
+        videoPreview.src = url; // 预加载视频
+        videoPreview.style.display = 'none'; // 先隐藏，等转场时显示
         if (imgPreview) {
             imgPreview.style.display = 'none';
         }
     }
+}
 
-    // 显示确认页面
-    confirmationPage.classList.remove('hidden');
-    confirmationPage.style.display = 'flex';
-
+// 无缝过渡到确认页面，避免媒体重新加载
+function seamlessTransitionToConfirmation(url, fileType) {
+    const mainContainer = document.querySelector('[data-component="main-content"]');
+    const videoPreview = document.getElementById('videoPreview');
+    const imgPreview = document.getElementById('imagePreview');
+    
     if (typeof gsap !== 'undefined') {
-        const circle = document.querySelector('[data-component="preview-circle"]');
-        gsap.fromTo(confirmationPage, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.inOut' });
-        if (circle) {
-            // 从默认的scale-110状态开始动画，确保与上传容器大小一致
-            gsap.fromTo(circle, { scale: 0.8, opacity: 0.8 }, { scale: 1.1, opacity: 1, duration: 0.8, ease: 'power3.out' });
+        const tl = gsap.timeline();
+        
+        // 1. 淡出主内容和上传成功预览
+        tl.to([mainContainer, uploadSuccess], {
+            opacity: 0,
+            duration: 0.4,
+            ease: 'power2.inOut',
+            onComplete: () => {
+                mainContainer.style.display = 'none';
+                hideEl(uploadSuccess);
+            }
+        })
+        
+        // 2. 同时显示确认页面（初始透明）
+        .call(() => {
+            confirmationPage.classList.remove('hidden');
+            confirmationPage.style.display = 'flex';
+            confirmationPage.style.opacity = '0';
+            
+            // 显示正确的媒体预览（媒体已预加载）
+            if (fileType === 'image') {
+                imgPreview.style.display = 'block';
+                videoPreview.style.display = 'none';
+            } else {
+                videoPreview.style.display = 'block';
+                if (imgPreview) imgPreview.style.display = 'none';
+            }
+        })
+        
+        // 3. 确认页面淡入
+        .to(confirmationPage, {
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power2.out'
+        })
+        
+        // 4. 预览圆形的精细动画
+        .fromTo('[data-component="preview-circle"]', 
+            { scale: 1.1, opacity: 0.9 },
+            { 
+                scale: 1.1, 
+                opacity: 1, 
+                duration: 0.5, 
+                ease: 'power2.out'
+            }, "-=0.4"
+        );
+        
+    } else {
+        // Fallback without GSAP
+        mainContainer.style.display = 'none';
+        hideEl(uploadSuccess);
+        
+        confirmationPage.classList.remove('hidden');
+        confirmationPage.style.display = 'flex';
+        confirmationPage.style.opacity = '1';
+        
+        if (fileType === 'image') {
+            imgPreview.style.display = 'block';
+            videoPreview.style.display = 'none';
+        } else {
+            videoPreview.style.display = 'block';
+            if (imgPreview) imgPreview.style.display = 'none';
         }
     }
+}
 
-    // 延迟隐藏上传成功预览，确保确认页面完全显示
-    setTimeout(() => {
-        hideEl(uploadSuccess);
-        // 同时确保确认页面的容器保持正确的缩放状态
-        const circle = document.querySelector('[data-component="preview-circle"]');
-        if (circle && typeof gsap !== 'undefined') {
-            gsap.set(circle, { scale: 1.1 }); // 确保最终缩放状态
-        }
-    }, 800); // 调整延迟时间与整体节奏匹配
+// 从预览状态直接过渡到确认页面（保留兼容性，但使用新的无缝转场）
+function transitionToConfirmationWithPreview(url, fileType) {
+    // 预加载媒体内容以确保一致性
+    preloadConfirmationMedia(url, fileType);
+    // 使用新的无缝转场函数
+    seamlessTransitionToConfirmation(url, fileType);
 }
 
 confirmBtn.addEventListener('click', () => {
@@ -838,34 +953,8 @@ function confirm_video(url_, original_url = null) {
     }
     
     console.log('Redirecting to:', redirectUrl);
-    // Enhanced page fade out before navigation
-    if (typeof gsap !== 'undefined') {
-        const currentPage = document.querySelector('#confirmationPage:not(.hidden), #mainPageContainer:not([style*="display: none"])');
-        const tl = gsap.timeline({
-            onComplete: () => { window.location.href = redirectUrl; }
-        });
-        
-        // 先让当前可见内容fade out
-        if (currentPage) {
-            tl.to(currentPage, { 
-                opacity: 0, 
-                scale: 0.95, 
-                y: -20, 
-                duration: 0.4, 
-                ease: 'power2.in' 
-            });
-        }
-        
-        // 然后整个body fade out
-        tl.to(document.body, { 
-            opacity: 0.3, 
-            duration: 0.3, 
-            ease: 'power2.out' 
-        }, "-=0.2");
-        
-    } else {
-        window.location.href = redirectUrl;
-    }
+    // Enhanced transition to think page
+    transitionToThinkPage(redirectUrl);
 }
 
 function hideMainContent() {
@@ -962,5 +1051,127 @@ function showConfirmationPageWithTransition() {
         }
     } else {
         confirmationPage.style.opacity = '1';
+    }
+}
+
+// 过渡到think页面的函数
+function transitionToThinkPage(redirectUrl) {
+    const currentPage = document.querySelector('#confirmationPage:not(.hidden), #mainPageContainer:not([style*="display: none"])');
+    const backgroundVideo = document.querySelector('.bg-video-container');
+    const nvshuRain = document.querySelector('.nvshu-rain');
+    
+    // 创建过渡覆盖层
+    const transitionOverlay = document.createElement('div');
+    transitionOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+    `;
+    
+    const transitionContent = document.createElement('div');
+    transitionContent.style.cssText = `
+        text-align: center;
+        color: #FFFDE9;
+        font-family: var(--font-inknut), serif;
+    `;
+    
+    transitionContent.innerHTML = `
+        <div style="font-size: 2rem; margin-bottom: 1rem;">Processing Your Media...</div>
+        <div style="font-size: 1.2rem; opacity: 0.8; margin-bottom: 2rem;">AI is analyzing and thinking</div>
+        <div class="loading-spinner" style="
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 253, 233, 0.3);
+            border-top: 3px solid #FFFDE9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        "></div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    `;
+    
+    transitionOverlay.appendChild(transitionContent);
+    document.body.appendChild(transitionOverlay);
+    
+    if (typeof gsap !== 'undefined') {
+        const tl = gsap.timeline();
+        
+        // 1. 淡出当前页面内容
+        if (currentPage) {
+            tl.to(currentPage, {
+                opacity: 0,
+                scale: 0.95,
+                y: -30,
+                duration: 0.6,
+                ease: "power2.inOut"
+            });
+        }
+        
+        // 2. 淡出背景视频和女书雨效果
+        if (backgroundVideo) {
+            tl.to(backgroundVideo, {
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.inOut"
+            }, "-=0.4");
+        }
+        
+        if (nvshuRain) {
+            tl.to(nvshuRain, {
+                opacity: 0,
+                duration: 0.6,
+                ease: "power2.inOut"
+            }, "-=0.6");
+        }
+        
+        // 3. 显示过渡覆盖层
+        tl.to(transitionOverlay, {
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.inOut"
+        }, "-=0.3")
+        
+        // 4. 过渡内容的入场动画
+        .fromTo(transitionContent, 
+            { opacity: 0, y: 20, scale: 0.9 },
+            { 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                duration: 0.6, 
+                ease: "back.out(1.7)" 
+            }, "-=0.3"
+        )
+        
+        // 5. 延迟后跳转
+        .call(() => {
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 800);
+        });
+        
+    } else {
+        // 降级处理：没有GSAP时的简单过渡
+        if (currentPage) currentPage.style.opacity = '0';
+        if (backgroundVideo) backgroundVideo.style.opacity = '0';
+        if (nvshuRain) nvshuRain.style.opacity = '0';
+        transitionOverlay.style.opacity = '1';
+        
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, 1200);
     }
 }

@@ -152,6 +152,26 @@ function addStatusItem(text, isActive = false, isCompleted = false, toggleConten
     }
     
     rightContent.appendChild(statusItem);
+    
+    // 添加进入动画
+    if (typeof gsap !== 'undefined') {
+        gsap.fromTo(statusItem, 
+            { opacity: 0, x: 20, scale: 0.95 },
+            { 
+                opacity: 1, 
+                x: 0, 
+                scale: 1,
+                duration: 0.5, 
+                ease: "back.out(1.7)",
+                delay: 0.1
+            }
+        );
+    } else {
+        // 降级处理
+        statusItem.style.opacity = '1';
+        statusItem.style.transform = 'translateX(0)';
+    }
+    
     return statusItem;
 }
 
@@ -449,8 +469,8 @@ async function generatePoem(description, poems) {
         
         // After minimum display time, mark as completed
         setTimeout(() => {
-            // replaceWithSimpleEl(data.poem)
-            window.location.href = `/guess?poem=${data.poem}`;
+            // Add transition effect before navigating to guess page
+            transitionToGuessPage(data.poem);
         }, remainingTime);
     } catch (error) {
         updateStatusItem(reflectingItem, `Error: ${error.message}`);
@@ -517,41 +537,101 @@ function initPageAnimation() {
     const mainContainer = document.getElementById('mainContainer');
     const leftPanel = document.querySelector('[data-component="left-panel"]');
     const rightPanel = document.querySelector('[data-component="right-panel"]');
+    const background = document.querySelector('[data-component="background"]');
+    const leftTitle = document.querySelector('[data-component="left-title"]');
+    const rightTitle = document.querySelector('[data-component="right-title"]');
+    const mediaWrapper = document.querySelector('[data-component="left-media-wrapper"]');
+    
+    // 初始设置所有元素为透明/偏移
+    if (mainContainer) {
+        mainContainer.style.opacity = '0';
+        mainContainer.style.transform = 'translateY(30px)';
+    }
     
     if (typeof gsap !== 'undefined') {
-        // 主容器fade in
-        gsap.to(mainContainer, { 
-            opacity: 1, 
-            duration: 0.6, 
-            ease: 'power2.out' 
+        const tl = gsap.timeline({ delay: 0.3 });
+        
+        // 1. 背景淡入
+        tl.fromTo(background, 
+            { opacity: 0 },
+            { opacity: 0.7, duration: 0.8, ease: "power2.out" }
+        )
+        
+        // 2. 主容器淡入和上移
+        .fromTo(mainContainer,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+            "-=0.6"
+        )
+        
+        // 3. 标题依次出现
+        .fromTo(leftTitle,
+            { opacity: 0, y: -20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+            "-=0.8"
+        )
+        .fromTo(rightTitle,
+            { opacity: 0, y: -20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+            "-=0.5"
+        )
+        
+        // 4. 左右面板交错进入
+        .fromTo(leftPanel, 
+            { opacity: 0, x: -60, scale: 0.9 },
+            { 
+                opacity: 1, 
+                x: 0, 
+                scale: 1,
+                duration: 0.9,
+                ease: 'back.out(1.7)'
+            },
+            "-=0.7"
+        )
+        .fromTo(rightPanel, 
+            { opacity: 0, x: 60, scale: 0.9 },
+            { 
+                opacity: 1, 
+                x: 0, 
+                scale: 1,
+                duration: 0.9,
+                ease: 'back.out(1.7)'
+            },
+            "-=0.6"
+        )
+        
+        // 5. 媒体容器特殊入场效果
+        .fromTo(mediaWrapper,
+            { opacity: 0, scale: 0.8, rotation: -2 },
+            { 
+                opacity: 1, 
+                scale: 1, 
+                rotation: 0,
+                duration: 1,
+                ease: "elastic.out(1, 0.6)"
+            },
+            "-=0.5"
+        )
+        
+        // 6. 启动持续的微妙动画效果
+        .call(() => {
+            // 媒体圆形的微妙呼吸效果
+            const mediaCircle = document.getElementById('mediaCircle');
+            if (mediaCircle) {
+                gsap.to(mediaCircle, {
+                    boxShadow: '0 0 30px rgba(255, 253, 233, 0.2)',
+                    duration: 3,
+                    ease: 'power2.inOut',
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
         });
         
-        // 左右面板依次出现
-        gsap.fromTo(leftPanel, 
-            { opacity: 0, x: -50, scale: 0.95 },
-            { 
-                opacity: 1, 
-                x: 0, 
-                scale: 1,
-                duration: 0.8,
-                ease: 'power2.out',
-                delay: 0.3
-            }
-        );
-        
-        gsap.fromTo(rightPanel, 
-            { opacity: 0, x: 50, scale: 0.95 },
-            { 
-                opacity: 1, 
-                x: 0, 
-                scale: 1,
-                duration: 0.8,
-                ease: 'power2.out',
-                delay: 0.5
-            }
-        );
     } else {
+        // 降级处理：没有GSAP时的简单显示
         mainContainer.style.opacity = '1';
+        mainContainer.style.transform = 'translateY(0)';
     }
 }
 
@@ -612,5 +692,82 @@ function startTextLoadingAnimation(element) {
 function stopTextLoadingAnimation() {
     if (typeof gsap !== 'undefined') {
         gsap.killTweensOf('.dot-1, .dot-2, .dot-3');
+    }
+}
+
+// 过渡到guess页面
+function transitionToGuessPage(poem) {
+    const mainContainer = document.getElementById('mainContainer');
+    const background = document.querySelector('[data-component="background"]');
+    
+    // 创建过渡覆盖层
+    const transitionOverlay = document.createElement('div');
+    transitionOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+    `;
+    
+    const transitionText = document.createElement('div');
+    transitionText.style.cssText = `
+        color: #FFFDE9;
+        font-size: 1.8rem;
+        text-align: center;
+        font-family: var(--font-inknut), serif;
+    `;
+    transitionText.innerHTML = 'Entering Language Development...<br><span style="font-size: 1.1rem; opacity: 0.8;">Preparing the guessing game</span>';
+    
+    transitionOverlay.appendChild(transitionText);
+    document.body.appendChild(transitionOverlay);
+    
+    // 停止所有现有的呼吸效果
+    stopMediaBreathingEffect();
+    
+    // 创建淡出和过渡动画
+    if (typeof gsap !== 'undefined') {
+        const tl = gsap.timeline();
+        
+        // 淡出主内容
+        tl.to([mainContainer], {
+            opacity: 0,
+            scale: 0.95,
+            duration: 0.8,
+            ease: "power2.inOut"
+        })
+        // 显示过渡覆盖层
+        .to(transitionOverlay, {
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.inOut"
+        }, "-=0.4")
+        // 过渡文字的微妙动画
+        .to(transitionText, {
+            scale: 1.05,
+            duration: 0.4,
+            ease: "power2.inOut",
+            yoyo: true,
+            repeat: 1
+        }, "-=0.3")
+        // 延迟后跳转
+        .call(() => {
+            setTimeout(() => {
+                window.location.href = `/guess?poem=${encodeURIComponent(poem)}`;
+            }, 600);
+        });
+    } else {
+        // 降级处理：没有GSAP时的简单过渡
+        mainContainer.style.opacity = '0';
+        transitionOverlay.style.opacity = '1';
+        setTimeout(() => {
+            window.location.href = `/guess?poem=${encodeURIComponent(poem)}`;
+        }, 1000);
     }
 }
