@@ -19,7 +19,7 @@ numpy==1.26.4
 scipy==1.13.1
 
 # AI服务API
-zhipuai==2.1.0
+zhipuai==2.1.5.20250825
 
 # 图像和视频处理
 Pillow==11.2.1
