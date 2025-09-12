@@ -191,7 +191,7 @@ python app.py --debug
 **支持的文件格式：**
 - 视频：MP4, WebM
 - 图片：PNG, JPG, JPEG
-- 文件大小限制：5MB
+- 文件大小限制：50MB
 
 #### 第二步：AI分析处理
 1. **自动跳转** - 上传成功后自动进入思考页面 (`/think`)
@@ -295,7 +295,7 @@ python app.py --debug
 **支持的文件格式：**
 - 视频：MP4, WebM
 - 图片：PNG, JPG, JPEG
-- 文件大小限制：5MB
+- 文件大小限制：50MB
 
 #### 2. 思考页面 (`/think`) - `think.html`
 **功能：** AI分析媒体并生成诗歌的中间处理页面

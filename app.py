@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, session, send_from_d
 import os
 import uuid
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 from config import Config
 from ai_nvshu_functions import find_similar, recognize_and_translate, create_new_poem, create_nvshu_from_poem, create_combined_nvshu_image, replace_with_simple_el, get_char_translate, translate_text
 from utils import load_dict_from_file
@@ -30,7 +31,7 @@ CORS(app, resources={r"/upload": {"origins": "*"}})
 # 使用 Config 类中的配置
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['DICTIONARY_PATH'] = Config.DICTIONARY_PATH
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 50MB
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 禁用静态资源缓存（开发环境）
 
@@ -107,8 +108,19 @@ def upload_file():
     try:
         # 详细的调试日志 ------------------------------
         app.logger.debug("Upload request received")
+        app.logger.debug(f"Content-Length: {request.content_length}")
+        app.logger.debug(f"Content-Type: {request.content_type}")
         app.logger.debug(f"Files in request: {list(request.files.keys())}")
         app.logger.debug(f"Form data: {dict(request.form)}")
+        
+        # 检查请求大小
+        if request.content_length and request.content_length > app.config['MAX_CONTENT_LENGTH']:
+            app.logger.error(f"Request too large: {request.content_length} bytes")
+            return jsonify({
+                'error': '请求过大',
+                'message': f'请求大小 {request.content_length} 字节超过了 {app.config["MAX_CONTENT_LENGTH"]} 字节的限制',
+                'max_size': f'{app.config["MAX_CONTENT_LENGTH"] // (1024*1024)}MB'
+            }), 413
 
         # 一系列的检查 ------------------------------
         if 'file' not in request.files:
@@ -550,6 +562,25 @@ def cleanup_old_files():
                 app.logger.debug(f"Deleted old file: {file_path}")
         except Exception as e:
             app.logger.error(f"Error deleting old file {file_path}: {str(e)}")
+
+# 错误处理
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    app.logger.error(f"File too large: {str(e)}")
+    return jsonify({
+        'error': '文件过大',
+        'message': '上传的文件超过了50MB的限制，请选择较小的文件',
+        'max_size': '50MB'
+    }), 413
+
+@app.errorhandler(413)
+def handle_413_error(e):
+    app.logger.error(f"413 Error: {str(e)}")
+    return jsonify({
+        'error': '请求体过大',
+        'message': '上传的文件超过了服务器限制，请选择较小的文件',
+        'max_size': '50MB'
+    }), 413
 
 # 注册应用退出时的清理函数
 atexit.register(cleanup_old_files)

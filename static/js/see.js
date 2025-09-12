@@ -139,8 +139,8 @@ function validateFile(file) {
     }
     
     // 检查文件大小
-    if (file.size > 5 * 1024 * 1024) {
-        throw new Error("File size exceeds 5MB limit. Please choose a smaller file.");
+    if (file.size > 50 * 1024 * 1024) {
+        throw new Error("File size exceeds 50MB limit. Please choose a smaller file.");
     }
     
     // 具体的文件类型验证

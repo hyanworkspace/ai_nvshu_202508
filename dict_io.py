@@ -14,18 +14,7 @@ def add_to_dictionary(char, char_3dim, char_translate):
     dictionary = load_dict_from_file(Config.DICTIONARY_PATH)
     
     # 检查字符是否已存在
-    if char in dictionary:
-        # 将字典值从列表格式转换为字典格式，以支持英文翻译
-        if isinstance(dictionary[char], list):
-            # 如果当前值是列表，转换为字典格式
-            dictionary[char] = {
-                'char_3dim': dictionary[char],
-                'char_translate': char_translate
-            }
-        else:
-            # 如果已经是字典格式，只更新翻译
-            dictionary[char]['char_translate'] = char_translate
-    else:
+    if not char in dictionary:
         # 如果字符不存在，直接添加新的字典格式数据
         dictionary[char] = {
             'char_3dim': char_3dim,

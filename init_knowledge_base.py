@@ -18,8 +18,8 @@ sys.path.append('.')
 from utils import *
 
 
-tmp_dir = '/Users/slv/Dev/ai_nvshu_202508/knowledge_tmp'
-consolidated_dir = '/Users/slv/Dev/ai_nvshu_202508/knowledge_base'
+tmp_dir = 'knowledge_tmp'
+consolidated_dir = 'knowledge_base'
 init_word_num = 20
 
 # -----------------------------------------------------------------------
@@ -214,8 +214,8 @@ simple_el_dict_ = load_dict_from_file(f'{tmp_dir}/simple.pkl')
 
 for char in list(simple_el_dict_.keys()):
     print(char)
-    create_combined_nvshu_image(simple_el_dict_[char], black=True, trim_wsp=True)
-    create_combined_nvshu_image(simple_el_dict_[char], black=False, trim_wsp=True)
+    create_combined_nvshu_image(simple_el_dict_[char]['char_3dim'], black=True, trim_wsp=True)
+    create_combined_nvshu_image(simple_el_dict_[char]['char_3dim'], black=False, trim_wsp=True)
 
 # for char in list(simple_el_dict_.keys()):
 #     print(char)

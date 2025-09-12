@@ -91,12 +91,12 @@
 
    ```bash
    sudo systemctl daemon-reload
-   sudo systemctl start flask
-   sudo systemctl enable flask
+   sudo systemctl start flaskapp
+   sudo systemctl enable flaskapp
    ```
 
 7. **配置 Nginx 反向代理**
-   在 `/etc/nginx/sites-available/flask` 写入：
+   在 `/etc/nginx/sites-available/flaskapp` 写入：
 
    ```nginx
    server {
@@ -116,7 +116,7 @@
    然后启用：
 
    ```bash
-   sudo ln -s /etc/nginx/sites-available/flask /etc/nginx/sites-enabled
+   sudo ln -s /etc/nginx/sites-available/flaskapp /etc/nginx/sites-enabled
    sudo nginx -t
    sudo systemctl restart nginx
    ```
