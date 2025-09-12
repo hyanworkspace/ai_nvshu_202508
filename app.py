@@ -14,7 +14,14 @@ from utils import *
 
 
 # 设置日志配置
-logging.basicConfig(level=logging.DEBUG, filename='app.log', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.DEBUG, 
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        # logging.StreamHandler()  # 同时输出到控制台
+    ]
+)
 
 app = Flask(__name__)
 app.secret_key = 'a-secret-key'
@@ -229,6 +236,8 @@ def describe_video():
         # 检查是否启用调试模式或AI服务不可用
         use_mock_data = app.debug or os.getenv('USE_MOCK_AI', 'false').lower() == 'true'
         
+        app.logger.info(f"Debug mode: {app.debug}, USE_MOCK_AI: {os.getenv('USE_MOCK_AI', 'false')}, use_mock_data: {use_mock_data}")
+        
         if use_mock_data:
             app.logger.info("Using mock data for video description")
             video_desc = '我看到一个女人坐在看似是咖啡馆或餐厅的桌子上。她穿着无袖上衣，拿着玫瑰靠近脸。该设置包括柜台上的各种物品，例如眼镜，餐巾纸和某些电子设备。桌子周围有椅子，穿过窗户，您可以在外面看到停放的汽车。氛围暗示了一个带有人工照明的室内环境。'
@@ -385,9 +394,15 @@ def generate_char():
             char_cn = poem[char_pos]
         else:
             try:
-                char_cn, char_pos, simple_el, repr_token, guess_char, guess_char_eng, guess_poems_eng = create_nvshu_from_poem(poem)
+                result = create_nvshu_from_poem(poem)
+                print(f"create_nvshu_from_poem returned: {result}")
+                print(f"Result type: {type(result)}, Length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
+                
+                char_cn, char_pos, simple_el, repr_token, guess_char, guess_char_eng, guess_poems_eng = result
+                print(f"Unpacked values: char_cn={char_cn}, char_pos={char_pos}, guess_char={guess_char}")
                 print("Completed create_nvshu_from_poem")
             except Exception as e:
+                print(f"Error in create_nvshu_from_poem: {str(e)}")
                 return jsonify(*handle_ai_function_error(e, "女书字符生成"))
             
             try:
@@ -541,5 +556,6 @@ atexit.register(cleanup_old_files)
 
 if __name__ == '__main__':
     # 使用 Flask 内置的调试重载器
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(debug=False)
 

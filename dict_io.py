@@ -48,7 +48,7 @@ def get_char_translation(char):
 def get_char_3dim(char):
     """获取字符的3维向量"""
     dictionary = load_dict_from_file(Config.DICTIONARY_PATH)
-    if char in dictionary:
+    if char in dictionary.keys():
         if isinstance(dictionary[char], dict):
             return dictionary[char].get('char_3dim', [])
         else:

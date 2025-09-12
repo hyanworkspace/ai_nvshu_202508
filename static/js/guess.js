@@ -235,8 +235,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             
             charData = await charResponse.json();
+            console.info('charData received:', charData);
             console.info('charData.char_pos:', charData.char_pos);
             console.info('charData.guess_char.length:', charData.guess_char.length);
+            
+            // 检查必要字段是否存在
+            if (!charData.char_pos && charData.char_pos !== 0) {
+                console.error('Missing char_pos in response');
+                return;
+            }
+            if (!charData.guess_char || !Array.isArray(charData.guess_char)) {
+                console.error('Missing or invalid guess_char in response');
+                return;
+            }
             
             // 更新背景字符为目标字符
             if (charData.char_cn) {
@@ -282,12 +293,18 @@ function updateEncodingTextDisplay() {
 }
 
 function startAutomaticRevelation() {
+    console.log('Starting startAutomaticRevelation function');
+    console.log('charData:', charData);
+    console.log('replaceData:', replaceData);
+    
     const pos = charData.char_pos;
     const guessChars = charData.guess_char;
     const guessCharsEng = charData.guess_char_eng
     const guessPoemsEng = charData.guess_poems_eng //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
     const poem_list = replaceData.poem_in_list;
     const revealingText = document.getElementById('revealing-text'); // 这个时候的 revealing-text 是已经格式化后的，没有标点符号
+    
+    console.log('pos:', pos, 'guessChars:', guessChars, 'revealingText element:', revealingText);
     
     // 获取媒体文件路径
     const mediaUrl = document.getElementById('media-url').value;

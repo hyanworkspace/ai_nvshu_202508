@@ -8,12 +8,10 @@ from dotenv import load_dotenv
 import os
 from PIL import Image
 import time
-# from zhipuai import ZhipuAI
+from zhipuai import ZhipuAI
 from utils import *
 from dict_io import *
 from word_vector_manager import word_vectors
-# from langchain_google_genai import ChatGoogleGenerativeAI
-# from huggingface_hub import InferenceClient
 
 # variables --------------------
 load_dotenv()  # 加载 .env 文件中的环境变量
@@ -24,7 +22,7 @@ load_dotenv()  # 加载 .env 文件中的环境变量
 # )
 
 ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
-# nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY) # 填写您自己的APIKey
+nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
 
 
 # 加载预训练的 BERT 模型和分词器
@@ -348,8 +346,7 @@ def create_nvshu_from_poem(poem):
         # 中文字, 中文字位置, 女书字（3-dim），768-dim vect, list of guess, list of guess(translated in eng), 带有替换字的五言诗的翻译
         idx = poem.index(feedback[0])
         guess_poems = [poem[:idx] + i + poem[idx+1:] for i in list_of_guess]
-        # 获取字符的3维向量，兼容新旧字典格式
-        char_3dim = get_char_3dim(feedback[0])
+        char_3dim = machine_A.knowledge.simple_el_dict[feedback[0]]['char_3dim']
         return feedback[0], idx, char_3dim, list(feedback[1].astype('float')), list_of_guess, [translate_text(x, 'zh-cn', 'en').lower() for x in list_of_guess], [translate_text(x, 'zh-cn', 'en').lower() for x in guess_poems]
     except Exception as e:
         # 提供更详细的错误信息

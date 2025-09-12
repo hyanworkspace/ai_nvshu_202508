@@ -8,7 +8,6 @@ from io import BytesIO
 from config import Config
 from process_video import convert_webm_to_mp4
 from dotenv import load_dotenv
-from huggingface_hub import InferenceClient
 from zhipuai import ZhipuAI
 
 # 加载 .env 文件中的环境变量
