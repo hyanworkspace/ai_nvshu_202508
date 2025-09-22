@@ -15,9 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 页面入场动画
     initPageAnimation();
-    
-    // 启动女书雨背景效果
-    startNvshuRain();
 
     // Initialize left panel with media
     const leftContent = document.getElementById('left-content');
@@ -146,9 +143,9 @@ function addStatusItem(text, isActive = false, isCompleted = false, toggleConten
         const toggleId = 'toggle-' + Date.now();
         statusItem.innerHTML += `
             <button class="toggle-button" onclick="toggleDetails('${toggleId}', this)">
-                Show details
+                Hide details
             </button>
-            <div id="${toggleId}" class="toggle-content" style="display: none;">
+            <div id="${toggleId}" class="toggle-content" style="display: block;">
                 ${toggleContent}
             </div>
         `;
@@ -236,9 +233,9 @@ function updateStatusItem(item, text, isCompleted = true, toggleContent = null) 
         const toggleId = 'toggle-' + Date.now();
         item.innerHTML += `
             <button class="toggle-button" onclick="toggleDetails('${toggleId}', this)">
-                Show details
+                Hide details
             </button>
-            <div id="${toggleId}" class="toggle-content" style="display: none;">
+            <div id="${toggleId}" class="toggle-content" style="display: block;">
                 ${toggleContent}
             </div>
         `;
@@ -554,19 +551,17 @@ function initPageAnimation() {
     if (typeof gsap !== 'undefined') {
         const tl = gsap.timeline({ delay: 0.3 });
         
-        // 1. 背景淡入（如果存在的话）
-        if (background) {
-            tl.fromTo(background, 
-                { opacity: 0 },
-                { opacity: 0.7, duration: 0.8, ease: "power2.out" }
-            );
-        }
+        // 1. 背景淡入
+        tl.fromTo(background, 
+            { opacity: 0 },
+            { opacity: 0.7, duration: 0.8, ease: "power2.out" }
+        )
         
         // 2. 主容器淡入和上移
-        tl.fromTo(mainContainer,
+        .fromTo(mainContainer,
             { opacity: 0, y: 30 },
             { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
-            background ? "-=0.6" : "0"
+            "-=0.6"
         )
         
         // 3. 标题依次出现
@@ -635,21 +630,8 @@ function initPageAnimation() {
         
     } else {
         // 降级处理：没有GSAP时的简单显示
-        if (background) background.style.opacity = '0.7';
         mainContainer.style.opacity = '1';
         mainContainer.style.transform = 'translateY(0)';
-        if (leftTitle) {
-            leftTitle.style.opacity = '1';
-            leftTitle.style.transform = 'translateY(0)';
-        }
-        if (rightTitle) {
-            rightTitle.style.opacity = '1';
-            rightTitle.style.transform = 'translateY(0)';
-        }
-        if (mediaWrapper) {
-            mediaWrapper.style.opacity = '1';
-            mediaWrapper.style.transform = 'translateY(0) scale(1) rotate(0)';
-        }
     }
 }
 
@@ -713,168 +695,6 @@ function stopTextLoadingAnimation() {
     }
 }
 
-// 女书雨效果生成器
-function createNvshuRain() {
-    const rainContainer = document.querySelector('[data-component="nvshu-rain"]');
-    if (!rainContainer) return;
-    
-    // 女书字符图片列表（使用实际存在的文件）
-    const nvshuChars = [
-        'combined_10-0-15_vertical_black_trim.png',
-        'combined_10-0-23_vertical_black_trim.png',
-        'combined_11-0-23_vertical_black_trim.png',
-        'combined_12-6-23_vertical_black_trim.png',
-        'combined_13-2-23_vertical_black_trim.png',
-        'combined_13-4-23_vertical_black_trim.png',
-        'combined_13-9-15_vertical_black_trim.png',
-        'combined_14-0-16_vertical_black_trim.png',
-        'combined_14-2-11_vertical_black_trim.png',
-        'combined_14-8-17_vertical_black_trim.png',
-        'combined_15-2-23_vertical_black_trim.png',
-        'combined_16-0-16_vertical_black_trim.png',
-        'combined_16-3-22_vertical_black_trim.png',
-        'combined_16-4-1_vertical_black_trim.png',
-        'combined_16-5-21_vertical_black_trim.png',
-        'combined_17-0-18_vertical_black_trim.png',
-        'combined_17-0-20_vertical_black_trim.png',
-        'combined_18-1-14_vertical_black_trim.png',
-        'combined_19-0-23_vertical_black_trim.png',
-        'combined_19-3-21_vertical_black_trim.png',
-        'combined_20-0-21_vertical_black_trim.png',
-        'combined_20-8-16_vertical_black_trim.png',
-        'combined_20-8-22_vertical_black_trim.png',
-        'combined_21-0-16_vertical_black_trim.png',
-        'combined_21-1-16_vertical_black_trim.png',
-        'combined_21-1-20_vertical_black_trim.png',
-        'combined_21-2-14_vertical_black_trim.png',
-        'combined_21-8-19_vertical_black_trim.png',
-        'combined_22-0-15_vertical_black_trim.png',
-        'combined_22-0-9_vertical_black_trim.png'
-    ];
-    
-    // 生成随机大小的函数
-    function getRandomSizes() {
-        const baseSize = 20 + Math.random() * 15; // 20-35px基础大小
-        const variation = 0.7 + Math.random() * 0.6; // 0.7-1.3倍变化
-        
-        return {
-            head: Math.round(baseSize * 1.4 * variation),
-            second: Math.round(baseSize * 1.2 * variation), 
-            normal: Math.round(baseSize * variation),
-            small: Math.round(baseSize * 0.8 * variation),
-            tiny: Math.round(baseSize * 0.6 * variation)
-        };
-    }
-    
-    // 生成随机透明度
-    function getRandomOpacities() {
-        const baseFactor = 0.8 + Math.random() * 0.4; // 0.8-1.2倍
-        return {
-            head: Math.min(0.8 * baseFactor, 0.9),
-            second: Math.min(0.6 * baseFactor, 0.7),
-            normal: Math.min(0.5 * baseFactor, 0.6),
-            small: Math.min(0.4 * baseFactor, 0.5),
-            tiny: Math.min(0.3 * baseFactor, 0.4)
-        };
-    }
-    
-    // 创建女书雨列
-    function createRainColumn() {
-        const column = document.createElement('div');
-        column.className = 'nvshu-column';
-        
-        // 随机位置
-        const leftPosition = Math.random() * 100;
-        column.style.left = `${leftPosition}%`;
-        
-        // 随机延迟
-        const delay = Math.random() * 10;
-        column.style.setProperty('--delay', `${delay}s`);
-        
-        // 获取这一列的随机大小和透明度
-        const sizes = getRandomSizes();
-        const opacities = getRandomOpacities();
-        
-        // 设置CSS变量
-        column.style.setProperty('--size-head', `${sizes.head}px`);
-        column.style.setProperty('--size-second', `${sizes.second}px`);
-        column.style.setProperty('--size', `${sizes.normal}px`);
-        column.style.setProperty('--size-small', `${sizes.small}px`);
-        column.style.setProperty('--size-tiny', `${sizes.tiny}px`);
-        
-        // 随机选择字符数量（3-7个）
-        const charCount = 3 + Math.floor(Math.random() * 5);
-        
-        for (let i = 0; i < charCount; i++) {
-            const img = document.createElement('img');
-            img.className = 'char-img';
-            img.src = `/static/nvshu_images/${nvshuChars[Math.floor(Math.random() * nvshuChars.length)]}`;
-            img.alt = '';
-            
-            // 设置个别字符的最大透明度
-            let maxOpacity;
-            if (i === 0) maxOpacity = opacities.head;
-            else if (i === 1) maxOpacity = opacities.second;
-            else if (i === 2) maxOpacity = opacities.normal;
-            else if (i === 3) maxOpacity = opacities.small;
-            else maxOpacity = opacities.tiny;
-            
-            img.style.setProperty('--max-opacity', maxOpacity);
-            
-            column.appendChild(img);
-        }
-        
-        return column;
-    }
-    
-    // 生成初始雨列（减少数量以适应think页面的沉静氛围）
-    const columnCount = Math.floor(window.innerWidth / 120); // 更稀疏的分布
-    
-    for (let i = 0; i < columnCount; i++) {
-        setTimeout(() => {
-            const column = createRainColumn();
-            rainContainer.appendChild(column);
-        }, i * 200); // 错开创建时间
-    }
-    
-    // 定期添加新的雨列
-    setInterval(() => {
-        // 随机决定是否添加新列（70%概率）
-        if (Math.random() < 0.7) {
-            const column = createRainColumn();
-            rainContainer.appendChild(column);
-            
-            // 清理过多的列元素
-            const columns = rainContainer.querySelectorAll('.nvshu-column');
-            if (columns.length > columnCount * 2) {
-                columns[0].remove();
-            }
-        }
-    }, 3000); // 每3秒检查一次
-}
-
-// 启动女书雨效果
-function startNvshuRain() {
-    const rainContainer = document.querySelector('[data-component="nvshu-rain"]');
-    if (!rainContainer) return;
-    
-    // 延迟启动，让页面先加载
-    setTimeout(() => {
-        createNvshuRain();
-        
-        // 淡入女书雨效果
-        if (typeof gsap !== 'undefined') {
-            gsap.to(rainContainer, {
-                opacity: 1,
-                duration: 2,
-                ease: 'power2.out'
-            });
-        } else {
-            rainContainer.style.opacity = '1';
-        }
-    }, 1500);
-}
-
 // 过渡到guess页面
 function transitionToGuessPage(poem) {
     const mainContainer = document.getElementById('mainContainer');
@@ -911,25 +731,17 @@ function transitionToGuessPage(poem) {
     // 停止所有现有的呼吸效果
     stopMediaBreathingEffect();
     
-    // 淡出女书雨效果
-    const rainContainer = document.querySelector('[data-component="nvshu-rain"]');
-    
     // 创建淡出和过渡动画
     if (typeof gsap !== 'undefined') {
         const tl = gsap.timeline();
         
-        // 淡出主内容和女书雨
+        // 淡出主内容
         tl.to([mainContainer], {
             opacity: 0,
             scale: 0.95,
             duration: 0.8,
             ease: "power2.inOut"
         })
-        .to(rainContainer, {
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.inOut"
-        }, "-=0.6")
         // 显示过渡覆盖层
         .to(transitionOverlay, {
             opacity: 1,
@@ -953,7 +765,6 @@ function transitionToGuessPage(poem) {
     } else {
         // 降级处理：没有GSAP时的简单过渡
         mainContainer.style.opacity = '0';
-        if (rainContainer) rainContainer.style.opacity = '0';
         transitionOverlay.style.opacity = '1';
         setTimeout(() => {
             window.location.href = `/guess?poem=${encodeURIComponent(poem)}`;

@@ -8,7 +8,7 @@ from io import BytesIO
 from config import Config
 from process_video import convert_webm_to_mp4
 from dotenv import load_dotenv
-# from zhipuai import ZhipuAI
+from zhipuai import ZhipuAI
 
 # 加载 .env 文件中的环境变量
 load_dotenv()
@@ -18,7 +18,7 @@ load_dotenv()
 #     provider="sambanova",
 #     api_key=HF_TOKEN,
 # )
-# nvshu_ai = ZhipuAI(api_key="7b43286295c846e9aa5a4b16b1a5b027.cSgcQ91fvl3rO3kr") # 填写您自己的APIKey
+nvshu_ai = ZhipuAI(api_key="7b43286295c846e9aa5a4b16b1a5b027.cSgcQ91fvl3rO3kr") # 填写您自己的APIKey
 
 
 class MediaAnalyzer:
