@@ -1,733 +1,891 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI女书 (AI Nüshu)</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
-    <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='images/favicon.png') }}"
+    />
+    <link
+      href="{{ url_for('static', filename='css/globals.css') }}"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/split-type.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/ActionButton.js') }}"></script>
     <style>
-        body {
-            overflow-x: hidden;
-            background: radial-gradient(ellipse at center, rgba(255, 253, 233, 0.03) 0%, rgba(0, 0, 0, 1) 70%);
+      body {
+        overflow-x: hidden;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(255, 253, 233, 0.03) 0%,
+          rgba(0, 0, 0, 1) 70%
+        );
+      }
+
+      /* 添加动态背景光效 */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 30%,
+            rgba(255, 253, 233, 0.05) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(255, 253, 233, 0.03) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 253, 233, 0.02) 0%,
+            transparent 70%
+          );
+        pointer-events: none;
+        z-index: -2;
+        animation: background-pulse 10s ease-in-out infinite;
+      }
+
+      @keyframes background-pulse {
+        0%,
+        100% {
+          opacity: 0.5;
         }
-        
-        /* 添加动态背景光效 */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 253, 233, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 253, 233, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255, 253, 233, 0.02) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: -2;
-            animation: background-pulse 10s ease-in-out infinite;
+        50% {
+          opacity: 1;
         }
-        
-        @keyframes background-pulse {
-            0%, 100% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
+      }
+
+      /* 女书字符雨效果 */
+      .nvshu-rain-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .nvshu-column {
+        position: absolute;
+        top: -300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: matrix-rain linear infinite;
+        z-index: 2;
+      }
+
+      .nvshu-column .char-img {
+        display: block;
+        width: 60px;
+        height: auto;
+        margin-bottom: 10px;
+        opacity: 0.8;
+        filter: brightness(1.5) contrast(1.2)
+          drop-shadow(0 0 8px rgba(255, 253, 233, 0.4));
+        animation: char-fade 1.5s ease-in-out infinite alternate;
+      }
+
+      .nvshu-column .char-img:first-child {
+        opacity: 1;
+        filter: brightness(2) contrast(1.5)
+          drop-shadow(0 0 15px rgba(255, 253, 233, 0.8));
+        width: 70px;
+      }
+
+      .nvshu-column .char-img:nth-child(2) {
+        opacity: 0.9;
+        width: 64px;
+      }
+
+      .nvshu-column .char-img:nth-child(3) {
+        opacity: 0.7;
+      }
+
+      .nvshu-column .char-img:nth-child(4) {
+        opacity: 0.5;
+      }
+
+      .nvshu-column .char-img:nth-child(n + 5) {
+        opacity: 0.3;
+      }
+
+      .nvshu-column .char:first-child {
+        color: rgba(255, 253, 233, 1);
+        text-shadow: 0 0 20px rgba(255, 253, 233, 0.8);
+        font-size: 24px;
+      }
+
+      .nvshu-column .char:nth-child(2) {
+        opacity: 0.8;
+      }
+
+      .nvshu-column .char:nth-child(3) {
+        opacity: 0.6;
+      }
+
+      .nvshu-column .char:nth-child(4) {
+        opacity: 0.4;
+      }
+
+      .nvshu-column .char:nth-child(n + 5) {
+        opacity: 0.2;
+      }
+
+      @keyframes matrix-rain {
+        0% {
+          transform: translateY(-200px);
+          opacity: 0;
         }
-        
-        /* 女书字符雨效果 */
-        .nvshu-rain-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
+        10% {
+          opacity: 1;
         }
-        
-        .nvshu-column {
-            position: absolute;
-            top: -300px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: matrix-rain linear infinite;
-            z-index: 2;
+        90% {
+          opacity: 1;
         }
-        
-        .nvshu-column .char-img {
-            display: block;
-            width: 60px;
-            height: auto;
-            margin-bottom: 10px;
-            opacity: 0.8;
-            filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 8px rgba(255, 253, 233, 0.4));
-            animation: char-fade 1.5s ease-in-out infinite alternate;
+        100% {
+          transform: translateY(calc(100vh + 200px));
+          opacity: 0;
         }
-        
-        .nvshu-column .char-img:first-child {
-            opacity: 1;
-            filter: brightness(2) contrast(1.5) drop-shadow(0 0 15px rgba(255, 253, 233, 0.8));
-            width: 70px;
+      }
+
+      @keyframes char-fade {
+        0% {
+          opacity: 0.1;
         }
-        
-        .nvshu-column .char-img:nth-child(2) {
-            opacity: 0.9;
-            width: 64px;
+        100% {
+          opacity: 1;
         }
-        
-        .nvshu-column .char-img:nth-child(3) {
-            opacity: 0.7;
-        }
-        
-        .nvshu-column .char-img:nth-child(4) {
-            opacity: 0.5;
-        }
-        
-        .nvshu-column .char-img:nth-child(n+5) {
-            opacity: 0.3;
-        }
-        
-        .nvshu-column .char:first-child {
-            color: rgba(255, 253, 233, 1);
-            text-shadow: 0 0 20px rgba(255, 253, 233, 0.8);
-            font-size: 24px;
-        }
-        
-        .nvshu-column .char:nth-child(2) {
-            opacity: 0.8;
-        }
-        
-        .nvshu-column .char:nth-child(3) {
-            opacity: 0.6;
-        }
-        
-        .nvshu-column .char:nth-child(4) {
-            opacity: 0.4;
-        }
-        
-        .nvshu-column .char:nth-child(n+5) {
-            opacity: 0.2;
-        }
-        
-        @keyframes matrix-rain {
-            0% {
-                transform: translateY(-200px);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(calc(100vh + 200px));
-                opacity: 0;
-            }
-        }
-        
-        @keyframes char-fade {
-            0% { opacity: 0.1; }
-            100% { opacity: 1; }
-        }
-        
-        .action-button {
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 253, 233, 0.2), transparent);
-            transition: left 0.7s ease;
-        }
-        
-        .action-button:hover::before {
-            left: 100%;
-        }
-        
-        .glow-effect {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle, rgba(255, 253, 233, 0.1) 0%, transparent 70%);
-            border-radius: 0.5rem;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-        }
-        
-        .action-button:hover .glow-effect {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-        
-        /* 增强按钮效果 */
-        .action-button {
-            box-shadow: 0 8px 32px rgba(255, 253, 233, 0.1);
-            border: 2px dashed rgba(255, 253, 233, 0.3);
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(255, 253, 233, 0.05));
-        }
-        
-        .action-button:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(255, 253, 233, 0.2);
-            border-color: rgba(255, 253, 233, 0.6);
-            background: linear-gradient(135deg, rgba(255, 253, 233, 0.1), rgba(255, 253, 233, 0.05));
-        }
-        
-        .action-button:active {
-            transform: translateY(-4px) scale(0.98);
-        }
-        
-        /* 优化女书字符雨的视觉效果 */
-        .nvshu-column:hover {
-            transform: scale(1.1);
-            transition: all 0.3s ease;
-        }
-        
-        .nvshu-column:hover .char-img {
-            filter: brightness(2.5) contrast(1.8) drop-shadow(0 0 20px rgba(255, 253, 233, 0.9)) !important;
-        }
-        
-        /* 随机化字符雨的速度 */
-        .nvshu-column:nth-child(2n) {
-            animation-duration: 12s;
-        }
-        
-        .nvshu-column:nth-child(3n) {
-            animation-duration: 8s;
-        }
-        
-        .nvshu-column:nth-child(4n) {
-            animation-duration: 15s;
-        }
-        
-        .nvshu-column:nth-child(5n) {
-            animation-duration: 10s;
-        }
-        
-        /* 背景视频容器与滤镜（黄调单色） */
-        .bg-video-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0; /* 位于字符雨(1)之下，内容(>10)之下 */
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .bg-video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(1) sepia(1) saturate(2) hue-rotate(350deg) brightness(0.65) contrast(1.1);
-        }
-        .bg-video-tint {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at center, rgba(255, 253, 233, 0.12) 0%, rgba(255, 253, 233, 0.06) 45%, rgba(0, 0, 0, 0.55) 100%),
-                linear-gradient(0deg, rgba(255, 253, 233, 0.08), rgba(255, 253, 233, 0.08));
-            pointer-events: none;
-        }
+      }
+
+      .action-button {
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .action-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 253, 233, 0.2),
+          transparent
+        );
+        transition: left 0.7s ease;
+      }
+
+      .action-button:hover::before {
+        left: 100%;
+      }
+
+      .glow-effect {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle,
+          rgba(255, 253, 233, 0.1) 0%,
+          transparent 70%
+        );
+        border-radius: 0.5rem;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: all 0.3s ease;
+      }
+
+      .action-button:hover .glow-effect {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+
+      /* 增强按钮效果 */
+      .action-button {
+        box-shadow: 0 8px 32px rgba(255, 253, 233, 0.1);
+        border: 2px dashed rgba(255, 253, 233, 0.3);
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.2),
+          rgba(255, 253, 233, 0.05)
+        );
+      }
+
+      .action-button:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(255, 253, 233, 0.2);
+        border-color: rgba(255, 253, 233, 0.6);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 253, 233, 0.1),
+          rgba(255, 253, 233, 0.05)
+        );
+      }
+
+      .action-button:active {
+        transform: translateY(-4px) scale(0.98);
+      }
+
+      /* 优化女书字符雨的视觉效果 */
+      .nvshu-column:hover {
+        transform: scale(1.1);
+        transition: all 0.3s ease;
+      }
+
+      .nvshu-column:hover .char-img {
+        filter: brightness(2.5) contrast(1.8)
+          drop-shadow(0 0 20px rgba(255, 253, 233, 0.9)) !important;
+      }
+
+      /* 随机化字符雨的速度 */
+      .nvshu-column:nth-child(2n) {
+        animation-duration: 12s;
+      }
+
+      .nvshu-column:nth-child(3n) {
+        animation-duration: 8s;
+      }
+
+      .nvshu-column:nth-child(4n) {
+        animation-duration: 15s;
+      }
+
+      .nvshu-column:nth-child(5n) {
+        animation-duration: 10s;
+      }
+
+      /* 背景视频容器与滤镜（黄调单色） */
+      .bg-video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0; /* 位于字符雨(1)之下，内容(>10)之下 */
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .bg-video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: grayscale(1) sepia(1) saturate(2) hue-rotate(350deg)
+          brightness(0.65) contrast(1.1);
+      }
+      .bg-video-tint {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            ellipse at center,
+            rgba(255, 253, 233, 0.12) 0%,
+            rgba(255, 253, 233, 0.06) 45%,
+            rgba(0, 0, 0, 0.55) 100%
+          ),
+          linear-gradient(
+            0deg,
+            rgba(255, 253, 233, 0.08),
+            rgba(255, 253, 233, 0.08)
+          );
+        pointer-events: none;
+      }
     </style>
-</head>
-<body class="bg-black text-[#FFFDE9] min-h-screen">
+  </head>
+  <body class="bg-black text-[#FFFDE9] min-h-screen">
     <!-- 女书字符雨背景 -->
     <div id="nvshu-rain" class="nvshu-rain-container"></div>
     <!-- 背景视频（黄调风格化） -->
     <div class="bg-video-container">
-        <video autoplay muted loop playsinline preload="auto" poster="{{ url_for('static', filename='images/bg1.png') }}">
-            <source src="{{ url_for('static', filename='1nv.mp4') }}" type="video/mp4">
-        </video>
-        <div class="bg-video-tint"></div>
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        poster="{{ url_for('static', filename='images/bg1.png') }}"
+      >
+        <source
+          src="{{ url_for('static', filename='1nv.mp4') }}"
+          type="video/mp4"
+        />
+      </video>
+      <div class="bg-video-tint"></div>
     </div>
-    
+
     <!-- Include Header Component -->
     {% include 'components/header.html' %}
-    
+
     <!-- 主内容 -->
-    <div id="landing-root" class="relative z-20 min-h-screen flex flex-col items-end justify-center px-6 -mt-20 max-w-6xl mx-auto">
-        <!-- 主标题 -->
-        <div id="main-title" class="text-center mb-6 opacity-0">
-            <h1 class="text-4xl md:text-5xl font-bold mb-3" style="font-family: 'Inknut Antiqua', serif;">
-                AI Nüshu
-            </h1>
-            <!-- <div class="text-2xl md:text-3xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
+    <div
+      id="landing-root"
+      class="relative z-20 min-h-screen flex flex-col items-end justify-center px-6 -mt-20 max-w-6xl mx-auto"
+    >
+      <!-- 主标题 -->
+      <div id="main-title" class="text-center mb-6 opacity-0">
+        <h1
+          class="text-4xl md:text-5xl font-bold mb-3"
+          style="font-family: 'Inknut Antiqua', serif"
+        >
+          AI Nüshu
+        </h1>
+        <!-- <div class="text-2xl md:text-3xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
                 (AI Nüshu)
             </div> -->
-        </div>
+      </div>
 
-        <!-- 副标题 -->
-        <!-- <p id="subtitle" class="text-lg md:text-xl text-center mb-10 font-light tracking-wide opacity-0">
+      <!-- 副标题 -->
+      <!-- <p id="subtitle" class="text-lg md:text-xl text-center mb-10 font-light tracking-wide opacity-0">
             Share a source to Generate an AI Nvshu character
         </p> -->
 
-        <!-- 操作按钮 -->
-        <div id="buttons" class="flex flex-col md:flex-row gap-6 mb-12 opacity-0">
-            <a href="/see" class="action-button relative block px-4 py-4 bg-black/20 border border-dashed border-[#FFFDE9]/40  text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
-                <div class="glow-effect"></div>
-                <div class="relative z-10">
-                    <div class="text-md opacity-80 font-light tracking-wider hover-effect hover-effect--bg-south">EXPLORE</div>
-                </div>
-            </a>
+      <!-- 操作按钮 -->
+      <div id="buttons" class="flex flex-col md:flex-row gap-6 mb-12 opacity-0">
+        <a
+          href="/see"
+          class="action-button relative block px-4 py-4 bg-black/20 border border-dashed border-[#FFFDE9]/40 text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10"
+        >
+          <div class="glow-effect"></div>
+          <div class="relative z-10">
+            <div
+              class="text-md opacity-80 font-light tracking-wider hover-effect hover-effect--bg-south"
+            >
+              EXPLORE
+            </div>
+          </div>
+        </a>
 
-            <!-- <a href="/dictionary" class="action-button relative block px-6 py-4 bg-black/20 border border-[#FFFDE9]/40 rounded-lg text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
+        <!-- <a href="/dictionary" class="action-button relative block px-6 py-4 bg-black/20 border border-[#FFFDE9]/40 rounded-lg text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
                 <div class="glow-effect"></div>
                 <div class="relative z-10">
                     <div class="text-xs opacity-80 font-light tracking-wider">Nüshu Dictionary</div>
                 </div>
             </a> -->
-        </div>
+      </div>
 
-        <!-- 项目描述 -->
-        <div id="description" class="max-w-lg text-start bg-black/40 backdrop-blur-sm p-6 border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5">
-            <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">
-                Nüshu (女书)
-            </h2>
-            <div class="space-y-3 text-sm leading-relaxed opacity-90">
-                <p>
-                    Nüshu (女书), Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.
-                </p>
+      <!-- 项目描述 -->
+      <div
+        id="description"
+        class="max-w-lg text-start bg-black/40 backdrop-blur-sm p-6 border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5"
+      >
+        <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">Nüshu (女书)</h2>
+        <div class="space-y-3 text-sm leading-relaxed opacity-90">
+          <p>
+            Nüshu (女书), Also called "Women's Script," is a unique language
+            created and used exclusively by women in Hunan Province, China, for
+            centuries to communicate Chinese in a world where they were denied
+            formal education.
+          </p>
 
-                <p>
-                    Can AI learn from ancient Chinese women and create their own secret language?
-                </p>
-                <p>
-                    This project trains AI agents to imitate illiterate women in ancient China to create a new language system,
-                    symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.
-                </p>
-            </div>
+          <p>
+            Can AI learn from ancient Chinese women and create their own secret
+            language?
+          </p>
+          <p>
+            This project trains AI agents to imitate illiterate women in ancient
+            China to create a new language system, symbolizing the defiance of
+            patriarchal constraints and the emergence of language in a
+            non-Western, feminist context.
+          </p>
         </div>
+      </div>
     </div>
 
     <script>
-        // 女书字符PNG图片列表
-        const nvshuImages = [
-            'combined_10-0-23_vertical_trim.png',
-            'combined_16-3-22_vertical_trim.png',
-            'combined_21-1-20_vertical_trim.png',
-            'combined_23-0-23_vertical_trim.png',
-            'combined_14-8-17_vertical_trim.png',
-            'combined_19-3-21_vertical_trim.png',
-            'combined_22-1-17_vertical_trim.png',
-            'combined_17-0-20_vertical_trim.png',
-            'combined_20-8-22_vertical_trim.png',
-            'combined_12-6-23_vertical_trim.png',
-            'combined_18-1-14_vertical_trim.png',
-            'combined_23-1-23_vertical_trim.png',
-            'combined_16-5-21_vertical_trim.png',
-            'combined_13-9-15_vertical_trim.png',
-            'combined_14-2-11_vertical_trim.png',
-            'combined_16-0-16_vertical_trim.png',
-            'combined_15-2-23_vertical_trim.png',
-            'combined_11-0-23_vertical_trim.png',
-            'combined_13-2-23_vertical_trim.png',
-            'combined_13-4-23_vertical_trim.png',
-            'combined_14-0-16_vertical_trim.png',
-            'combined_16-4-1_vertical_trim.png',
-            'combined_17-0-18_vertical_trim.png',
-            'combined_19-0-23_vertical_trim.png',
-            'combined_20-0-21_vertical_trim.png',
-            'combined_20-8-16_vertical_trim.png',
-            'combined_21-0-16_vertical_trim.png',
-            'combined_21-1-16_vertical_trim.png',
-            'combined_21-2-14_vertical_trim.png',
-            'combined_21-8-19_vertical_trim.png',
-            'combined_22-0-15_vertical_trim.png',
-            'combined_22-0-9_vertical_trim.png',
-            'combined_22-1-23_vertical_trim.png',
-            'combined_22-8-13_vertical_trim.png',
-            'combined_23-0-11_vertical_trim.png',
-            'combined_23-0-13_vertical_trim.png',
-            'combined_23-1-16_vertical_trim.png',
-            'combined_23-2-17_vertical_trim.png',
-            'combined_23-2-23_vertical_trim.png',
-            'combined_23-4-23_vertical_trim.png',
-            'combined_23-8-23_vertical_trim.png',
-            'combined_4-5-16_vertical_trim.png',
-            'combined_5-3-23_vertical_trim.png',
-            'combined_7-23-3_vertical_trim.png'
-        ];
+      // 女书字符PNG图片列表
+      const nvshuImages = [
+        "combined_10-0-23_vertical_trim.png",
+        "combined_16-3-22_vertical_trim.png",
+        "combined_21-1-20_vertical_trim.png",
+        "combined_23-0-23_vertical_trim.png",
+        "combined_14-8-17_vertical_trim.png",
+        "combined_19-3-21_vertical_trim.png",
+        "combined_22-1-17_vertical_trim.png",
+        "combined_17-0-20_vertical_trim.png",
+        "combined_20-8-22_vertical_trim.png",
+        "combined_12-6-23_vertical_trim.png",
+        "combined_18-1-14_vertical_trim.png",
+        "combined_23-1-23_vertical_trim.png",
+        "combined_16-5-21_vertical_trim.png",
+        "combined_13-9-15_vertical_trim.png",
+        "combined_14-2-11_vertical_trim.png",
+        "combined_16-0-16_vertical_trim.png",
+        "combined_15-2-23_vertical_trim.png",
+        "combined_11-0-23_vertical_trim.png",
+        "combined_13-2-23_vertical_trim.png",
+        "combined_13-4-23_vertical_trim.png",
+        "combined_14-0-16_vertical_trim.png",
+        "combined_16-4-1_vertical_trim.png",
+        "combined_17-0-18_vertical_trim.png",
+        "combined_19-0-23_vertical_trim.png",
+        "combined_20-0-21_vertical_trim.png",
+        "combined_20-8-16_vertical_trim.png",
+        "combined_21-0-16_vertical_trim.png",
+        "combined_21-1-16_vertical_trim.png",
+        "combined_21-2-14_vertical_trim.png",
+        "combined_21-8-19_vertical_trim.png",
+        "combined_22-0-15_vertical_trim.png",
+        "combined_22-0-9_vertical_trim.png",
+        "combined_22-1-23_vertical_trim.png",
+        "combined_22-8-13_vertical_trim.png",
+        "combined_23-0-11_vertical_trim.png",
+        "combined_23-0-13_vertical_trim.png",
+        "combined_23-1-16_vertical_trim.png",
+        "combined_23-2-17_vertical_trim.png",
+        "combined_23-2-23_vertical_trim.png",
+        "combined_23-4-23_vertical_trim.png",
+        "combined_23-8-23_vertical_trim.png",
+        "combined_4-5-16_vertical_trim.png",
+        "combined_5-3-23_vertical_trim.png",
+        "combined_7-23-3_vertical_trim.png",
+      ];
 
-        // 创建女书字符雨列
-        function createNvshuColumn(x, index) {
-            console.log('Creating image column at x:', x); // 调试日志
-            
-            const column = document.createElement('div');
-            column.className = 'nvshu-column';
-            
-            const duration = gsap.utils.random(8, 15);
-            const delay = gsap.utils.random(0, 4);
-            
-            column.style.cssText = `
+      // 创建女书字符雨列
+      function createNvshuColumn(x, index) {
+        console.log("Creating image column at x:", x); // 调试日志
+
+        const column = document.createElement("div");
+        column.className = "nvshu-column";
+
+        const duration = gsap.utils.random(8, 15);
+        const delay = gsap.utils.random(0, 4);
+
+        column.style.cssText = `
                 left: ${x}px;
                 animation-duration: ${duration}s;
                 animation-delay: ${delay}s;
                 z-index: 2;
             `;
-            
-            // 随机生成字符串长度
-            const length = 1;
-            
-            for (let i = 0; i < length; i++) {
-                const imgElement = document.createElement('img');
-                imgElement.className = 'char-img';
-                imgElement.src = `/static/nvshu_images/${nvshuImages[Math.floor(Math.random() * nvshuImages.length)]}`;
-                imgElement.style.animationDelay = (i * 0.1) + 's';
-                
-                // 添加错误处理
-                imgElement.onerror = function() {
-                    console.warn('Failed to load image:', this.src);
-                    // 如果图片加载失败，隐藏这个元素
-                    this.style.display = 'none';
-                };
-                
-                column.appendChild(imgElement);
-            }
-            
-            const container = document.getElementById('nvshu-rain');
-            if (container) {
-                container.appendChild(column);
-                console.log('Image column added to container'); // 调试日志
-                
-                // 动画完成后重新创建
-                const totalDuration = (duration + delay) * 1000;
-                setTimeout(() => {
-                    if (column.parentNode) {
-                        column.parentNode.removeChild(column);
-                        createNvshuColumn(x, index);
-                    }
-                }, totalDuration);
-            } else {
-                console.error('Container not found!');
-            }
-        }
-        
-        // 创建多个字符雨列
-        function initNvshuRain() {
-            const container = document.getElementById('nvshu-rain');
-            if (!container) {
-                console.error('Nvshu rain container not found!');
-                return;
-            }
-            
-            const screenWidth = window.innerWidth;
-            const columnWidth = 200; // 每列的宽度，为放大两倍的图片留更多空间
-            const numColumns = Math.floor(screenWidth / columnWidth);
-            
-            console.log('Screen width:', screenWidth, 'Creating', numColumns, 'nvshu image rain columns');
-            
-            // 清空现有内容
-            container.innerHTML = '';
-            
-            for (let i = 0; i < numColumns; i++) {
-                const x = i * columnWidth + Math.random() * 90 - 15; // 添加一些随机偏移
-                setTimeout(() => {
-                    createNvshuColumn(x, i);
-                }, i * 150); // 错开创建时间
-            }
+
+        // 随机生成字符串长度
+        const length = 1;
+
+        for (let i = 0; i < length; i++) {
+          const imgElement = document.createElement("img");
+          imgElement.className = "char-img";
+          imgElement.src = `/static/nvshu_images/${
+            nvshuImages[Math.floor(Math.random() * nvshuImages.length)]
+          }`;
+          imgElement.style.animationDelay = i * 0.1 + "s";
+
+          // 添加错误处理
+          imgElement.onerror = function () {
+            console.warn("Failed to load image:", this.src);
+            // 如果图片加载失败，隐藏这个元素
+            this.style.display = "none";
+          };
+
+          column.appendChild(imgElement);
         }
 
-        // 创建额外的光点效果
-        function createLightParticles() {
-            const container = document.getElementById('nvshu-rain');
-            if (!container) return;
-            
-            for (let i = 0; i < 15; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'absolute w-1 h-1 bg-[#FFFDE9] rounded-full opacity-20 pointer-events-none';
-                particle.style.left = gsap.utils.random(0, 100) + '%';
-                particle.style.top = gsap.utils.random(0, 100) + '%';
-                particle.style.boxShadow = '0 0 10px rgba(255, 253, 233, 0.5)';
-                
-                container.appendChild(particle);
+        const container = document.getElementById("nvshu-rain");
+        if (container) {
+          container.appendChild(column);
+          console.log("Image column added to container"); // 调试日志
 
-                // 缓慢的上升动画
-                gsap.to(particle, {
-                    y: -window.innerHeight,
-                    duration: gsap.utils.random(20, 40),
-                    ease: "none",
-                    repeat: -1,
-                    delay: gsap.utils.random(0, 10)
-                });
-                
-                // 闪烁效果
-                gsap.to(particle, {
-                    opacity: gsap.utils.random(0.1, 0.4),
-                    duration: gsap.utils.random(2, 4),
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "power2.inOut"
-                });
+          // 动画完成后重新创建
+          const totalDuration = (duration + delay) * 1000;
+          setTimeout(() => {
+            if (column.parentNode) {
+              column.parentNode.removeChild(column);
+              createNvshuColumn(x, index);
             }
+          }, totalDuration);
+        } else {
+          console.error("Container not found!");
         }
-
-        // 页面加载动画
-        function initPageAnimations() {
-            const tl = gsap.timeline();
-            
-            tl.to('#main-title', {
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                ease: "power3.out"
-            })
-            .to('#subtitle', {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: "power3.out"
-            }, "-=0.8")
-            .to('#buttons', {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: "power3.out"
-            }, "-=0.6")
-            .to('#description', {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: "power3.out"
-            }, "-=0.4");
-
-            // 标题发光效果
-            gsap.to('#main-title h1', {
-                textShadow: "0 0 30px rgba(255, 253, 233, 0.8), 0 0 60px rgba(255, 253, 233, 0.4)",
-                duration: 3,
-                repeat: -1,
-                yoyo: true,
-                ease: "power2.inOut"
-            });
-            
-            // 副标题微妙动画
-            gsap.to('#main-title div', {
-                textShadow: "0 0 15px rgba(255, 253, 233, 0.3)",
-                duration: 4,
-                repeat: -1,
-                yoyo: true,
-                ease: "power2.inOut",
-                delay: 1
-            });
-
-            // 按钮微动画
-            gsap.to('.action-button', {
-                y: -5,
-                duration: 2,
-                repeat: -1,
-                yoyo: true,
-                ease: "power2.inOut",
-                stagger: 0.2,
-                delay: 2
-            });
-        }
-
-        // 按钮点击效果
-        function loadSeePageSPA() {
-            if (document.getElementById('see-spa-root')) {
-                // Already loaded; just show
-                const landingRoot = document.getElementById('landing-root');
-                gsap.to(landingRoot, { opacity: 0, duration: 0.7, ease: 'power2.out', onComplete: () => {
-                    landingRoot.style.display = 'none';
-                    const seeRoot = document.getElementById('see-spa-root');
-                    seeRoot.style.display = 'block';
-                    gsap.fromTo(seeRoot, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.inOut' });
-                }});
-                history.pushState({page: 'see'}, '', '/see');
-                return;
-            }
-
-            const landingRoot = document.getElementById('landing-root');
-            gsap.to(landingRoot, { opacity: 0, duration: 0.4, ease: 'power2.out', onComplete: async () => {
-                try {
-                    const res = await fetch('/see', { credentials: 'same-origin' });
-                    const html = await res.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    const pageContainer = doc.querySelector('[data-component="page-container"]');
-                    const confirmationPage = doc.getElementById('confirmationPage');
-                    const privacyPolicy = doc.getElementById('privacyPolicy');
-                    const videoRecorder = doc.getElementById('videoRecorder');
-
-                    const seeRoot = document.createElement('div');
-                    seeRoot.id = 'see-spa-root';
-                    seeRoot.style.display = 'none';
-                    seeRoot.style.position = 'relative';
-                    seeRoot.style.zIndex = 20; // above background
-
-                    if (pageContainer) seeRoot.appendChild(pageContainer);
-                    if (videoRecorder) seeRoot.appendChild(videoRecorder);
-                    if (confirmationPage) seeRoot.appendChild(confirmationPage);
-                    if (privacyPolicy) seeRoot.appendChild(privacyPolicy);
-
-                    document.body.appendChild(seeRoot);
-
-                    // Dynamically load see.js after DOM is in place
-                    const script = document.createElement('script');
-                    script.src = '/static/js/see.js';
-                    script.onload = () => {
-                        landingRoot.style.display = 'none';
-                        seeRoot.style.display = 'block';
-                        gsap.fromTo(seeRoot, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.inOut' });
-                        history.pushState({page: 'see'}, '', '/see');
-
-                        // Attach drag & drop listeners (DOMContentLoaded in see.js won't fire in SPA)
-                        try {
-                            const uploadCircle = document.getElementById('uploadOption');
-                            if (uploadCircle && typeof preventDefaults === 'function' && typeof handleDrop === 'function') {
-                                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                                    uploadCircle.addEventListener(eventName, preventDefaults, false);
-                                    document.body.addEventListener(eventName, preventDefaults, false);
-                                });
-                                uploadCircle.addEventListener('drop', handleDrop, false);
-                            }
-                        } catch (e) { console.warn('Attach drag-drop failed:', e); }
-                    };
-                    document.body.appendChild(script);
-                } catch (err) {
-                    console.error('Failed to load /see:', err);
-                    // Fallback to full navigation
-                    window.location.href = '/see';
-                }
-            }});
-        }
-
-        // Handle back/forward navigation
-        window.addEventListener('popstate', () => {
-            if (location.pathname === '/') {
-                const seeRoot = document.getElementById('see-spa-root');
-                const landingRoot = document.getElementById('landing-root');
-                if (seeRoot && landingRoot) {
-                    gsap.to(seeRoot, { opacity: 0, duration: 0.3, ease: 'power2.inOut', onComplete: () => {
-                        seeRoot.style.display = 'none';
-                        landingRoot.style.display = 'block';
-                        gsap.fromTo(landingRoot, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' });
-                    }});
-                }
-            }
-        });
-
-        document.querySelectorAll('.action-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const href = button.getAttribute('href') || '';
-                if (href === '/see') {
-                    e.preventDefault();
-                    gsap.to(button, {
-                        scale: 0.95,
-                        duration: 0.1,
-                        ease: 'power2.out',
-                        yoyo: true,
-                        repeat: 1,
-                        onComplete: loadSeePageSPA
-                    });
-                } else {
-                    e.preventDefault();
-                    gsap.to(button, {
-                        scale: 0.95,
-                        duration: 0.1,
-                        ease: 'power2.out',
-                        yoyo: true,
-                        repeat: 1,
-                        onComplete: () => {
-                            gsap.to(document.body, {
-                                opacity: 0,
-                                duration: 0.8,
-                                ease: 'power2.inOut',
-                                onComplete: () => { window.location.href = button.href; }
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, initializing Matrix-style Nvshu rain...'); // 调试日志
-            
-            // 检查GSAP是否加载
-            if (typeof gsap === 'undefined') {
-                console.error('GSAP not loaded!');
-                return;
-            }
-            
-            // 检查容器是否存在
-            const container = document.getElementById('nvshu-rain');
-            if (!container) {
-                console.error('Nvshu rain container not found!');
-                return;
-            }
-            
-            console.log('Creating Nvshu character rain...');
-            
-            // 初始化女书字符雨
-            setTimeout(() => {
-                initNvshuRain();
-            }, 500);
-
-            // 创建光点粒子
-            setTimeout(() => {
-                createLightParticles();
-            }, 1000);
-
-            // 启动页面动画
-            setTimeout(() => {
-                initPageAnimations();
-            }, 800);
-            
-            // 窗口大小改变时重新初始化
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    // 清空现有的雨滴
-                    container.innerHTML = '';
-                    // 重新初始化
-                    initNvshuRain();
-                    createLightParticles();
-                }, 300);
-            });
-        });
-    </script>
-</body>
-{% if DEBUG %}
-<script>
-(function(){
-  let lastV = 0;
-  async function poll(){
-    try{
-      const r = await fetch('/__dev_version', {cache:'no-store'});
-      if(r.ok){
-        const {v} = await r.json();
-        if(lastV && v > lastV){ location.reload(); return; }
-        lastV = v;
       }
-    }catch(e){}
-    setTimeout(poll, 700);
-  }
-  poll();
-})();
-</script>
-<script type="module" src="/static/js/effect-4/index.js"></script>
-{% endif %}
+
+      // 创建多个字符雨列
+      function initNvshuRain() {
+        const container = document.getElementById("nvshu-rain");
+        if (!container) {
+          console.error("Nvshu rain container not found!");
+          return;
+        }
+
+        const screenWidth = window.innerWidth;
+        const columnWidth = 200; // 每列的宽度，为放大两倍的图片留更多空间
+        const numColumns = Math.floor(screenWidth / columnWidth);
+
+        console.log(
+          "Screen width:",
+          screenWidth,
+          "Creating",
+          numColumns,
+          "nvshu image rain columns"
+        );
+
+        // 清空现有内容
+        container.innerHTML = "";
+
+        for (let i = 0; i < numColumns; i++) {
+          const x = i * columnWidth + Math.random() * 90 - 15; // 添加一些随机偏移
+          setTimeout(() => {
+            createNvshuColumn(x, i);
+          }, i * 150); // 错开创建时间
+        }
+      }
+
+      // 创建额外的光点效果
+      function createLightParticles() {
+        const container = document.getElementById("nvshu-rain");
+        if (!container) return;
+
+        for (let i = 0; i < 15; i++) {
+          const particle = document.createElement("div");
+          particle.className =
+            "absolute w-1 h-1 bg-[#FFFDE9] rounded-full opacity-20 pointer-events-none";
+          particle.style.left = gsap.utils.random(0, 100) + "%";
+          particle.style.top = gsap.utils.random(0, 100) + "%";
+          particle.style.boxShadow = "0 0 10px rgba(255, 253, 233, 0.5)";
+
+          container.appendChild(particle);
+
+          // 缓慢的上升动画
+          gsap.to(particle, {
+            y: -window.innerHeight,
+            duration: gsap.utils.random(20, 40),
+            ease: "none",
+            repeat: -1,
+            delay: gsap.utils.random(0, 10),
+          });
+
+          // 闪烁效果
+          gsap.to(particle, {
+            opacity: gsap.utils.random(0.1, 0.4),
+            duration: gsap.utils.random(2, 4),
+            repeat: -1,
+            yoyo: true,
+            ease: "power2.inOut",
+          });
+        }
+      }
+
+      // 页面加载动画
+      function initPageAnimations() {
+        const tl = gsap.timeline();
+
+        tl.to("#main-title", {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: "power3.out",
+        })
+          .to(
+            "#subtitle",
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: "power3.out",
+            },
+            "-=0.8"
+          )
+          .to(
+            "#buttons",
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: "power3.out",
+            },
+            "-=0.6"
+          )
+          .to(
+            "#description",
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: "power3.out",
+            },
+            "-=0.4"
+          );
+
+        // 标题发光效果
+        gsap.to("#main-title h1", {
+          textShadow:
+            "0 0 30px rgba(255, 253, 233, 0.8), 0 0 60px rgba(255, 253, 233, 0.4)",
+          duration: 3,
+          repeat: -1,
+          yoyo: true,
+          ease: "power2.inOut",
+        });
+
+        // 副标题微妙动画
+        gsap.to("#main-title div", {
+          textShadow: "0 0 15px rgba(255, 253, 233, 0.3)",
+          duration: 4,
+          repeat: -1,
+          yoyo: true,
+          ease: "power2.inOut",
+          delay: 1,
+        });
+
+        // 按钮微动画
+        gsap.to(".action-button", {
+          y: -5,
+          duration: 2,
+          repeat: -1,
+          yoyo: true,
+          ease: "power2.inOut",
+          stagger: 0.2,
+          delay: 2,
+        });
+      }
+
+      // 按钮点击效果
+      function loadSeePageSPA() {
+        if (document.getElementById("see-spa-root")) {
+          // Already loaded; just show
+          const landingRoot = document.getElementById("landing-root");
+          gsap.to(landingRoot, {
+            opacity: 0,
+            duration: 0.7,
+            ease: "power2.out",
+            onComplete: () => {
+              landingRoot.style.display = "none";
+              const seeRoot = document.getElementById("see-spa-root");
+              seeRoot.style.display = "block";
+              gsap.fromTo(
+                seeRoot,
+                { opacity: 0 },
+                { opacity: 1, duration: 0.8, ease: "power2.inOut" }
+              );
+            },
+          });
+          history.pushState({ page: "see" }, "", "/see");
+          return;
+        }
+
+        const landingRoot = document.getElementById("landing-root");
+        gsap.to(landingRoot, {
+          opacity: 0,
+          duration: 0.4,
+          ease: "power2.out",
+          onComplete: async () => {
+            try {
+              const res = await fetch("/see", { credentials: "same-origin" });
+              const html = await res.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, "text/html");
+
+              const pageContainer = doc.querySelector(
+                '[data-component="page-container"]'
+              );
+              const confirmationPage = doc.getElementById("confirmationPage");
+              const privacyPolicy = doc.getElementById("privacyPolicy");
+              const videoRecorder = doc.getElementById("videoRecorder");
+
+              const seeRoot = document.createElement("div");
+              seeRoot.id = "see-spa-root";
+              seeRoot.style.display = "none";
+              seeRoot.style.position = "relative";
+              seeRoot.style.zIndex = 20; // above background
+
+              if (pageContainer) seeRoot.appendChild(pageContainer);
+              if (videoRecorder) seeRoot.appendChild(videoRecorder);
+              if (confirmationPage) seeRoot.appendChild(confirmationPage);
+              if (privacyPolicy) seeRoot.appendChild(privacyPolicy);
+
+              document.body.appendChild(seeRoot);
+
+              // Dynamically load see.js after DOM is in place
+              const script = document.createElement("script");
+              script.src = "/static/js/see.js";
+              script.onload = () => {
+                landingRoot.style.display = "none";
+                seeRoot.style.display = "block";
+                gsap.fromTo(
+                  seeRoot,
+                  { opacity: 0 },
+                  { opacity: 1, duration: 0.8, ease: "power2.inOut" }
+                );
+                history.pushState({ page: "see" }, "", "/see");
+
+                // Attach drag & drop listeners (DOMContentLoaded in see.js won't fire in SPA)
+                try {
+                  const uploadCircle = document.getElementById("uploadOption");
+                  if (
+                    uploadCircle &&
+                    typeof preventDefaults === "function" &&
+                    typeof handleDrop === "function"
+                  ) {
+                    ["dragenter", "dragover", "dragleave", "drop"].forEach(
+                      (eventName) => {
+                        uploadCircle.addEventListener(
+                          eventName,
+                          preventDefaults,
+                          false
+                        );
+                        document.body.addEventListener(
+                          eventName,
+                          preventDefaults,
+                          false
+                        );
+                      }
+                    );
+                    uploadCircle.addEventListener("drop", handleDrop, false);
+                  }
+                } catch (e) {
+                  console.warn("Attach drag-drop failed:", e);
+                }
+              };
+              document.body.appendChild(script);
+            } catch (err) {
+              console.error("Failed to load /see:", err);
+              // Fallback to full navigation
+              window.location.href = "/see";
+            }
+          },
+        });
+      }
+
+      // Handle back/forward navigation
+      window.addEventListener("popstate", () => {
+        if (location.pathname === "/") {
+          const seeRoot = document.getElementById("see-spa-root");
+          const landingRoot = document.getElementById("landing-root");
+          if (seeRoot && landingRoot) {
+            gsap.to(seeRoot, {
+              opacity: 0,
+              duration: 0.3,
+              ease: "power2.inOut",
+              onComplete: () => {
+                seeRoot.style.display = "none";
+                landingRoot.style.display = "block";
+                gsap.fromTo(
+                  landingRoot,
+                  { opacity: 0 },
+                  { opacity: 1, duration: 0.4, ease: "power2.out" }
+                );
+              },
+            });
+          }
+        }
+      });
+
+      document.querySelectorAll(".action-button").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const href = button.getAttribute("href") || "";
+          if (href === "/see") {
+            e.preventDefault();
+            gsap.to(button, {
+              scale: 0.95,
+              duration: 0.1,
+              ease: "power2.out",
+              yoyo: true,
+              repeat: 1,
+              onComplete: loadSeePageSPA,
+            });
+          } else {
+            e.preventDefault();
+            gsap.to(button, {
+              scale: 0.95,
+              duration: 0.1,
+              ease: "power2.out",
+              yoyo: true,
+              repeat: 1,
+              onComplete: () => {
+                gsap.to(document.body, {
+                  opacity: 0,
+                  duration: 0.8,
+                  ease: "power2.inOut",
+                  onComplete: () => {
+                    window.location.href = button.href;
+                  },
+                });
+              },
+            });
+          }
+        });
+      });
+
+      // 初始化
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM loaded, initializing Matrix-style Nvshu rain..."); // 调试日志
+
+        // 检查GSAP是否加载
+        if (typeof gsap === "undefined") {
+          console.error("GSAP not loaded!");
+          return;
+        }
+
+        // 检查容器是否存在
+        const container = document.getElementById("nvshu-rain");
+        if (!container) {
+          console.error("Nvshu rain container not found!");
+          return;
+        }
+
+        console.log("Creating Nvshu character rain...");
+
+        // 初始化女书字符雨
+        setTimeout(() => {
+          initNvshuRain();
+        }, 500);
+
+        // 创建光点粒子
+        setTimeout(() => {
+          createLightParticles();
+        }, 1000);
+
+        // 启动页面动画
+        setTimeout(() => {
+          initPageAnimations();
+        }, 800);
+
+        // 窗口大小改变时重新初始化
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            // 清空现有的雨滴
+            container.innerHTML = "";
+            // 重新初始化
+            initNvshuRain();
+            createLightParticles();
+          }, 300);
+        });
+      });
+    </script>
+  </body>
+  {% if DEBUG %}
+  <script>
+    (function () {
+      let lastV = 0;
+      async function poll() {
+        try {
+          const r = await fetch("/__dev_version", { cache: "no-store" });
+          if (r.ok) {
+            const { v } = await r.json();
+            if (lastV && v > lastV) {
+              location.reload();
+              return;
+            }
+            lastV = v;
+          }
+        } catch (e) {}
+        setTimeout(poll, 700);
+      }
+      poll();
+    })();
+  </script>
+  <script type="module" src="/static/js/effect-4/index.js"></script>
+  {% endif %}
 </html>
