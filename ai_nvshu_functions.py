@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 from PIL import Image
 import time
-from zhipuai import ZhipuAI
+# from zhipuai import ZhipuAI
 from utils import *
 from dict_io import *
 from word_vector_manager import word_vectors
@@ -22,7 +22,7 @@ load_dotenv()  # 加载 .env 文件中的环境变量
 # )
 
 ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
-nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
+# nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
 
 
 # 加载预训练的 BERT 模型和分词器
