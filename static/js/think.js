@@ -461,7 +461,6 @@ function addStatusItem(
           isCompleted ? "✓" : isActive ? "◐" : "○"
         }</div>
         <div class="status-item-content">
-            <div class="status-step-label">STEP ${stepLabel}</div>
             <div class="status-text" data-thinking-text>${text}</div>
             ${
               toggleContent
