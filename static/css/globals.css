@@ -60,6 +60,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url(../images/noise.png);
+  background-size: 100px;
+  background-repeat: repeat;
+  background-position: 50% 50%;
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
 }
 body::after {
 content: '';
@@ -68,10 +86,20 @@ top: 0;
 left: 0;
 height: 100%;
 width: 100%;
-background-image: repeating-linear-gradient(transparent, transparent 2px, #7070703d 3px);
-background-size: auto 100%;
+background-image: url(../images/noise.png), repeating-linear-gradient(transparent, transparent 2px, #7070703d 3px);
+background-size: 100px, auto 100%;
+background-repeat: repeat, repeat;
 pointer-events: none;
+z-index: 2;
 }
+
+/* Ensure all body children are above the noise texture */
+body > * {
+  position: relative;
+  z-index: 3;
+}
+
+
 
 a {
   color: inherit;
