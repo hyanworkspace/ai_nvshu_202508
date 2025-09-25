@@ -6,6 +6,7 @@ const poem = urlParams.get('poem');
 let charData = null;
 let replaceData = null;
 let guessInterval = null;
+let showingTextOverlay = true;
 
 // 新增函数：处理自定义格式的字符串
 function parseCustomFormat(str) {
@@ -90,6 +91,103 @@ function formatChinesePoem(text) {
       .replace(/。/g, '')
 }
 
+
+// 初始化媒体显示
+function initializeSpeakerMedia() {
+    const mediaUrl = document.getElementById('media-url').value;
+    console.log('Initializing speaker media with URL:', mediaUrl);
+    if (!mediaUrl) {
+        console.warn('No media URL found');
+        return;
+    }
+    
+    const mediaNode = document.getElementById('speaker-media-node');
+    if (!mediaNode) return;
+    
+    // 创建媒体元素
+    let mediaElement;
+    const isVideo = mediaUrl.toLowerCase().includes('.mp4') || 
+                   mediaUrl.toLowerCase().includes('.webm') || 
+                   mediaUrl.toLowerCase().includes('.mov');
+    const isImage = mediaUrl.toLowerCase().includes('.png') || 
+                   mediaUrl.toLowerCase().includes('.jpg') || 
+                   mediaUrl.toLowerCase().includes('.jpeg') || 
+                   mediaUrl.toLowerCase().includes('.gif');
+    
+    if (isVideo) {
+        mediaElement = document.createElement('video');
+        mediaElement.src = mediaUrl;
+        mediaElement.autoplay = true;
+        mediaElement.loop = true;
+        mediaElement.muted = true;
+        mediaElement.playsInline = true;
+        mediaElement.controls = false;
+    } else if (isImage) {
+        mediaElement = document.createElement('img');
+        mediaElement.src = mediaUrl;
+        mediaElement.alt = 'Uploaded media';
+    } else {
+        console.warn('Unknown media type for URL:', mediaUrl);
+        // 默认尝试作为图片处理
+        mediaElement = document.createElement('img');
+        mediaElement.src = mediaUrl;
+        mediaElement.alt = 'Uploaded media';
+    }
+    
+    mediaElement.className = "w-full h-full object-cover rounded-full";
+    
+    // 添加错误处理
+    mediaElement.onerror = function() {
+        console.error('Failed to load media:', mediaUrl);
+        this.style.display = 'none';
+    };
+    
+    mediaNode.appendChild(mediaElement);
+    
+    // 添加点击切换功能
+    const speakerCircle = document.querySelector('[data-component="speaker-circle"]');
+    if (speakerCircle) {
+        speakerCircle.addEventListener('click', toggleSpeakerDisplay);
+        speakerCircle.title = 'Click to toggle between original media and poem text';
+    }
+}
+
+// 切换显示功能
+function toggleSpeakerDisplay() {
+    const textOverlay = document.getElementById('speaker-text-overlay');
+    const bgChar = document.getElementById('speaker-bg-char');
+    const translate = document.getElementById('speaker-translate');
+    
+    if (showingTextOverlay) {
+        // 隐藏文字，显示媒体
+        if (typeof gsap !== 'undefined') {
+            gsap.to([textOverlay, bgChar, translate], {
+                opacity: 0,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
+        } else {
+            textOverlay.style.opacity = '0';
+            bgChar.style.opacity = '0';
+            translate.style.opacity = '0';
+        }
+        showingTextOverlay = false;
+    } else {
+        // 显示文字，隐藏媒体
+        if (typeof gsap !== 'undefined') {
+            gsap.to([textOverlay, bgChar, translate], {
+                opacity: 1,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
+        } else {
+            textOverlay.style.opacity = '1';
+            bgChar.style.opacity = '1';
+            translate.style.opacity = '1';
+        }
+        showingTextOverlay = true;
+    }
+}
 
 // 页面入场动画
 function initGuessPageAnimation() {
@@ -182,6 +280,10 @@ function initGuessPageAnimation() {
 document.addEventListener('DOMContentLoaded', async () => {
     // 首先执行页面入场动画
     initGuessPageAnimation();
+    
+    // 初始化媒体显示
+    initializeSpeakerMedia();
+    
     if (!poem) {
         alert('No poem provided');
         return;
