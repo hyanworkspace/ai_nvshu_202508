@@ -96,13 +96,37 @@ function formatChinesePoem(text) {
 function initializeSpeakerMedia() {
     const mediaUrl = document.getElementById('media-url').value;
     console.log('Initializing speaker media with URL:', mediaUrl);
-    if (!mediaUrl) {
+    
+    // 调试：显示媒体URL在页面上
+    if (mediaUrl) {
+        console.log('Media URL found:', mediaUrl);
+        // 临时在页面上显示URL用于调试
+        const debugDiv = document.createElement('div');
+        debugDiv.style.cssText = 'position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; z-index: 9999; font-size: 12px; max-width: 300px; word-break: break-all;';
+        debugDiv.textContent = 'Media URL: ' + mediaUrl;
+        document.body.appendChild(debugDiv);
+        
+        // 5秒后移除调试信息
+        setTimeout(() => {
+            if (debugDiv.parentNode) {
+                debugDiv.parentNode.removeChild(debugDiv);
+            }
+        }, 5000);
+    } else {
         console.warn('No media URL found');
         return;
     }
     
     const mediaNode = document.getElementById('speaker-media-node');
-    if (!mediaNode) return;
+    const textOverlay = document.getElementById('speaker-text-overlay');
+    
+    if (!mediaNode) {
+        console.error('Speaker media node not found');
+        return;
+    }
+    
+    // 清空现有内容
+    mediaNode.innerHTML = '';
     
     // 创建媒体元素
     let mediaElement;
@@ -134,13 +158,48 @@ function initializeSpeakerMedia() {
         mediaElement.alt = 'Uploaded media';
     }
     
-    mediaElement.className = "w-full h-full object-cover rounded-full";
-    
     // 添加错误处理
     mediaElement.onerror = function() {
         console.error('Failed to load media:', mediaUrl);
         this.style.display = 'none';
+        
+        // 如果媒体加载失败，显示默认背景
+        const defaultBg = document.getElementById('speaker-default-bg');
+        if (defaultBg) {
+            defaultBg.style.opacity = '1';
+        }
+        
+        // 显示文字覆盖层
+        if (textOverlay) {
+            textOverlay.style.opacity = '1';
+            showingTextOverlay = true;
+        }
     };
+    
+    // 媒体加载成功后的处理
+    const onMediaLoaded = function() {
+        console.log('Media loaded successfully, dimensions:', this.naturalWidth || this.videoWidth, 'x', this.naturalHeight || this.videoHeight);
+        
+        // 隐藏默认背景
+        const defaultBg = document.getElementById('speaker-default-bg');
+        if (defaultBg) {
+            defaultBg.style.opacity = '0';
+        }
+        
+        // 媒体加载成功后，初始显示媒体背景，文字覆盖层半透明
+        if (textOverlay) {
+            textOverlay.style.opacity = '0.8'; // 半透明显示文字
+        }
+        showingTextOverlay = true;
+        
+        console.log('Media loaded and default background hidden');
+    };
+    
+    if (isImage) {
+        mediaElement.onload = onMediaLoaded;
+    } else if (isVideo) {
+        mediaElement.onloadeddata = onMediaLoaded;
+    }
     
     mediaNode.appendChild(mediaElement);
     
@@ -148,44 +207,49 @@ function initializeSpeakerMedia() {
     const speakerCircle = document.querySelector('[data-component="speaker-circle"]');
     if (speakerCircle) {
         speakerCircle.addEventListener('click', toggleSpeakerDisplay);
-        speakerCircle.title = 'Click to toggle between original media and poem text';
+        speakerCircle.title = 'Click to toggle between media and text';
+        speakerCircle.style.cursor = 'pointer';
     }
 }
 
 // 切换显示功能
 function toggleSpeakerDisplay() {
     const textOverlay = document.getElementById('speaker-text-overlay');
-    const bgChar = document.getElementById('speaker-bg-char');
-    const translate = document.getElementById('speaker-translate');
+    const mediaNode = document.getElementById('speaker-media-node');
+    
+    if (!textOverlay) {
+        console.error('Text overlay not found');
+        return;
+    }
+    
+    console.log('Toggling display, current showingTextOverlay:', showingTextOverlay);
     
     if (showingTextOverlay) {
-        // 隐藏文字，显示媒体
+        // 隐藏文字覆盖层，完全显示媒体背景
         if (typeof gsap !== 'undefined') {
-            gsap.to([textOverlay, bgChar, translate], {
+            gsap.to(textOverlay, {
                 opacity: 0,
-                duration: 0.3,
+                duration: 0.4,
                 ease: 'power2.out'
             });
         } else {
             textOverlay.style.opacity = '0';
-            bgChar.style.opacity = '0';
-            translate.style.opacity = '0';
         }
         showingTextOverlay = false;
+        console.log('Hiding text overlay, showing media');
     } else {
-        // 显示文字，隐藏媒体
+        // 显示文字覆盖层（半透明，让媒体仍然可见）
         if (typeof gsap !== 'undefined') {
-            gsap.to([textOverlay, bgChar, translate], {
-                opacity: 1,
-                duration: 0.3,
+            gsap.to(textOverlay, {
+                opacity: 0.8,
+                duration: 0.4,
                 ease: 'power2.out'
             });
         } else {
-            textOverlay.style.opacity = '1';
-            bgChar.style.opacity = '1';
-            translate.style.opacity = '1';
+            textOverlay.style.opacity = '0.8';
         }
         showingTextOverlay = true;
+        console.log('Showing text overlay with transparency');
     }
 }
 

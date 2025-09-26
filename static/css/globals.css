@@ -1,22 +1,25 @@
 @font-face {
-  font-family: 'Inknut Antiqua';
-  src: url('/static/fonts/Inknut_Antiqua/InknutAntiqua-Regular.ttf') format('truetype');
+  font-family: "Inknut Antiqua";
+  src: url("/static/fonts/Inknut_Antiqua/InknutAntiqua-Regular.ttf")
+    format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Inknut Antiqua';
-  src: url('/static/fonts/Inknut_Antiqua/InknutAntiqua-Medium.ttf') format('truetype');
+  font-family: "Inknut Antiqua";
+  src: url("/static/fonts/Inknut_Antiqua/InknutAntiqua-Medium.ttf")
+    format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Inknut Antiqua';
-  src: url('/static/fonts/Inknut_Antiqua/InknutAntiqua-Bold.ttf') format('truetype');
+  font-family: "Inknut Antiqua";
+  src: url("/static/fonts/Inknut_Antiqua/InknutAntiqua-Bold.ttf")
+    format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -24,9 +27,9 @@
 
 /* Define Chinese font with its own family name */
 @font-face {
-  font-family: 'XiQue YanShuTi';
+  font-family: "XiQue YanShuTi";
   /* Use specific name */
-  src: url('/static/fonts/喜鹊燕书体(简 繁体).ttf') format('truetype');
+  src: url("/static/fonts/喜鹊燕书体(简 繁体).ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -37,16 +40,16 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #FFFDE9;
+  --foreground: #fffde9;
   --background: #000000;
   /* Define font stack with English font first, then Chinese, then fallbacks */
-  --font-stack: 'Inknut Antiqua', 'XiQue YanShuTi', system-ui, sans-serif;
+  --font-stack: "Inknut Antiqua", "XiQue YanShuTi", system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #FFFDE9;
+    --foreground: #fffde9;
   }
 }
 
@@ -64,7 +67,7 @@ body {
 }
 
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
@@ -80,17 +83,18 @@ body::before {
   z-index: 1;
 }
 body::after {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-height: 100%;
-width: 100%;
-background-image: url(../images/noise.png), repeating-linear-gradient(transparent, transparent 2px, #7070703d 3px);
-background-size: 100px, auto 100%;
-background-repeat: repeat, repeat;
-pointer-events: none;
-z-index: 2;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-image: url(../images/noise.png),
+    repeating-linear-gradient(transparent, transparent 2px, #7070703d 3px);
+  background-size: 100px, auto 100%;
+  background-repeat: repeat, repeat;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Ensure all body children are above the noise texture */
@@ -98,8 +102,6 @@ body > * {
   position: relative;
   z-index: 3;
 }
-
-
 
 a {
   color: inherit;
@@ -143,7 +145,7 @@ button {
 /* Styles for pages after agreeing to privacy */
 body.agreed-style {
   background-color: #000000;
-  color: #FFFDE9;
+  color: #fffde9;
 }
 
 body.agreed-style::before {
@@ -153,7 +155,7 @@ body.agreed-style::before {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('/static/images/bg2.png');
+  background-image: url("/static/images/bg2.png");
   background-size: cover;
   background-position: center;
   opacity: 0.7;
@@ -162,7 +164,7 @@ body.agreed-style::before {
 }
 
 /* Ensure content on agreed pages is above the background overlay */
-body.agreed-style>* {
+body.agreed-style > * {
   position: relative;
   z-index: 1;
 }
@@ -174,7 +176,7 @@ body.agreed-style .text-black,
 body.agreed-style .text-gray-700 {
   background-color: transparent !important;
   /* Override existing backgrounds */
-  color: #FFFDE9 !important;
+  color: #fffde9 !important;
   /* Override existing text colors */
 }
 
@@ -188,29 +190,33 @@ body.agreed-style .right-panel {
 }
 
 .mask-radial-fading {
-  mask-image: radial-gradient(circle, #FFFDe9 20%, transparent 70%);
-  -webkit-mask-image: radial-gradient(circle, #FFFDE9 20%, transparent 70%);
+  mask-image: radial-gradient(circle, #fffde9 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle, #fffde9 20%, transparent 70%);
 }
 
 @layer utilities {
   .radial-fade {
-    background-image: radial-gradient(circle, #FFFDE9 60%, transparent 70%);
+    background-image: radial-gradient(circle, #fffde9 60%, transparent 70%);
   }
 
   .radial-fade-small {
-    background-image: radial-gradient(circle, #FFFDE9 65%, transparent 70%);
+    background-image: radial-gradient(circle, #fffde9 65%, transparent 70%);
   }
 
   /* 定义自定义属性用于动画 */
   @property --gradient-stop {
-    syntax: '<percentage>';
+    syntax: "<percentage>";
     inherits: false;
     initial-value: 65%;
   }
 
   .radial-fade-listener {
     --gradient-stop: 65%;
-    background-image: radial-gradient(circle, #FFFDE9 var(--gradient-stop), transparent 70%);
+    background-image: radial-gradient(
+      circle,
+      #fffde9 var(--gradient-stop),
+      transparent 70%
+    );
     animation: breatheRadial 3s ease-in-out infinite;
   }
 
@@ -254,7 +260,7 @@ body.agreed-style .right-panel {
 
 .hover-effect--bg::after,
 .hover-effect--bg-south::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   width: 100%;
@@ -278,4 +284,55 @@ body.agreed-style .right-panel {
   width: auto;
   transform-origin: 50% 100%;
   transform: scaleY(var(--anim));
+}
+
+/* Guess页面媒体背景样式 */
+.speaker-media-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.speaker-media-background img,
+.speaker-media-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.speaker-text-overlay {
+  position: relative;
+  z-index: 10;
+  background: rgba(255, 253, 233, 0.85);
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+
+/* 圆形点击提示 */
+.circle-clickable {
+  cursor: pointer;
+  position: relative;
+}
+
+.circle-clickable::before {
+  content: "Click to toggle";
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fffde9;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.circle-clickable:hover::before {
+  opacity: 0.6;
 }

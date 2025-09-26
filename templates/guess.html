@@ -29,14 +29,25 @@
         <!-- Left Circle - Speaker -->
         <div class="flex-1 flex flex-col items-center" data-component="left-panel">
             <div class="w-[30vw] min-w-[280px] max-w-[500px]" data-component="speaker-circle-wrapper">
-                <div class="aspect-square w-full rounded-full radial-fade-small flex items-center justify-center relative" data-component="speaker-circle">
-                    <!-- 背景中文字符 -->
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="text-8xl text-center text-black vertical-text bg-char-style" id="speaker-bg-char" data-component="speaker-bg-char" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; font-family: 'XiQue YanShuTi', serif;"></div>
+                <div class="aspect-square w-full rounded-full flex items-center justify-center relative overflow-hidden" data-component="speaker-circle">
+                    <!-- 默认背景层 -->
+                    <div class="absolute inset-0 w-full h-full rounded-full radial-fade-small" id="speaker-default-bg" data-component="speaker-default-bg"></div>
+                    
+                    <!-- 媒体背景 -->
+                    <div class="absolute inset-0 w-full h-full rounded-full overflow-hidden z-2" id="speaker-media-node" data-component="speaker-media-node">
+                        <!-- 媒体元素将在这里动态添加 -->
                     </div>
-                    <div class="text-4xl text-center text-black vertical-text" id="original-text" data-component="original-text" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; "></div> 
-                    <!-- 英文翻译 -->
-                    <div class="absolute bottom-16 right-25 text-s text-black opacity-70 font-medium" id="speaker-translate" data-component="speaker-translate"></div>
+                    
+                    <!-- 文字覆盖层 -->
+                    <div class="absolute inset-0 flex items-center justify-center z-10" id="speaker-text-overlay" data-component="speaker-text-overlay">
+                        <!-- 背景中文字符 -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-8xl text-center text-black vertical-text bg-char-style" id="speaker-bg-char" data-component="speaker-bg-char" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; font-family: 'XiQue YanShuTi', serif;"></div>
+                        </div>
+                        <div class="text-4xl text-center text-black vertical-text" id="original-text" data-component="original-text" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap; "></div> 
+                        <!-- 英文翻译 -->
+                        <div class="absolute bottom-16 right-25 text-s text-black opacity-70 font-medium" id="speaker-translate" data-component="speaker-translate"></div>
+                    </div>
                 </div>
             </div>
             <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="speaker-label">Speaker</div>
@@ -205,6 +216,63 @@
         
         #user-media {
             transition: all 0.3s ease;
+        }
+        
+        /* Speaker 圆形背景层级 */
+        #speaker-default-bg {
+            z-index: 1;
+        }
+        
+        #speaker-media-node {
+            z-index: 2;
+        }
+        
+        #speaker-media-node img,
+        #speaker-media-node video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        /* 当有媒体时隐藏默认背景 */
+        #speaker-media-node:not(:empty) + * #speaker-default-bg {
+            opacity: 0;
+        }
+        
+        /* 文字覆盖层样式 */
+        #speaker-text-overlay {
+            background: rgba(255, 253, 233, 0.7);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            z-index: 10;
+        }
+        
+        /* 默认背景过渡效果 */
+        #speaker-default-bg {
+            transition: opacity 0.3s ease;
+        }
+        
+        /* 点击提示样式 */
+        [data-component="speaker-circle"]:hover {
+            cursor: pointer;
+        }
+        
+        [data-component="speaker-circle"]::after {
+            content: "Click to toggle";
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFFDE9;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        [data-component="speaker-circle"]:hover::after {
+            opacity: 0.6;
         }
         
         /* char-image-container 字符信息显示样式 */

@@ -123,12 +123,14 @@
                 <p class="text-2xl mb-6" data-component="success-message">You've created a new AI<br>Nvshu character :)</p>
                 <div class="space-y-4" data-component="name-input-section">
                     <p class="text-2xl" data-component="name-prompt">Could you tell me your name?</p>
-                    <input type="text" id="user-name" placeholder="Enter your name" data-component="name-input"
-                        class="bg-transparent border-b-2 border-[#FFFDE9] border-opacity-50 text-[#FFFDE9] placeholder-[#FFFDE9] placeholder-opacity-50 focus:outline-none focus:border-opacity-100 px-2 py-1">
-                    <button id="save-btn" data-component="save-button"
-                        class="bg-[#FFFDE9] text-black px-4 py-2 rounded transition duration-200 hover:bg-[#fffde9cc]">
-                        Save
-                    </button>
+                    <div class="flex items-center space-x-16">
+                        <input type="text" id="user-name" placeholder="Enter your name" data-component="name-input"
+                            class="max-w-xs bg-transparent border-b-4 border-[#FFFDE9] border-opacity-50 text-[#FFFDE9] placeholder-[#FFFDE9] placeholder-opacity-50 focus:outline-none focus:border-opacity-100 px-2 py-1">
+                        <button id="save-btn" data-component="save-button"
+                            class="inline-flex items-center justify-center px-6 py-1 border-2 border-dashed border-[rgba(255,251,233,0.8)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                            Save
+                        </button>
+                    </div>
 
 
                 </div>
