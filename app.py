@@ -1,9 +1,18 @@
 from flask import Flask, render_template, request, jsonify, session, send_from_directory
 import os
 import uuid
+import json
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
+from dotenv import load_dotenv
 from config import Config
+# 隐藏 Werkzeug 的 HTTP 请求日志
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
+# 加载环境变量
+load_dotenv()
 from ai_nvshu_functions import find_similar, recognize_and_translate, create_new_poem, create_nvshu_from_poem, create_combined_nvshu_image, replace_with_simple_el, get_char_translate, translate_text
 from utils import load_dict_from_file
 from process_video import pixelate
@@ -13,20 +22,17 @@ import atexit
 import time
 from utils import *
 
+# 设置优化的日志配置
+from logging_config import setup_optimized_logging
 
-# 设置日志配置
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('app.log'),
-        # logging.StreamHandler()  # 同时输出到控制台
-    ]
-)
+# 初始化日志系统
+setup_optimized_logging()
 
 app = Flask(__name__)
 app.secret_key = 'a-secret-key'
 CORS(app, resources={r"/upload": {"origins": "*"}})
+
+
 
 # 使用 Config 类中的配置
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
@@ -106,16 +112,9 @@ def texteffectdemo():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
-        # 详细的调试日志 ------------------------------
-        app.logger.debug("Upload request received")
-        app.logger.debug(f"Content-Length: {request.content_length}")
-        app.logger.debug(f"Content-Type: {request.content_type}")
-        app.logger.debug(f"Files in request: {list(request.files.keys())}")
-        app.logger.debug(f"Form data: {dict(request.form)}")
-        
         # 检查请求大小
         if request.content_length and request.content_length > app.config['MAX_CONTENT_LENGTH']:
-            app.logger.error(f"Request too large: {request.content_length} bytes")
+            app.logger.error(f"请求过大: {request.content_length} 字节")
             return jsonify({
                 'error': '请求过大',
                 'message': f'请求大小 {request.content_length} 字节超过了 {app.config["MAX_CONTENT_LENGTH"]} 字节的限制',
@@ -129,20 +128,19 @@ def upload_file():
         
         file = request.files['file']
         file_type = request.form.get('file_type', '')  # 获取客户端传递的文件类型
-        app.logger.debug(f"File details: name={file.filename}, type={file_type}, content_type={file.content_type}")
         
         if file.filename == '':
-            app.logger.error("Empty filename")
+            app.logger.error("文件名为空")
             return jsonify({'error': '没有选择文件'}), 400
         
         # 改进的文件验证逻辑
         if not file:
-            app.logger.error("No file object")
+            app.logger.error("文件对象为空")
             return jsonify({'error': '文件对象为空'}), 400
         
         # 检查文件是否被允许
         if not allowed_file(file.filename):
-            app.logger.error(f"File not allowed: {file.filename}, type: {file_type}")
+            app.logger.error(f"不支持的文件类型: {file.filename}")
             return jsonify({'error': f'不支持的文件类型: {file.filename}'}), 400
         
         # 生成唯一的文件名
@@ -164,7 +162,7 @@ def upload_file():
                     file_extension = 'webm' 
         
         if not file_extension:
-            app.logger.error(f"Cannot determine file extension for {original_filename}")
+            app.logger.error(f"无法确定文件扩展名: {original_filename}")
             return jsonify({'error': '无法确定文件类型'}), 400
         
         unique_filename = f"{str(uuid.uuid4())}.{file_extension}"
@@ -172,10 +170,9 @@ def upload_file():
         # 确保上传目录存在
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
             os.makedirs(app.config['UPLOAD_FOLDER'])
-            app.logger.debug(f"Created upload directory: {app.config['UPLOAD_FOLDER']}")
+            app.logger.info(f"创建上传目录: {app.config['UPLOAD_FOLDER']}")
         
         # 保存文件
-        # file_path = os.path.join(Config.UPLOAD_FOLDER, unique_filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(file_path)
         
@@ -187,14 +184,14 @@ def upload_file():
         session['media_url'] = file_url
         session['original_media_url'] = file_url
         
-        app.logger.debug(f"Session data set: media_type={file_type}, media_url={file_url}")
+        app.logger.info(f"文件上传成功: {file.filename} -> {unique_filename}")
 
         return jsonify({
             'message': '文件上传成功',
             'file_url': file_url
         })
     except Exception as e:
-        app.logger.error(f"Error in upload_file: {str(e)}")
+        app.logger.error(f"文件上传失败: {str(e)}")
         return jsonify({
             "message": "error",
             "error": str(e)
@@ -237,9 +234,6 @@ def think():
     else:
         media_url = request.args.get('media_url')
         original_media_url = request.args.get('original_media_url', media_url) 
-    # # 确保session中有正确的URL
-    # session['media_url'] = media_url
-    # session['original_media_url'] = original_media_url
     return render_template('think.html', media_url=media_url, original_media_url=original_media_url)
 
 @app.route('/describe_video', methods=['POST'])
@@ -248,16 +242,17 @@ def describe_video():
         # 检查是否启用调试模式或AI服务不可用
         use_mock_data = app.debug or os.getenv('USE_MOCK_AI', 'false').lower() == 'true'
         
-        app.logger.info(f"Debug mode: {app.debug}, USE_MOCK_AI: {os.getenv('USE_MOCK_AI', 'false')}, use_mock_data: {use_mock_data}")
-        
         if use_mock_data:
-            app.logger.info("Using mock data for video description")
             video_desc = '我看到一个女人坐在看似是咖啡馆或餐厅的桌子上。她穿着无袖上衣，拿着玫瑰靠近脸。该设置包括柜台上的各种物品，例如眼镜，餐巾纸和某些电子设备。桌子周围有椅子，穿过窗户，您可以在外面看到停放的汽车。氛围暗示了一个带有人工照明的室内环境。'
             video_desc_en = 'I see a woman sitting at a table in what appears to be a café or restaurant. She is wearing a sleeveless top and holding a rose close to her face. The setting includes various items on the counter such as glasses, napkins, and some electronic devices. There are chairs around the table, and through the window, you can see parked cars outside. The ambiance suggests an indoor environment with artificial lighting.'
+            
+            return jsonify({
+                "video_desc": video_desc,
+                'video_desc_eng': video_desc_en
+            })
         else:
             media_type = session.get('media_type')
             media_url = session.get('original_media_url', session.get('media_url'))
-            app.logger.debug(f"Media URL from session: {media_url}")
             if not media_url:
                 raise ValueError('No media URL provided for describe_video')
             
@@ -267,40 +262,41 @@ def describe_video():
             
             # 从 URL 中提取文件名
             filename = os.path.basename(media_url.split('?')[0])
-            app.logger.debug(f"Extracted filename: {filename}")
             # 构建完整的文件路径
             media_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             # 规范化路径
             media_path = os.path.abspath(os.path.normpath(media_path))
-            app.logger.debug(f"Full media path: {media_path}")
-            
-            print(f'处理的媒体路径: {media_path}')
             
             # 验证文件是否存在
             if not os.path.isfile(media_path):
                 raise FileNotFoundError(f'文件不存在: {media_path}')
-            
             # 验证路径是否在允许的目录内
             if not media_path.startswith(os.path.abspath(app.config['UPLOAD_FOLDER'])):
                 raise ValueError('无效的文件路径')
-            
-            app.logger.debug(f"Calling recognize_and_translate with: media_path={media_path}, media_type={media_type}")
+
+            app.logger.info(f"开始处理媒体文件: {filename}")
             result = recognize_and_translate(media_path, media_type, session['session_id'], logger=app.logger)
-            app.logger.debug(f"recognize_and_translate returned: {result}")
-            
             if not result:
                 raise ValueError('Media recognition returned None or empty result')
-            if not isinstance(result, (list, tuple)) or len(result) != 2:
-                raise ValueError(f'Media recognition failed to return valid description. Expected tuple of 2, got: {type(result)} with value: {result}')
             
-            video_desc, video_desc_en = result
-
-        return jsonify({
-            "video_desc": video_desc,
-            'video_desc_eng': video_desc_en
-        })
+            # 处理新的返回格式（可能包含关键帧URL）
+            if isinstance(result, (list, tuple)) and len(result) == 3:
+                video_desc, video_desc_en, keyframe_url = result
+                # 如果有关键帧URL，更新session中的media_url
+                if keyframe_url:
+                    session['media_url'] = keyframe_url
+                    app.logger.info(f"更新media_url为关键帧: {keyframe_url}")
+            elif isinstance(result, (list, tuple)) and len(result) == 2:
+                video_desc, video_desc_en = result
+            else:
+                raise ValueError(f'Media recognition failed to return valid description. Expected tuple of 2 or 3, got: {type(result)} with value: {result}')
+            
+            return jsonify({
+                "video_desc": video_desc,
+                "video_desc_eng": video_desc_en
+            })
     except Exception as e:
-        app.logger.debug(f"Error: {str(e)}")  # 修复日志格式化错误
+        app.logger.error(f"视频描述失败: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/generate_poem', methods=['POST'])
@@ -374,7 +370,7 @@ def replace_with_created_char():
 @app.route('/generate_char', methods=['POST'])
 def generate_char():
     try:
-        print("Starting generate_char function")
+        app.logger.info("开始生成女书字符")
         
         # 验证请求数据
         data = request.get_json()
@@ -394,8 +390,6 @@ def generate_char():
                 status_code=400
             ))
         
-        print(f"Received data: {data}")
-        
         if app.debug:
             char_pos, simple_el, repr_token, guess_char = load_dict_from_file('knowledge_tmp/tmp.pkl')
             guess_char_eng = [translate_text(x, 'zh-CN', 'en') for x in guess_char]
@@ -407,24 +401,24 @@ def generate_char():
         else:
             try:
                 result = create_nvshu_from_poem(poem)
-                print(f"create_nvshu_from_poem returned: {result}")
-                print(f"Result type: {type(result)}, Length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
+                # print(f"create_nvshu_from_poem returned: {result}")
+                # print(f"Result type: {type(result)}, Length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
                 
                 char_cn, char_pos, simple_el, repr_token, guess_char, guess_char_eng, guess_poems_eng = result
-                print(f"Unpacked values: char_cn={char_cn}, char_pos={char_pos}, guess_char={guess_char}")
-                print("Completed create_nvshu_from_poem")
+                # print(f"Unpacked values: char_cn={char_cn}, char_pos={char_pos}, guess_char={guess_char}")
+                # print("Completed create_nvshu_from_poem")
             except Exception as e:
                 print(f"Error in create_nvshu_from_poem: {str(e)}")
                 return jsonify(*handle_ai_function_error(e, "女书字符生成"))
             
             try:
                 char_translate = get_char_translate(char_cn, poem, data.get('poem_eng', ''))
-                print("Completed get_char_translate")
+                # print("Completed get_char_translate")
             except Exception as e:
                 print(f"翻译字符时出错: {str(e)}")
                 char_translate = f"字符: {char_cn}"
         
-        print("Creating combined images")
+        # print("Creating combined images")
         try:
             img_path = create_combined_nvshu_image(list(simple_el))
             _ = create_combined_nvshu_image(list(simple_el), black=True)
@@ -433,7 +427,7 @@ def generate_char():
             return jsonify(*handle_ai_function_error(e, "女书图片生成"))
 
         print("Storing session data")
-        session['char_img_path'] = img_path_pixelated
+        session['char_img_path'] = img_path # img_path_pixelated
         session['char_translate'] = char_translate
         session['char_3dim'] = simple_el
         session['char'] = char_cn
@@ -441,20 +435,19 @@ def generate_char():
         media_url = session.get('original_media_url', session.get('media_url'))
         # 从 URL 中提取文件名
         filename = os.path.basename(media_url.split('?')[0])
-        app.logger.debug(f"Extracted filename: {filename}")
         # 构建完整的文件路径
         media_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         # 规范化路径
         media_path = os.path.abspath(os.path.normpath(media_path))
 
-        print("Returning response")
+        app.logger.info("女书字符生成完成")
         return jsonify({
             'char_translate': char_translate,
             "char_pos": char_pos,
             "char_cn": char_cn,
             'simple_el': list(simple_el),
             'repr_token': repr_token,
-            'char_img_path': img_path_pixelated, 
+            'char_img_path_pixelated': img_path_pixelated, 
             'guess_char': guess_char,
             'guess_char_eng': guess_char_eng,
             'guess_poems_eng': guess_poems_eng,
@@ -478,7 +471,11 @@ def guess():
 
 @app.route('/get_result')
 def get_result():
-    return render_template('result.html', media_url=session['media_url'], char_translate=session['char_translate'], char_img_path=session['char_img_path'], char_3dim=session['char_3dim'])
+    img_path = session['char_img_path']
+    img_dir = os.path.dirname(img_path)
+    img_filename = os.path.basename(img_path)
+    pixelated_img_path = os.path.join(img_dir, f"pixelated_{img_filename}")
+    return render_template('result.html', media_url=session['media_url'], char_translate=session['char_translate'], char_img_path=pixelated_img_path, char_3dim=session['char_3dim'])
 
 
 @app.route('/save_user_name', methods=['POST'])
@@ -489,13 +486,74 @@ def save_user_name():
 
 @app.route('/frame_11')
 def frame_11():
-    # 确保这里有你需要的模板和逻辑
+    img_path = session['char_img_path']
+    img_dir = os.path.dirname(img_path)
+    img_filename = os.path.basename(img_path)
+    pixelated_img_path = os.path.join(img_dir, f"pixelated_{img_filename}")
     return render_template(
         'frame_11.html', 
-        media_url=session['original_media_url'], char_img_path=session['char_img_path'], 
-        char_3dim=session['char_3dim'], username=session['user_name'],  char_translate=session['char_translate'],
-        poem=session['poem'], poem_eng=session['poem_eng'],  
+        media_url=session['original_media_url'],
+        char_img_path=pixelated_img_path,
+        char_3dim=session['char_3dim'],
+        username=session['user_name'],
+        char_translate=session['char_translate'],
+        poem=session['poem'],
+        poem_eng=session['poem_eng'],
+        char=session['char']  # 加上 char 这个中文字
+    )
+
+@app.route('/frame_11_from_dict')
+def frame_11_from_dict():
+    # 从URL参数获取字符信息
+    char = request.args.get('char', '')
+    from_dictionary = request.args.get('from_dictionary', 'false')
+    
+    try:
+        from dict_io import get_char_full_data
+        
+        # 从字典中获取完整数据
+        char_data = get_char_full_data(char)
+        
+        if not char_data:
+            return render_template('error.html', error_message="Character not found in dictionary")
+        
+        # 提取数据
+        char_3dim = char_data.get('char_3dim', [])
+        char_translate = char_data.get('char_translate', char)
+        img_path = char_data.get('char_img_path')
+        poem = char_data.get('poem', f"这是从字典中选择的字符：{char}")
+        poem_eng = char_data.get('poem_eng', f"This is a character selected from dictionary: {char}")
+        # media_url = char_data.get('media_url')
+        creator = char_data.get('creator', 'default')
+        
+        # 处理图片路径
+        if img_path:
+            # 如果有存储的图片路径，添加 pixelated_ 前缀
+            img_dir = os.path.dirname(img_path)
+            img_filename = os.path.basename(img_path)
+            pixelated_img_path = os.path.join(img_dir, f"pixelated_{img_filename}")
+        elif char_3dim and len(char_3dim) >= 3:
+            # 如果没有存储的图片路径，根据3维向量生成
+            pixelated_img_path = f"/static/nvshu_images/pixelated_combined_{char_3dim[0]}-{char_3dim[1]}-{char_3dim[2]}_vertical_trim.png"
+        else:
+            pixelated_img_path = None
+        
+        return render_template(
+            'frame_11.html', 
+            media_url = None,
+            # media_url=media_url,
+            char_img_path=pixelated_img_path,
+            char_3dim=char_3dim,
+            username=creator,  # 使用创建者作为用户名
+            char_translate=char_translate,
+            poem=poem,
+            poem_eng=poem_eng,
+            char=char,
+            from_dictionary=from_dictionary
         )
+    except Exception as e:
+        app.logger.error(f"Error in frame_11_from_dict: {str(e)}")
+        return render_template('error.html', error_message="Failed to load character details")
 
 @app.route('/save_storage_preference', methods=['POST'])
 def save_storage_preference():
@@ -540,9 +598,15 @@ def add_to_dictionary():
         char = session.get('char')
         char_3dim = session.get('char_3dim')
         char_translate = session.get('char_translate')
+        user_name = session.get('user_name', 'default')  # 获取用户名，默认为 'default'
+        char_img_path = session.get('char_img_path')
+        poem = session.get('poem')
+        poem_eng = session.get('poem_eng')
+        # media_url = session.get('media_url')  # 使用关键帧URL而不是原始视频URL
         
         if char and char_3dim:
-            add_to_dictionary(char, char_3dim, char_translate)
+            add_to_dictionary(char, char_3dim, char_translate, user_name, 
+                            char_img_path, poem, poem_eng)  # , media_url)
             return jsonify({'status': 'success'})
         else:
             return jsonify({'status': 'error', 'message': 'Missing character data'}), 400
@@ -553,20 +617,60 @@ def add_to_dictionary():
 def cleanup_old_files():
     """清理所有过期的会话文件"""
     now = time.time()
-    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        try:
-            # 删除超过24小时未访问的文件
-            if os.path.getatime(file_path) < now - 24 * 3600:
-                os.remove(file_path)
-                app.logger.debug(f"Deleted old file: {file_path}")
-        except Exception as e:
-            app.logger.error(f"Error deleting old file {file_path}: {str(e)}")
+    upload_folder = app.config['UPLOAD_FOLDER']
+    
+    try:
+        for filename in os.listdir(upload_folder):
+            file_path = os.path.join(upload_folder, filename)
+            try:
+                # 跳过 output_frames 目录，避免权限问题
+                if filename == 'output_frames':
+                    continue
+                    
+                # 只处理文件，跳过目录
+                if not os.path.isfile(file_path):
+                    continue
+                    
+                # 删除超过24小时未访问的文件
+                if os.path.getatime(file_path) < now - 24 * 3600:
+                    os.remove(file_path)
+                    app.logger.info(f"删除过期文件: {file_path}")
+            except PermissionError as e:
+                app.logger.warning(f"权限不足，跳过文件 {file_path}: {str(e)}")
+            except Exception as e:
+                app.logger.error(f"删除文件失败 {file_path}: {str(e)}")
+                
+        # 单独处理 output_frames 目录中的过期文件
+        output_frames_dir = os.path.join(upload_folder, 'output_frames')
+        if os.path.exists(output_frames_dir):
+            cleanup_output_frames(output_frames_dir, now)
+            
+    except Exception as e:
+        app.logger.error(f"清理文件时出错: {str(e)}")
+
+def cleanup_output_frames(output_frames_dir, now):
+    """清理 output_frames 目录中的过期文件"""
+    try:
+        for session_dir in os.listdir(output_frames_dir):
+            session_path = os.path.join(output_frames_dir, session_dir)
+            if os.path.isdir(session_path):
+                try:
+                    # 检查目录的最后访问时间
+                    if os.path.getatime(session_path) < now - 24 * 3600:
+                        import shutil
+                        shutil.rmtree(session_path)
+                        app.logger.info(f"删除过期会话目录: {session_path}")
+                except PermissionError as e:
+                    app.logger.warning(f"权限不足，跳过目录 {session_path}: {str(e)}")
+                except Exception as e:
+                    app.logger.error(f"删除目录失败 {session_path}: {str(e)}")
+    except Exception as e:
+        app.logger.error(f"清理 output_frames 目录时出错: {str(e)}")
 
 # 错误处理
 @app.errorhandler(RequestEntityTooLarge)
 def handle_file_too_large(e):
-    app.logger.error(f"File too large: {str(e)}")
+    app.logger.error(f"文件过大: {str(e)}")
     return jsonify({
         'error': '文件过大',
         'message': '上传的文件超过了50MB的限制，请选择较小的文件',
@@ -575,18 +679,17 @@ def handle_file_too_large(e):
 
 @app.errorhandler(413)
 def handle_413_error(e):
-    app.logger.error(f"413 Error: {str(e)}")
+    app.logger.error(f"请求体过大: {str(e)}")
     return jsonify({
         'error': '请求体过大',
         'message': '上传的文件超过了服务器限制，请选择较小的文件',
         'max_size': '50MB'
     }), 413
 
-# 注册应用退出时的清理函数
 atexit.register(cleanup_old_files)
 
 if __name__ == '__main__':
     # 使用 Flask 内置的调试重载器
-    # app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(host='0.0.0.0', port=5001, debug=False)
     app.run(debug=False)
 

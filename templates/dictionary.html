@@ -287,6 +287,18 @@
                     </div>
                 `;
                 
+                // 添加点击事件处理
+                characterElement.addEventListener('click', () => {
+                    // 跳转到frame_11页面，传递字符信息
+                    const params = new URLSearchParams({
+                        char: char,
+                        char_3dim: JSON.stringify(dimensions),
+                        char_translate: translation,
+                        from_dictionary: 'true'
+                    });
+                    window.location.href = `/frame_11_from_dict?${params.toString()}`;
+                });
+                
                 grid.appendChild(characterElement);
                 
                 // Add staggered entrance animation

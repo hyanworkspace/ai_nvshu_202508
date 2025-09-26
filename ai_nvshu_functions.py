@@ -12,17 +12,29 @@ from zhipuai import ZhipuAI
 from utils import *
 from dict_io import *
 from word_vector_manager import word_vectors
+from googletrans import Translator
 
 # variables --------------------
 load_dotenv()  # 加载 .env 文件中的环境变量
-# HF_TOKEN = os.getenv('HF_TOKEN')
-# nvshu_ai = InferenceClient(
-#     provider="sambanova",
-#     api_key=HF_TOKEN,
-# )
 
 ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
 nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
+
+# 简单的重试装饰器
+def retry_on_network_error(max_retries=3, backoff_factor=0.5):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise e
+                    time.sleep(backoff_factor * (2 ** attempt))
+            return None
+        return wrapper
+    return decorator
+
 
 
 # 加载预训练的 BERT 模型和分词器
@@ -32,17 +44,22 @@ model = BertModel.from_pretrained('bert-base-uncased')
 simple_el_dict = load_dict_from_file('knowledge_tmp/simple.pkl')
 
 # functions --------------------
+@retry_on_network_error(max_retries=3, backoff_factor=0.5)
 def translate_text(text, src_language='en', target_language="zh-cn"):
-    # 首先尝试使用 googletrans
+    # 首先尝试使用增强的 googletrans
     try:
         translator = Translator()
-        result = translator.translate(text, src=src_language, dest=target_language)
-        return result.text
+        if translator:
+            result = translator.translate(text, src=src_language, dest=target_language)
+            return result.text
+        else:
+            raise Exception("Google翻译客户端未初始化")
     except Exception as e:
-        print(f"googletrans 翻译失败: {str(e)}")
-        
-        # 如果 googletrans 失败，尝试使用 zhipu_AI
+        # 如果 googletrans 失败，尝试使用增强的 zhipu_AI
         try:
+            if not nvshu_ai:
+                raise Exception("智谱AI客户端未初始化")
+                
             # 构建翻译提示
             if target_language == "zh-cn" and src_language == "en":
                 prompt = f"请将以下英文翻译成中文，只返回翻译结果，不要其他内容：{text}"
@@ -64,11 +81,10 @@ def translate_text(text, src_language='en', target_language="zh-cn"):
             )
             
             translation = completion.choices[0].message.content.strip()
-            print(f"zhipu_AI 翻译成功: {text} -> {translation}")
             return translation
             
         except Exception as ai_error:
-            print(f"zhipu_AI 翻译也失败: {str(ai_error)}")
+            # 如果两种方法都失败，使用简单的映射
             
             # 如果两种方法都失败，使用简单的映射
             simple_translations = {
@@ -142,11 +158,22 @@ def recognize_and_translate(filename, media_type, session_id, logger=None):
         analyzer = MediaAnalyzer(Config.VISION_MODEL, media_type, session_id)
         # result = analyzer.analyze_media(media_path)
         result = analyzer.analyze_media(filename)
-        result_seperated = [x.strip() for x in result.split('.') if x.strip() != '']
-        result_seperated_translated = [translate_text(x) for x in result_seperated]
-        # 翻译为中文
-        # return make_chinese_english_pairs(result_seperated_translated, result_seperated)
-        return translate_text(result), result
+        
+        # 如果返回的是元组（分析结果，关键帧路径），则处理关键帧路径
+        if isinstance(result, tuple) and len(result) == 2:
+            analysis_result, keyframe_path = result
+            # 将关键帧路径转换为URL
+            if keyframe_path:
+                # 从绝对路径转换为相对URL
+                keyframe_url = keyframe_path.replace(Config.BASE_DIR, '').replace('\\', '/')
+                if not keyframe_url.startswith('/'):
+                    keyframe_url = '/' + keyframe_url
+                return translate_text(analysis_result), analysis_result, keyframe_url
+            else:
+                return translate_text(analysis_result), analysis_result, None
+        else:
+            # 兼容旧格式（只返回分析结果）
+            return translate_text(result), result, None
     except Exception as e:
         if logger:
             logger.debug(f"调用video recg API时出错: {str(e)}")

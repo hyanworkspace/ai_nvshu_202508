@@ -642,7 +642,7 @@ function displayCharacterImage() {
     
     container.innerHTML = '';
     
-    if (charData.char_img_path) {
+    if (charData.char_img_path_pixelated) {
         // Hide the encoding and guessing text
         document.getElementById('encoding-text').style.display = 'none';
         document.getElementById('guessing-text').style.display = 'none';
@@ -658,7 +658,7 @@ function displayCharacterImage() {
         }
 
         const img = document.createElement('img');
-        img.src = charData.char_img_path;
+        img.src = charData.char_img_path_pixelated;
         img.alt = 'Generated Nüshu character';
         img.className = 'char-image';
         container.appendChild(img);

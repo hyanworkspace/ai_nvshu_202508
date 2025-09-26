@@ -21,6 +21,11 @@ scipy==1.13.1
 # AI服务API
 zhipuai==2.1.5.20250825
 
+# 网络优化
+httpx==0.25.2
+urllib3==2.0.7
+requests==2.31.0
+
 # 图像和视频处理
 Pillow==11.2.1
 opencv-python==4.11.0.86

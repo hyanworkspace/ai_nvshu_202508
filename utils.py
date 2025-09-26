@@ -76,7 +76,12 @@ class Machine:
         #print(f"=====end add_to_simple_el_dict=======")
         self.knowledge.simple_el_dict[original_char] = {
             'char_3dim': transformed_vector,
-            'char_translate': original_char  # 默认翻译为字符本身
+            'char_translate': original_char,
+            'creator': 'default',
+            'char_img_path': f'static/nvshu_images/combined_{"-".join(map(str, transformed_vector))}_vertical_trim.png', 
+            'poem': None,  # 系统生成的字符没有原始诗句
+            'poem_eng': None,  # 系统生成的字符没有英文诗句
+            # 'media_url': None  # 系统生成的字符没有原始媒体
         }
 
 

@@ -3,22 +3,22 @@ import cv2
 import os
 import base64
 import requests
+import time
 from PIL import Image
 from io import BytesIO
 from config import Config
 from process_video import convert_webm_to_mp4
 from dotenv import load_dotenv
 from zhipuai import ZhipuAI
+from logging_config import get_optimized_logger
+
+# 配置日志
+logger = get_optimized_logger(__name__)
 
 # 加载 .env 文件中的环境变量
 load_dotenv()
-# HF_TOKEN = os.getenv('HF_TOKEN')
-
-# nvshu_ai = InferenceClient(
-#     provider="sambanova",
-#     api_key=HF_TOKEN,
-# )
-nvshu_ai = ZhipuAI(api_key="7b43286295c846e9aa5a4b16b1a5b027.cSgcQ91fvl3rO3kr") # 填写您自己的APIKey
+ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
+nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
 
 
 class MediaAnalyzer:
@@ -32,11 +32,12 @@ class MediaAnalyzer:
         """
         从视频中抽取关键帧，最多抽取MAX_FRAMES帧
         :param video_path: 视频文件路径
-        :return: 提取的帧列表(PIL图像)
+        :return: (提取的帧列表(PIL图像), 帧文件路径列表)
         """
         cap = cv2.VideoCapture(video_path)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         frames = []
+        frame_paths = []
         
         # 计算采样间隔，确保最多取MAX_FRAMES帧
         sample_interval = max(1, total_frames // int(Config.MAX_FRAMES))
@@ -57,9 +58,10 @@ class MediaAnalyzer:
             # 保存帧供调试使用
             frame_path = os.path.join(self.output_dir, f"frame_{frame_count}.jpg")
             pil_image.save(frame_path)
+            frame_paths.append(frame_path)
             
         cap.release()
-        return frames
+        return frames, frame_paths
     
     def encode_image_to_base64(self, image):
         """
@@ -127,15 +129,17 @@ class MediaAnalyzer:
                 print(f"转换后的视频路径: {video_path}")
             
             # 2. 抽取关键帧
-            frames = self.extract_key_frames(video_path)
+            frames, frame_paths = self.extract_key_frames(video_path)
             if not frames:
                 raise Exception("无法从视频中抽取关键帧")
             
-            # 3. 分析每一帧
+            # 3. 分析每一帧，并返回关键帧路径
             for i, frame in enumerate(frames):
                 if i == int(Config.MAX_FRAMES) // 2:
                     analysis = self.analyze_frame(frame)
-                    return analysis
+                    # 返回分析结果和关键帧路径
+                    keyframe_path = frame_paths[i] if i < len(frame_paths) else None
+                    return analysis, keyframe_path
         except Exception as e:
             print(f"视频分析出错: {str(e)}")
             raise
@@ -217,46 +221,15 @@ class MediaAnalyzer:
         if pil_image:
             return [pil_image]
         return []
-    
-    # def summarize_analyses(self, frame_analyses):
-    #     """
-    #     使用LLM汇总所有帧的分析结果
-    #     """
-    #     if not frame_analyses:
-    #         return "未能获取视频内容分析"
-        
-    #     # 将所有帧分析结果合并为一个文本
-    #     combined_analyses = "\n\n".join(
-    #         [f"帧 {i+1} 分析:\n{analysis}" for i, analysis in enumerate(frame_analyses)]
-    #     )
-    #     headers = {
-    #         "Content-Type": "application/json",
-    #         "Authorization": f"Bearer {self.api_key}"
-    #     }
-        
-    #     payload = {
-    #         "model": "gpt-4",
-    #         "messages": [
-    #             {
-    #                 "role": "system",
-    #                 "content": Config.SUMMARY_PROMPT
-    #             },
-    #             {
-    #                 "role": "user",
-    #                 "content": f"请根据以下各帧的分析结果，总结视频的主要内容:\n\n{combined_analyses}"
-    #             }
-    #         ],
-    #         "max_tokens": 2000
-    #     }
-        
-    #     try:
-    #         response = requests.post(
-    #             "https://api.openai.com/v1/chat/completions",
-    #             headers=headers,
-    #             json=payload
-    #         )
-    #         response.raise_for_status()
-    #         return response.json()["choices"][0]["message"]["content"]
-    #     except Exception as e:
-    #         print(f"总结API调用出错: {e}")
-    #         return combined_analyses  # 如果总结失败，返回原始分析
+
+# 独立的媒体分析函数
+def analyze_media(media_path, media_type):
+    """
+    分析媒体文件并返回描述
+    :param media_path: 媒体文件路径
+    :param media_type: 媒体类型 ('video' 或 'image')
+    :return: 包含 video_desc 和 video_desc_eng 的字典
+    """
+    analyzer = MediaAnalyzer(media_type)
+    result = analyzer.analyze_media(media_path)
+    return result

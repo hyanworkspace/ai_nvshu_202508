@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 重置radio按钮状态，确保用户回退后可以重新选择
+    document.querySelectorAll('input[name="storage"]').forEach(radio => {
+        radio.checked = false;
+    });
     // 保存图片功能 - 修改为截取正确的虚线框容器
     document.getElementById('save-image-btn').addEventListener('click', function() {
         // First capture the main container as image
@@ -234,9 +238,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // 保存用户选择到session
+    // 保存用户选择到session并跳转到字典页面
+    let isProcessing = false; // 防止重复提交
+    
     document.querySelectorAll('input[name="storage"]').forEach(radio => {
-        radio.addEventListener('change', async function() {
+        radio.addEventListener('click', async function() {
+            // 防止重复提交
+            if (isProcessing) {
+                return;
+            }
+            isProcessing = true;
+            
             try {
                 // 保存用户选择
                 const response = await fetch('/save_storage_preference', {
@@ -256,8 +268,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                 }
+
+                // 无论选择 Yes 还是 No，都跳转到字典页面
+                const dictionaryBtn = document.getElementById('go-to-dictionary-btn');
+                const dictionaryUrl = dictionaryBtn.dataset.dictionaryUrl;
+                if (dictionaryUrl) {
+                    window.location.href = dictionaryUrl;
+                } else {
+                    console.error('Dictionary URL not found.');
+                }
             } catch (error) {
                 console.error('Error:', error);
+                isProcessing = false; // 出错时重置状态
             }
         });
     });

@@ -32,6 +32,7 @@
             <div class="w-full lg:flex-[0.4] text-[#FFFDE9] space-y-4 md:space-y-6" data-component="left-column">
                 <div data-component="character-info">
                     <h1 class="text-xl md:text-2xl" data-component="character-title">This is a new AI nvshu<br>character: "{{ char_translate }}"</h1>
+                    <h1 class="text-xl md:text-2xl" data-component="character-title">The original <br>character: "{{ char }}"</h1>
                 </div>
                 <div data-component="creator-info">
                     <p class="text-lg md:text-xl" data-component="creator-text">Created by "{{ username }}"</p>
@@ -59,11 +60,13 @@
                 <div class="relative w-40 h-40 md:w-48 md:h-48 lg:-ml-24" data-component="video-wrapper">
                     <!-- 视频圆形-->
                     <div class="absolute inset-0 z-10 rounded-full mask-radial-fading grayscale overflow-hidden" data-component="video-circle">
-                        {% if video_url %}
+                        {% if media_url %}
                         <video class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="video-element"
-                            src="{{ video_url }}" muted playsinline preload="metadata" autoplay></video>
+                            src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
                         {% else %}
-                        <p>No video available</p>
+                        <div class="w-full h-full flex items-center justify-center text-[#FFFDE9] text-sm">
+                            <p>From Dictionary</p>
+                        </div>
                         {% endif %}
                     </div>
                     <!-- 顶部淡黄色遮罩：上层 -->
