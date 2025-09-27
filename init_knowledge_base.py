@@ -211,12 +211,16 @@ simple_el_dict_ = load_dict_from_file(f'{tmp_dir}/simple.pkl')
 # dict[char]
 # import pandas as pd
 # pd.DataFrame(dict).T
-# del simple_el_dict_['入']
+# simple_el_dict_.keys()
+# len(simple_el_dict_.keys())
+# del simple_el_dict_['草']
+# save_dict_to_file(simple_el_dict_, f'{tmp_dir}/simple.pkl')
+
 from process_video import pixelate
 for char in list(simple_el_dict_.keys()):
     print(char)
     create_combined_nvshu_image(simple_el_dict_[char]['char_3dim'], black=True, trim_wsp=True)
-    to_pixelate =create_combined_nvshu_image(simple_el_dict_[char]['char_3dim'], black=False, trim_wsp=True)
+    to_pixelate = create_combined_nvshu_image(simple_el_dict_[char]['char_3dim'], black=False, trim_wsp=True)
     pixelate(to_pixelate)
 
 # for char in list(simple_el_dict_.keys()):
