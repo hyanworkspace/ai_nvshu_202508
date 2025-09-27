@@ -231,10 +231,22 @@ def think():
     if app.debug:
         media_url = '/uploads/output_5sec.mp4'
         original_media_url = '/uploads/output_5sec.mp4'
+        media_type = 'video'
     else:
         media_url = request.args.get('media_url')
-        original_media_url = request.args.get('original_media_url', media_url) 
-    return render_template('think.html', media_url=media_url, original_media_url=original_media_url)
+        original_media_url = request.args.get('original_media_url', media_url)
+        media_type = request.args.get('media_type', 'video')
+    
+    # 确保session中有正确的URL和类型信息
+    if media_url:
+        session['media_url'] = media_url
+        session['original_media_url'] = original_media_url
+        session['media_type'] = media_type
+    
+    return render_template('think.html', 
+                         media_url=media_url, 
+                         original_media_url=original_media_url,
+                         media_type=media_type)
 
 @app.route('/describe_video', methods=['POST'])
 def describe_video():
@@ -690,6 +702,6 @@ atexit.register(cleanup_old_files)
 
 if __name__ == '__main__':
     # 使用 Flask 内置的调试重载器
-    # app.run(host='0.0.0.0', port=5001, debug=False)
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(debug=False)
 

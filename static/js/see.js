@@ -950,6 +950,13 @@ function confirm_video(url_, original_url = null) {
     
     if (original_url) {
         redirectUrl += `&original_media_url=${encodeURIComponent(original_url)}`;
+    } else {
+        redirectUrl += `&original_media_url=${encodeURIComponent(url_)}`;
+    }
+    
+    // 添加媒体类型信息
+    if (uploadedFileType) {
+        redirectUrl += `&media_type=${encodeURIComponent(uploadedFileType)}`;
     }
     
     console.log('Redirecting to:', redirectUrl);

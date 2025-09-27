@@ -1,341 +1,965 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI 女书</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
-    <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/nvshu_rain.css') }}" rel="stylesheet">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='images/favicon.png') }}"
+    />
+    <link
+      href="{{ url_for('static', filename='css/globals.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/nvshu_rain.css') }}"
+      rel="stylesheet"
+    />
     <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Match landing page background */
-        body {
-            overflow-x: hidden;
-            background: radial-gradient(ellipse at center, rgba(255, 253, 233, 0.03) 0%, rgba(0, 0, 0, 1) 70%);
-        }
+      /* Match landing page background */
+      body {
+        overflow-x: hidden;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(255, 253, 233, 0.03) 0%,
+          rgba(0, 0, 0, 1) 70%
+        );
+      }
 
-        /* Background video container and tint */
-        .bg-video-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .bg-video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(1) sepia(1) saturate(2) hue-rotate(350deg) brightness(0.65) contrast(1.1);
-        }
-        .bg-video-tint {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at center, rgba(255, 253, 233, 0.12) 0%, rgba(255, 253, 233, 0.06) 45%, rgba(0, 0, 0, 0.55) 100%),
-                linear-gradient(0deg, rgba(255, 253, 233, 0.08), rgba(255, 253, 233, 0.08));
-            pointer-events: none;
-        }
-        /* Override rain sizes to match landing page */
-        .nvshu-column .char-img { width: 60px; }
-        .nvshu-column .char-img:first-child { width: 70px; }
-        
-        /* 页面过渡优化 */
-        #confirmationPage, #mainPageContainer {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        
-        /* 背景视频和女书雨的过渡效果 */
-        .bg-video-container {
-            transition: opacity 0.8s ease;
-        }
-        
-        .nvshu-rain {
-            transition: opacity 0.6s ease;
-        }
-        
-        /* 按钮交互增强 */
-        .confirm-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 253, 233, 0.3);
-        }
-        
-        /* 预览容器的微妙动画 */
-        #previewContainer {
-            transition: all 0.3s ease;
-        }
-        
-        #previewContainer:hover {
-            transform: scale(1.01);
-        }
+      /* Pixel Canvas Component */
+      pixel-canvas {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        border-radius: 50%;
+        overflow: hidden;
+      }
 
-        /* Simple spinner */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 253, 233, 0.3);
-            border-top-color: rgba(255, 253, 233, 0.9);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+      /* Enhanced circle hover effects */
+      .recording-circle-enhanced {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
 
-        /* Progress border animation */
-        .progress-border {
-            stroke-linecap: round;
-            animation: progressBorder 1s ease-in-out forwards;
-        }
-        @keyframes progressBorder {
-            0% {
-                stroke-dashoffset: 301.6;
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                stroke-dashoffset: 0;
-                opacity: 1;
-            }
-        }
+      .recording-circle-enhanced:hover {
+        transform: scale(1.08) rotate(1deg);
+        box-shadow: 0 20px 40px rgba(255, 253, 233, 0.15),
+          0 0 60px rgba(255, 253, 233, 0.1),
+          inset 0 0 30px rgba(255, 253, 233, 0.05);
+      }
 
+      .recording-circle-enhanced:hover pixel-canvas {
+        opacity: 1;
+      }
+
+      /* Glowing border effect */
+      .recording-circle-enhanced::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          rgba(255, 253, 233, 0.1),
+          rgba(255, 253, 233, 0.3),
+          rgba(255, 253, 233, 0.1),
+          rgba(255, 253, 233, 0.3),
+          rgba(255, 253, 233, 0.1)
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: -1;
+        animation: rotate 8s linear infinite;
+      }
+
+      .recording-circle-enhanced:hover::before {
+        opacity: 1;
+      }
+
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Shimmer effect overlay */
+      .shimmer-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 253, 233, 0.1) 50%,
+          transparent 70%
+        );
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+
+      .recording-circle-enhanced:hover .shimmer-overlay {
+        transform: translateX(100%);
+      }
+
+      /* Pulsing inner glow */
+      .inner-glow {
+        position: absolute;
+        inset: 10%;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at center,
+          rgba(255, 253, 233, 0.1) 0%,
+          transparent 70%
+        );
+        opacity: 0;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .recording-circle-enhanced:hover .inner-glow {
+        opacity: 1;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(0.95);
+          opacity: 0.3;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.6;
+        }
+      }
+
+      /* Background video container and tint */
+      .bg-video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .bg-video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: grayscale(1) sepia(1) saturate(2) hue-rotate(350deg)
+          brightness(0.65) contrast(1.1);
+      }
+      .bg-video-tint {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            ellipse at center,
+            rgba(255, 253, 233, 0.12) 0%,
+            rgba(255, 253, 233, 0.06) 45%,
+            rgba(0, 0, 0, 0.55) 100%
+          ),
+          linear-gradient(
+            0deg,
+            rgba(255, 253, 233, 0.08),
+            rgba(255, 253, 233, 0.08)
+          );
+        pointer-events: none;
+      }
+      /* Override rain sizes to match landing page */
+      .nvshu-column .char-img {
+        width: 60px;
+      }
+      .nvshu-column .char-img:first-child {
+        width: 70px;
+      }
+
+      /* 页面过渡优化 */
+      #confirmationPage,
+      #mainPageContainer {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      /* 背景视频和女书雨的过渡效果 */
+      .bg-video-container {
+        transition: opacity 0.8s ease;
+      }
+
+      .nvshu-rain {
+        transition: opacity 0.6s ease;
+      }
+
+      /* 按钮交互增强 */
+      .confirm-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 253, 233, 0.3);
+      }
+
+      /* 预览容器的微妙动画 */
+      #previewContainer {
+        transition: all 0.3s ease;
+      }
+
+      #previewContainer:hover {
+        transform: scale(1.01);
+      }
+
+      /* Simple spinner */
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 253, 233, 0.3);
+        border-top-color: rgba(255, 253, 233, 0.9);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Progress border animation */
+      .progress-border {
+        stroke-linecap: round;
+        animation: progressBorder 1s ease-in-out forwards;
+      }
+      @keyframes progressBorder {
+        0% {
+          stroke-dashoffset: 301.6;
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          stroke-dashoffset: 0;
+          opacity: 1;
+        }
+      }
     </style>
-</head>
-<body data-component="page-body">
+  </head>
+  <body data-component="page-body">
     <!-- Reusable Nvshu background -->
     <div id="nvshu-rain" class="nvshu-rain-container"></div>
     <!-- Background video to match landing page -->
     <div class="bg-video-container">
-        <video autoplay muted loop playsinline preload="auto" poster="{{ url_for('static', filename='images/bg1.png') }}">
-            <source src="{{ url_for('static', filename='1nv.mp4') }}" type="video/mp4">
-        </video>
-        <div class="bg-video-tint"></div>
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        poster="{{ url_for('static', filename='images/bg1.png') }}"
+      >
+        <source
+          src="{{ url_for('static', filename='1nv.mp4') }}"
+          type="video/mp4"
+        />
+      </video>
+      <div class="bg-video-tint"></div>
     </div>
     <!-- Include Header Component -->
     {% include 'components/header.html' %}
 
-    <div class="relative w-screen h-screen bg-transparent text-white overflow-hidden pt-20" data-component="page-container" id="mainPageContainer">
+    <div
+      class="relative w-screen h-screen bg-transparent text-white overflow-hidden pt-20"
+      data-component="page-container"
+      id="mainPageContainer"
+    >
+      <!-- Main content -->
+      <div
+        class="relative z-10 h-full w-full flex flex-row items-center justify-center"
+        data-component="main-content"
+      >
+        <!-- Circles Container for symmetrical alignment -->
+        <div
+          class="flex flex-row items-center justify-center gap-[min(60px,3vw)] w-full max-w-[1920px] px-[min(60px,3vw)]"
+          data-component="circles-container"
+        >
+          <!-- Video Recording Circle -->
+          <div
+            class="relative group w-[25vw] max-w-[640px]"
+            id="recordOption"
+            data-component="video-recording-circle"
+          >
+            <div
+              class="recording-circle-enhanced aspect-square w-full rounded-full radial-fade mix-blend-difference bg-[radial-gradient(circle_at_center,rgba(255,251,233,0.9)_70%,rgba(255,251,233,0)_100%)] flex flex-col items-center justify-center cursor-pointer"
+              data-component="recording-circle-container"
+            >
+              <!-- Pixel Canvas for hover effect -->
+              <pixel-canvas
+                data-colors="rgba(255,253,233,0.8),rgba(255,253,233,0.6),rgba(255,253,233,0.3)"
+                data-gap="8"
+                data-speed="50"
+              ></pixel-canvas>
 
-        <!-- Main content -->
-        <div class="relative z-10 h-full w-full flex flex-row items-center justify-center" data-component="main-content">
-            <!-- Circles Container for symmetrical alignment -->
-            <div class="flex flex-row items-center justify-center gap-[min(60px,3vw)] w-full max-w-[1920px] px-[min(60px,3vw)]" data-component="circles-container">
-                <!-- Video Recording Circle -->
-                <div class="relative group w-[25vw] max-w-[640px]" id="recordOption" data-component="video-recording-circle">
-                    <div class="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(255,251,233,0.9)_70%,rgba(255,251,233,0)_100%)] flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105" data-component="recording-circle-container">
-                        <!-- Inner dotted circle -->
-                        <div class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border" data-component="dotted-border"></div>
-                        <!-- Recording loader overlay -->
-                        <div id="recordLoader" class="hidden absolute inset-0 rounded-full bg-black/30 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                            <div class="spinner"></div>
-                        </div>
-                        <div class="mb-1 w-[min(100px,20%)] h-[min(100px,20%)] relative" data-component="camera-icon-container">
-                            <img src="{{ url_for('static', filename='images/cameraIcon.png') }}"
-                                 alt="Camera icon"
-                                 class="w-full h-full object-contain">
-                        </div>
-                        <p class="text-gray-700 text-center text-[min(1.2rem,1.6vw)] leading-none font-medium" data-component="recording-text">Click to record a video</p>
-                        
-                        <!-- 录制时显示的视频预览 -->
-                            <video id="recordPreview" autoplay muted playsinline 
-                                class="hidden w-full h-full absolute inset-0 rounded-full object-cover" data-component="record-preview"></video>
-                        
-                        <!-- 录制控制按钮 -->
-                        <div class="record-controls hidden absolute bottom-5 z-20 flex gap-2" data-component="record-controls">
-                            <button id="startRecordBtn" class="inline-flex items-center justify-center px-6 py-2 text-sm rounded-full border-2 border-dashed border-black/60 bg-black/80 text-white font-medium cursor-pointer transition-all duration-300 hover:bg-black hover:border-black hover:-translate-y-1 focus:outline-none disabled:opacity-50" data-component="start-record-btn">Start Recording</button>
-                            <button id="stopRecordBtn" class="inline-flex items-center justify-center px-6 py-2 text-sm rounded-full border-2 border-dashed border-red-400 bg-red-500/80 text-white font-medium cursor-pointer transition-all duration-300 hover:bg-red-500 hover:border-red-300 hover:-translate-y-1 focus:outline-none disabled:opacity-50" data-component="stop-record-btn">Stop Recording</button>
-                        </div>
-                    </div>
-                </div>
+              <!-- Shimmer overlay -->
+              <div class="shimmer-overlay"></div>
 
-                <!-- File Upload Circle -->
-                <div class="relative group w-[25vw] max-w-[640px]" id="uploadOption" data-component="file-upload-circle">
-                    <div class="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(255,251,233,0.9)_70%,rgba(255,251,233,0)_100%)] flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105" data-component="upload-circle-container">
-                        <!-- Inner dotted circle -->
-                        <div class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border" data-component="upload-dotted-border"></div>
-                        <!-- Upload loader overlay with progress border -->
-                        <div id="uploadLoader" class="hidden absolute inset-0 rounded-full bg-black/30 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                            <div class="spinner"></div>
-                            <!-- Progress border animation -->
-                            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-dasharray="301.6" stroke-dashoffset="301.6" class="progress-border" />
-                            </svg>
-                        </div>
-                        <!-- Upload success overlay with preview -->
-                        <div id="uploadSuccess" class="hidden absolute inset-0 rounded-full bg-white/95 z-20 flex items-center justify-center overflow-hidden">
-                            <img id="uploadPreview" class="w-full h-full object-cover" style="display: none;">
-                            <video id="uploadVideoPreview" class="w-full h-full object-cover" style="display: none;" autoplay muted loop></video>
-                        </div>
-                        <div class="mb-1 w-[min(100px,20%)] h-[min(100px,20%)] relative" data-component="upload-icon-container">
-                            <img src="{{ url_for('static', filename='images/uploadImageIcon.png') }}"
-                                 alt="Upload icon"
-                                 class="w-full h-full object-contain">
-                        </div>
-                        <p class="text-gray-700 text-center text-[min(1.2rem,1.6vw)] leading-none font-medium" data-component="upload-text">Drag to here or browse files</p>
-                        <div class="space-y-0" data-component="format-info">
-                            <p class="text-gray-500 text-[min(0.7rem,1.2vw)] mt-1 font-light leading-none">Supported format:</p>
-                            <p class="text-gray-500 text-[min(0.7rem,1.2vw)] font-light leading-none">MP4, PNG, JPG</p>
-                            <p class="text-gray-500 text-[min(0.7rem,1.2vw)] font-light leading-none">(Max 5mb each)</p>
-                        </div>
-                        <input type="file" id="fileInput" accept="video/mp4,image/png,image/jpeg" class="hidden" data-component="file-input">
-                    </div>
-                </div>
+              <!-- Inner glow -->
+              <div class="inner-glow"></div>
+              <!-- Inner dotted circle -->
+              <div
+                class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border"
+                data-component="dotted-border"
+              ></div>
+              <!-- Recording loader overlay -->
+              <div
+                id="recordLoader"
+                class="hidden absolute inset-0 rounded-full bg-black/30 backdrop-blur-[2px] z-20 flex items-center justify-center"
+              >
+                <div class="spinner"></div>
+              </div>
+              <div
+                class="mb-1 w-[min(100px,20%)] h-[min(100px,20%)] relative"
+                data-component="camera-icon-container"
+              >
+                <img
+                  src="{{ url_for('static', filename='images/cameraIcon.png') }}"
+                  alt="Camera icon"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+              <p
+                class="text-gray-700 text-center text-[min(1.2rem,1.6vw)] leading-none font-medium"
+                data-component="recording-text"
+              >
+                Click to record a video
+              </p>
+
+              <!-- 录制时显示的视频预览 -->
+              <video
+                id="recordPreview"
+                autoplay
+                muted
+                playsinline
+                class="hidden w-full h-full absolute inset-0 rounded-full object-cover"
+                data-component="record-preview"
+              ></video>
+
+              <!-- 录制控制按钮 -->
+              <div
+                class="record-controls hidden absolute bottom-5 z-20 flex gap-2"
+                data-component="record-controls"
+              >
+                <button
+                  id="startRecordBtn"
+                  class="inline-flex items-center justify-center px-6 py-2 text-sm rounded-full border-2 border-dashed border-black/60 bg-black/80 text-white font-medium cursor-pointer transition-all duration-300 hover:bg-black hover:border-black hover:-translate-y-1 focus:outline-none disabled:opacity-50"
+                  data-component="start-record-btn"
+                >
+                  Start Recording
+                </button>
+                <button
+                  id="stopRecordBtn"
+                  class="inline-flex items-center justify-center px-6 py-2 text-sm rounded-full border-2 border-dashed border-red-400 bg-red-500/80 text-white font-medium cursor-pointer transition-all duration-300 hover:bg-red-500 hover:border-red-300 hover:-translate-y-1 focus:outline-none disabled:opacity-50"
+                  data-component="stop-record-btn"
+                >
+                  Stop Recording
+                </button>
+              </div>
             </div>
+          </div>
+
+          <!-- File Upload Circle -->
+          <div
+            class="relative group w-[25vw] max-w-[640px]"
+            id="uploadOption"
+            data-component="file-upload-circle"
+          >
+            <div
+              class="recording-circle-enhanced aspect-square w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(255,251,233,0.9)_70%,rgba(255,251,233,0)_100%)] flex flex-col items-center justify-center cursor-pointer"
+              data-component="upload-circle-container"
+            >
+              <!-- Pixel Canvas for hover effect -->
+              <pixel-canvas
+                data-colors="rgba(255,253,233,0.8),rgba(255,253,233,0.6),rgba(255,253,233,0.3)"
+                data-gap="8"
+                data-speed="50"
+              ></pixel-canvas>
+
+              <!-- Shimmer overlay -->
+              <div class="shimmer-overlay"></div>
+
+              <!-- Inner glow -->
+              <div class="inner-glow"></div>
+              <!-- Inner dotted circle -->
+              <div
+                class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border"
+                data-component="upload-dotted-border"
+              ></div>
+              <!-- Upload loader overlay with progress border -->
+              <div
+                id="uploadLoader"
+                class="hidden absolute inset-0 rounded-full bg-black/30 backdrop-blur-[2px] z-20 flex items-center justify-center"
+              >
+                <div class="spinner"></div>
+                <!-- Progress border animation -->
+                <svg
+                  class="absolute inset-0 w-full h-full"
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="48"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.8)"
+                    stroke-width="2"
+                    stroke-dasharray="301.6"
+                    stroke-dashoffset="301.6"
+                    class="progress-border"
+                  />
+                </svg>
+              </div>
+              <!-- Upload success overlay with preview -->
+              <div
+                id="uploadSuccess"
+                class="hidden absolute inset-0 rounded-full bg-white/95 z-20 flex items-center justify-center overflow-hidden"
+              >
+                <img
+                  id="uploadPreview"
+                  class="w-full h-full object-cover"
+                  style="display: none"
+                />
+                <video
+                  id="uploadVideoPreview"
+                  class="w-full h-full object-cover"
+                  style="display: none"
+                  autoplay
+                  muted
+                  loop
+                ></video>
+              </div>
+              <div
+                class="mb-1 w-[min(100px,20%)] h-[min(100px,20%)] relative"
+                data-component="upload-icon-container"
+              >
+                <img
+                  src="{{ url_for('static', filename='images/uploadImageIcon.png') }}"
+                  alt="Upload icon"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                class="relative group"
+                data-component="upload-text-container"
+              >
+                <p
+                  class="text-gray-700 text-center text-[min(1.2rem,1.6vw)] leading-none font-medium"
+                  data-component="upload-text"
+                >
+                  Drag to here or browse files
+                </p>
+
+                <!-- Tooltip -->
+                <div
+                  class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-30"
+                  data-component="tooltip"
+                >
+                  <div class="text-center">
+                    <div class="font-medium">Supported formats:</div>
+                    <div>MP4, PNG, JPG (Max 5MB each)</div>
+                  </div>
+                  <!-- Tooltip arrow -->
+                  <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-black/90"
+                  ></div>
+                </div>
+              </div>
+              <input
+                type="file"
+                id="fileInput"
+                accept="video/mp4,image/png,image/jpeg"
+                class="hidden"
+                data-component="file-input"
+              />
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- 隐藏的视频录制元素 -->
-    <video id="videoRecorder" autoplay muted class="hidden aspect-video"></video>
-
+    <video
+      id="videoRecorder"
+      autoplay
+      muted
+      class="hidden aspect-video"
+    ></video>
 
     <!-- 确认页面 -->
-    <div class="fixed inset-0 bg-transparent text-white overflow-hidden font-inknut hidden opacity-0" id="confirmationPage" data-component="confirmation-page">
-
-        <!-- Main content -->
-        <div class="relative z-10 h-full w-full flex flex-col items-center justify-center" data-component="confirmation-main-content">
-            <!-- Privacy statement -->
-            <p class="text-center text-[min(1.2rem,1.6vw)] mb-12 text-[rgb(255,251,233)]" data-component="privacy-statement">
+    <div
+      class="fixed inset-0 bg-transparent text-white overflow-hidden font-inknut hidden opacity-0"
+      id="confirmationPage"
+      data-component="confirmation-page"
+    >
+      <!-- Main content -->
+      <div
+        class="relative z-10 h-full w-full flex flex-col items-center justify-center"
+        data-component="confirmation-main-content"
+      >
+        <!-- Privacy statement -->
+        <!-- <p class="text-center text-[min(1.2rem,1.6vw)] mb-12 text-[rgb(255,251,233)]" data-component="privacy-statement">
                 By uploading, you agree to our Privacy & Data Usage Statement
-            </p>
+            </p> -->
 
-            <!-- Preview Circle -->
-            <div class="relative w-[25vw] max-w-[640px] mb-10" id="previewContainer" data-component="preview-container">
-                <div class="aspect-square w-full rounded-full bg-[rgba(255,251,233,0.9)] flex items-center justify-center overflow-hidden transform scale-110" data-component="preview-circle">
-                    <!-- Inner dotted circle -->
-                    <div class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border" data-component="preview-dotted-border"></div>
+        <!-- Preview Circle -->
+        <div
+          class="relative w-[25vw] max-w-[640px] mb-10"
+          id="previewContainer"
+          data-component="preview-container"
+        >
+          <div
+            class="aspect-square w-full rounded-full bg-[rgba(255,251,233,0.9)] flex items-center justify-center overflow-hidden transform scale-110"
+            data-component="preview-circle"
+          >
+            <!-- Inner dotted circle -->
+            <div
+              class="absolute w-[86.7%] h-[86.7%] rounded-full border-[3px] border-dotted border-black rotating-border"
+              data-component="preview-dotted-border"
+            ></div>
 
-                    <!-- Video preview -->
-                    <!-- <video id="videoPreview" autoplay loop class="w-full h-full absolute inset-0 rounded-full object-cover mix-blend-exclusion"></video> -->
-                    <video id="videoPreview" autoplay loop class="w-full h-full absolute inset-0 rounded-full object-cover" data-component="video-preview"></video>
-                </div>
-            </div>
-
-            <!-- Action buttons -->
-            <div class="flex flex-row justify-between w-full max-w-[40vw] mt-4" data-component="action-buttons">
-                <div data-component="re-upload-button-container">
-                    <button id="reUploadBtn" class="inline-flex items-center justify-center px-10 py-3 rounded-full border-2 border-dashed border-[rgba(255,251,233,0.6)] bg-[rgba(255,251,233,0.2)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.4)] hover:border-[rgba(255,251,233,0.9)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full max-w-[20vw]" data-component="re-upload-btn">
-                        Re-Upload
-                    </button>
-                </div>
-                <div data-component="confirm-button-container">
-                    <button id="confirmBtn" class="inline-flex items-center justify-center px-10 py-3 rounded-full border-2 border-dashed border-[rgba(255,251,233,0.8)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full max-w-[20vw]" data-component="confirm-btn">
-                        Confirm
-                    </button>
-                </div>
-            </div>
+            <!-- Video preview -->
+            <!-- <video id="videoPreview" autoplay loop class="w-full h-full absolute inset-0 rounded-full object-cover mix-blend-exclusion"></video> -->
+            <video
+              id="videoPreview"
+              autoplay
+              loop
+              class="w-full h-full absolute inset-0 rounded-full object-cover"
+              data-component="video-preview"
+            ></video>
+          </div>
         </div>
+
+        <!-- Action buttons -->
+        <div
+          class="flex flex-row justify-between w-full max-w-[40vw] mt-4"
+          data-component="action-buttons"
+        >
+          <div data-component="re-upload-button-container">
+            <button
+              id="reUploadBtn"
+              class="inline-flex items-center justify-center px-10 py-3 rounded-full border-2 border-dashed border-[rgba(255,251,233,0.6)] bg-[rgba(255,251,233,0.2)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.4)] hover:border-[rgba(255,251,233,0.9)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full max-w-[20vw]"
+              data-component="re-upload-btn"
+            >
+              Re-Upload
+            </button>
+          </div>
+          <div data-component="confirm-button-container">
+            <button
+              id="confirmBtn"
+              class="inline-flex items-center justify-center px-10 py-3 rounded-full border-2 border-dashed border-[rgba(255,251,233,0.8)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full max-w-[20vw]"
+              data-component="confirm-btn"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 隐私政策弹窗 -->
-    <div id="privacyPolicy" class="fixed inset-0 z-50 hidden flex items-center justify-center" data-component="privacy-policy-modal">
-        <!-- 半透明背景 -->
-        <div class="absolute inset-0 bg-black bg-opacity-50" data-component="modal-backdrop"></div>
-        
-        <!-- 弹窗内容 -->
-        <div class="relative z-10 w-[600px] bg-[rgba(0,0,0,0.8)] rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] overflow-hidden" data-component="modal-content">
-            <!-- 标题和内容区域 -->
-            <div class="max-h-[300px] overflow-y-auto px-8 py-6 text-[rgb(255,251,233)] custom-scrollbar" data-component="modal-body">
-                <h3 class="text-xl font-medium mb-4" data-component="modal-title">Privacy & Data Usage Statement</h3>
-                <p class="text-sm leading-relaxed" data-component="modal-text">
-                    We respect your privacy and are committed to protecting your personal information. When you upload an image or video for this interactive experience, your content is used solely for generating the artistic response. We do not store or share your content with third parties, and all uploaded content is automatically deleted after processing. No personal identification information is collected.
-                </p>
-            </div>
-            
-            <!-- 按钮容器 -->
-            <div class="border-t border-[rgb(255,251,233)] border-opacity-20 px-8 py-4 flex justify-center items-center" data-component="modal-footer">
-                <button id="agreeBtn" class="w-full max-w-[8vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style="padding: 0.1rem 1rem;" data-component="agree-btn">
-                    Yes, I agree
-                </button>
-            </div>
+    <div
+      id="privacyPolicy"
+      class="fixed inset-0 z-50 hidden flex items-center justify-center"
+      data-component="privacy-policy-modal"
+    >
+      <!-- 半透明背景 -->
+      <div
+        class="absolute inset-0 bg-black bg-opacity-50"
+        data-component="modal-backdrop"
+      ></div>
+
+      <!-- 弹窗内容 -->
+      <div
+        class="relative z-10 w-[600px] bg-[rgba(0,0,0,0.8)] rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] overflow-hidden"
+        data-component="modal-content"
+      >
+        <!-- 标题和内容区域 -->
+        <div
+          class="max-h-[300px] overflow-y-auto px-8 py-6 text-[rgb(255,251,233)] custom-scrollbar"
+          data-component="modal-body"
+        >
+          <h3 class="text-xl font-medium mb-4" data-component="modal-title">
+            Privacy & Data Usage Statement
+          </h3>
+          <p class="text-sm leading-relaxed" data-component="modal-text">
+            We respect your privacy and are committed to protecting your
+            personal information. When you upload an image or video for this
+            interactive experience, your content is used solely for generating
+            the artistic response. We do not store or share your content with
+            third parties, and all uploaded content is automatically deleted
+            after processing. No personal identification information is
+            collected.
+          </p>
         </div>
+
+        <!-- 按钮容器 -->
+        <div
+          class="border-t border-[rgb(255,251,233)] border-opacity-20 px-8 py-4 flex justify-center items-center"
+          data-component="modal-footer"
+        >
+          <button
+            id="agreeBtn"
+            class="w-full max-w-[8vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            style="padding: 0.1rem 1rem"
+            data-component="agree-btn"
+          >
+            Yes, I agree
+          </button>
+        </div>
+      </div>
     </div>
 
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 251, 233, 0.1);
-            border-radius: 3px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 251, 233, 0.3);
-            border-radius: 3px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 251, 233, 0.5);
-        }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 251, 233, 0.1);
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 251, 233, 0.3);
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 251, 233, 0.5);
+      }
     </style>
+
+    <!-- Pixel Canvas Component -->
+    <script>
+      // Pixel Canvas Component
+      class Pixel {
+        constructor(canvas, context, x, y, color, speed, delay) {
+          this.width = canvas.width;
+          this.height = canvas.height;
+          this.ctx = context;
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          this.speed = this.getRandomValue(0.1, 0.9) * speed;
+          this.size = 0;
+          this.sizeStep = Math.random() * 0.4;
+          this.minSize = 0.5;
+          this.maxSizeInteger = 2;
+          this.maxSize = this.getRandomValue(this.minSize, this.maxSizeInteger);
+          this.delay = delay;
+          this.counter = 0;
+          this.counterStep =
+            Math.random() * 4 + (this.width + this.height) * 0.01;
+          this.isIdle = false;
+          this.isReverse = false;
+          this.isShimmer = false;
+        }
+
+        getRandomValue(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        draw() {
+          const centerOffset = this.maxSizeInteger * 0.5 - this.size * 0.5;
+          this.ctx.fillStyle = this.color;
+          this.ctx.fillRect(
+            this.x + centerOffset,
+            this.y + centerOffset,
+            this.size,
+            this.size
+          );
+        }
+
+        appear() {
+          this.isIdle = false;
+          if (this.counter <= this.delay) {
+            this.counter += this.counterStep;
+            return;
+          }
+          if (this.size >= this.maxSize) {
+            this.isShimmer = true;
+          }
+          if (this.isShimmer) {
+            this.shimmer();
+          } else {
+            this.size += this.sizeStep;
+          }
+          this.draw();
+        }
+
+        disappear() {
+          this.isShimmer = false;
+          this.counter = 0;
+          if (this.size <= 0) {
+            this.isIdle = true;
+            return;
+          } else {
+            this.size -= 0.1;
+          }
+          this.draw();
+        }
+
+        shimmer() {
+          if (this.size >= this.maxSize) {
+            this.isReverse = true;
+          } else if (this.size <= this.minSize) {
+            this.isReverse = false;
+          }
+          if (this.isReverse) {
+            this.size -= this.speed;
+          } else {
+            this.size += this.speed;
+          }
+        }
+      }
+
+      class PixelCanvas extends HTMLElement {
+        static register(tag = "pixel-canvas") {
+          if ("customElements" in window) {
+            customElements.define(tag, this);
+          }
+        }
+
+        static css = `
+          :host {
+            display: grid;
+            inline-size: 100%;
+            block-size: 100%;
+            overflow: hidden;
+          }
+        `;
+
+        get colors() {
+          return (
+            this.dataset.colors?.split(",") || ["#f8fafc", "#f1f5f9", "#cbd5e1"]
+          );
+        }
+
+        get gap() {
+          const value = this.dataset.gap || 5;
+          const min = 4;
+          const max = 50;
+          if (value <= min) {
+            return min;
+          } else if (value >= max) {
+            return max;
+          } else {
+            return parseInt(value);
+          }
+        }
+
+        get speed() {
+          const value = this.dataset.speed || 35;
+          const min = 0;
+          const max = 100;
+          const throttle = 0.001;
+          if (value <= min || this.reducedMotion) {
+            return min;
+          } else if (value >= max) {
+            return max * throttle;
+          } else {
+            return parseInt(value) * throttle;
+          }
+        }
+
+        get noFocus() {
+          return this.hasAttribute("data-no-focus");
+        }
+
+        connectedCallback() {
+          const canvas = document.createElement("canvas");
+          const sheet = new CSSStyleSheet();
+          this._parent = this.parentNode;
+          this.shadowroot = this.attachShadow({ mode: "open" });
+          sheet.replaceSync(PixelCanvas.css);
+          this.shadowroot.adoptedStyleSheets = [sheet];
+          this.shadowroot.append(canvas);
+          this.canvas = this.shadowroot.querySelector("canvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.timeInterval = 1000 / 60;
+          this.timePrevious = performance.now();
+          this.reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches;
+          this.init();
+          this.resizeObserver = new ResizeObserver(() => this.init());
+          this.resizeObserver.observe(this);
+          this._parent.addEventListener("mouseenter", this);
+          this._parent.addEventListener("mouseleave", this);
+          if (!this.noFocus) {
+            this._parent.addEventListener("focusin", this);
+            this._parent.addEventListener("focusout", this);
+          }
+        }
+
+        disconnectedCallback() {
+          this.resizeObserver.disconnect();
+          this._parent.removeEventListener("mouseenter", this);
+          this._parent.removeEventListener("mouseleave", this);
+          if (!this.noFocus) {
+            this._parent.removeEventListener("focusin", this);
+            this._parent.removeEventListener("focusout", this);
+          }
+          delete this._parent;
+        }
+
+        handleEvent(event) {
+          this[`on${event.type}`](event);
+        }
+
+        onmouseenter() {
+          this.handleAnimation("appear");
+        }
+
+        onmouseleave() {
+          this.handleAnimation("disappear");
+        }
+
+        onfocusin(e) {
+          if (e.currentTarget.contains(e.relatedTarget)) return;
+          this.handleAnimation("appear");
+        }
+
+        onfocusout(e) {
+          if (e.currentTarget.contains(e.relatedTarget)) return;
+          this.handleAnimation("disappear");
+        }
+
+        handleAnimation(name) {
+          cancelAnimationFrame(this.animation);
+          this.animation = this.animate(name);
+        }
+
+        init() {
+          const rect = this.getBoundingClientRect();
+          const width = Math.floor(rect.width);
+          const height = Math.floor(rect.height);
+          this.pixels = [];
+          this.canvas.width = width;
+          this.canvas.height = height;
+          this.canvas.style.width = `${width}px`;
+          this.canvas.style.height = `${height}px`;
+          this.createPixels();
+        }
+
+        getDistanceToCanvasCenter(x, y) {
+          const dx = x - this.canvas.width / 2;
+          const dy = y - this.canvas.height / 2;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          return distance;
+        }
+
+        createPixels() {
+          for (let x = 0; x < this.canvas.width; x += this.gap) {
+            for (let y = 0; y < this.canvas.height; y += this.gap) {
+              const color =
+                this.colors[Math.floor(Math.random() * this.colors.length)];
+              const delay = this.reducedMotion
+                ? 0
+                : this.getDistanceToCanvasCenter(x, y);
+              this.pixels.push(
+                new Pixel(this.canvas, this.ctx, x, y, color, this.speed, delay)
+              );
+            }
+          }
+        }
+
+        animate(fnName) {
+          this.animation = requestAnimationFrame(() => this.animate(fnName));
+          const timeNow = performance.now();
+          const timePassed = timeNow - this.timePrevious;
+          if (timePassed < this.timeInterval) return;
+          this.timePrevious = timeNow - (timePassed % this.timeInterval);
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          for (let i = 0; i < this.pixels.length; i++) {
+            this.pixels[i][fnName]();
+          }
+          if (this.pixels.every((pixel) => pixel.isIdle)) {
+            cancelAnimationFrame(this.animation);
+          }
+        }
+      }
+
+      // Register the pixel canvas component
+      PixelCanvas.register();
+    </script>
 
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/see.js') }}"></script>
     <!-- Global page loader (used during post-confirm uploads) -->
-    <div id="globalLoader" class="hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-        <div class="flex flex-col items-center">
-            <div class="spinner"></div>
-            <div class="mt-4 text-[#FFFDE9] text-sm">Uploading...</div>
-        </div>
+    <div
+      id="globalLoader"
+      class="hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+    >
+      <div class="flex flex-col items-center">
+        <div class="spinner"></div>
+        <div class="mt-4 text-[#FFFDE9] text-sm">Uploading...</div>
+      </div>
     </div>
     <script>
-    // Nvshu character rain (aligned with landing page)
-    const nvshuImages = [
-        'combined_10-0-23_vertical_trim.png',
-        'combined_16-3-22_vertical_trim.png',
-        'combined_21-1-20_vertical_trim.png',
-        'combined_23-0-23_vertical_trim.png',
-        'combined_14-8-17_vertical_trim.png',
-        'combined_19-3-21_vertical_trim.png',
-        'combined_22-1-17_vertical_trim.png',
-        'combined_17-0-20_vertical_trim.png',
-        'combined_20-8-22_vertical_trim.png',
-        'combined_12-6-23_vertical_trim.png',
-        'combined_18-1-14_vertical_trim.png',
-        'combined_23-1-23_vertical_trim.png',
-        'combined_16-5-21_vertical_trim.png',
-        'combined_13-9-15_vertical_trim.png',
-        'combined_14-2-11_vertical_trim.png',
-        'combined_16-0-16_vertical_trim.png',
-        'combined_15-2-23_vertical_trim.png',
-        'combined_11-0-23_vertical_trim.png',
-        'combined_13-2-23_vertical_trim.png',
-        'combined_13-4-23_vertical_trim.png',
-        'combined_14-0-16_vertical_trim.png',
-        'combined_16-4-1_vertical_trim.png',
-        'combined_17-0-18_vertical_trim.png',
-        'combined_19-0-23_vertical_trim.png',
-        'combined_20-0-21_vertical_trim.png',
-        'combined_20-8-16_vertical_trim.png',
-        'combined_21-0-16_vertical_trim.png',
-        'combined_21-1-16_vertical_trim.png',
-        'combined_21-2-14_vertical_trim.png',
-        'combined_21-8-19_vertical_trim.png',
-        'combined_22-0-15_vertical_trim.png',
-        'combined_22-0-9_vertical_trim.png',
-        'combined_22-1-23_vertical_trim.png',
-        'combined_22-8-13_vertical_trim.png',
-        'combined_23-0-11_vertical_trim.png',
-        'combined_23-0-13_vertical_trim.png',
-        'combined_23-1-16_vertical_trim.png',
-        'combined_23-2-17_vertical_trim.png',
-        'combined_23-2-23_vertical_trim.png',
-        'combined_23-4-23_vertical_trim.png',
-        'combined_23-8-23_vertical_trim.png',
-        'combined_4-5-16_vertical_trim.png',
-        'combined_5-3-23_vertical_trim.png',
-        'combined_7-23-3_vertical_trim.png'
-    ];
+      // Nvshu character rain (aligned with landing page)
+      const nvshuImages = [
+        "combined_10-0-23_vertical_trim.png",
+        "combined_16-3-22_vertical_trim.png",
+        "combined_21-1-20_vertical_trim.png",
+        "combined_23-0-23_vertical_trim.png",
+        "combined_14-8-17_vertical_trim.png",
+        "combined_19-3-21_vertical_trim.png",
+        "combined_22-1-17_vertical_trim.png",
+        "combined_17-0-20_vertical_trim.png",
+        "combined_20-8-22_vertical_trim.png",
+        "combined_12-6-23_vertical_trim.png",
+        "combined_18-1-14_vertical_trim.png",
+        "combined_23-1-23_vertical_trim.png",
+        "combined_16-5-21_vertical_trim.png",
+        "combined_13-9-15_vertical_trim.png",
+        "combined_14-2-11_vertical_trim.png",
+        "combined_16-0-16_vertical_trim.png",
+        "combined_15-2-23_vertical_trim.png",
+        "combined_11-0-23_vertical_trim.png",
+        "combined_13-2-23_vertical_trim.png",
+        "combined_13-4-23_vertical_trim.png",
+        "combined_14-0-16_vertical_trim.png",
+        "combined_16-4-1_vertical_trim.png",
+        "combined_17-0-18_vertical_trim.png",
+        "combined_19-0-23_vertical_trim.png",
+        "combined_20-0-21_vertical_trim.png",
+        "combined_20-8-16_vertical_trim.png",
+        "combined_21-0-16_vertical_trim.png",
+        "combined_21-1-16_vertical_trim.png",
+        "combined_21-2-14_vertical_trim.png",
+        "combined_21-8-19_vertical_trim.png",
+        "combined_22-0-15_vertical_trim.png",
+        "combined_22-0-9_vertical_trim.png",
+        "combined_22-1-23_vertical_trim.png",
+        "combined_22-8-13_vertical_trim.png",
+        "combined_23-0-11_vertical_trim.png",
+        "combined_23-0-13_vertical_trim.png",
+        "combined_23-1-16_vertical_trim.png",
+        "combined_23-2-17_vertical_trim.png",
+        "combined_23-2-23_vertical_trim.png",
+        "combined_23-4-23_vertical_trim.png",
+        "combined_23-8-23_vertical_trim.png",
+        "combined_4-5-16_vertical_trim.png",
+        "combined_5-3-23_vertical_trim.png",
+        "combined_7-23-3_vertical_trim.png",
+      ];
 
-    function createNvshuColumn(x, index) {
-        const column = document.createElement('div');
-        column.className = 'nvshu-column';
+      function createNvshuColumn(x, index) {
+        const column = document.createElement("div");
+        column.className = "nvshu-column";
 
         const duration = gsap.utils.random(8, 15);
         const delay = gsap.utils.random(0, 4);
@@ -349,119 +973,149 @@
 
         const length = 1;
         for (let i = 0; i < length; i++) {
-            const imgElement = document.createElement('img');
-            imgElement.className = 'char-img';
-            imgElement.src = `/static/nvshu_images/${nvshuImages[Math.floor(Math.random() * nvshuImages.length)]}`;
-            imgElement.style.animationDelay = (i * 0.1) + 's';
-            imgElement.onerror = function() { this.style.display = 'none'; };
-            column.appendChild(imgElement);
+          const imgElement = document.createElement("img");
+          imgElement.className = "char-img";
+          imgElement.src = `/static/nvshu_images/${
+            nvshuImages[Math.floor(Math.random() * nvshuImages.length)]
+          }`;
+          imgElement.style.animationDelay = i * 0.1 + "s";
+          imgElement.onerror = function () {
+            this.style.display = "none";
+          };
+          column.appendChild(imgElement);
         }
 
-        const container = document.getElementById('nvshu-rain');
+        const container = document.getElementById("nvshu-rain");
         if (container) {
-            container.appendChild(column);
-            const totalDuration = (duration + delay) * 1000;
-            setTimeout(() => {
-                if (column.parentNode) {
-                    column.parentNode.removeChild(column);
-                    createNvshuColumn(x, index);
-                }
-            }, totalDuration);
+          container.appendChild(column);
+          const totalDuration = (duration + delay) * 1000;
+          setTimeout(() => {
+            if (column.parentNode) {
+              column.parentNode.removeChild(column);
+              createNvshuColumn(x, index);
+            }
+          }, totalDuration);
         }
-    }
+      }
 
-    function initNvshuRain() {
-        const container = document.getElementById('nvshu-rain');
+      function initNvshuRain() {
+        const container = document.getElementById("nvshu-rain");
         if (!container) return;
         const screenWidth = window.innerWidth;
         const columnWidth = 200;
         const numColumns = Math.floor(screenWidth / columnWidth);
-        container.innerHTML = '';
+        container.innerHTML = "";
         for (let i = 0; i < numColumns; i++) {
-            const x = i * columnWidth + Math.random() * 90 - 15;
-            setTimeout(() => { createNvshuColumn(x, i); }, i * 150);
+          const x = i * columnWidth + Math.random() * 90 - 15;
+          setTimeout(() => {
+            createNvshuColumn(x, i);
+          }, i * 150);
         }
-    }
+      }
 
-    function createLightParticles() {
-        const container = document.getElementById('nvshu-rain');
+      function createLightParticles() {
+        const container = document.getElementById("nvshu-rain");
         if (!container) return;
         for (let i = 0; i < 15; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'absolute w-1 h-1 bg-[#FFFDE9] rounded-full opacity-20 pointer-events-none';
-            particle.style.left = gsap.utils.random(0, 100) + '%';
-            particle.style.top = gsap.utils.random(0, 100) + '%';
-            particle.style.boxShadow = '0 0 10px rgba(255, 253, 233, 0.5)';
-            container.appendChild(particle);
-            gsap.to(particle, { y: -window.innerHeight, duration: gsap.utils.random(20, 40), ease: 'none', repeat: -1, delay: gsap.utils.random(0, 10) });
-            gsap.to(particle, { opacity: gsap.utils.random(0.1, 0.4), duration: gsap.utils.random(2, 4), repeat: -1, yoyo: true, ease: 'power2.inOut' });
+          const particle = document.createElement("div");
+          particle.className =
+            "absolute w-1 h-1 bg-[#FFFDE9] rounded-full opacity-20 pointer-events-none";
+          particle.style.left = gsap.utils.random(0, 100) + "%";
+          particle.style.top = gsap.utils.random(0, 100) + "%";
+          particle.style.boxShadow = "0 0 10px rgba(255, 253, 233, 0.5)";
+          container.appendChild(particle);
+          gsap.to(particle, {
+            y: -window.innerHeight,
+            duration: gsap.utils.random(20, 40),
+            ease: "none",
+            repeat: -1,
+            delay: gsap.utils.random(0, 10),
+          });
+          gsap.to(particle, {
+            opacity: gsap.utils.random(0.1, 0.4),
+            duration: gsap.utils.random(2, 4),
+            repeat: -1,
+            yoyo: true,
+            ease: "power2.inOut",
+          });
         }
-    }
+      }
 
-    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         // 页面加载时的入场动画
         initPageEntranceAnimation();
-        
-        if (typeof gsap === 'undefined') return;
-        setTimeout(() => { initNvshuRain(); }, 500);
-        setTimeout(() => { createLightParticles(); }, 1000);
+
+        if (typeof gsap === "undefined") return;
+        setTimeout(() => {
+          initNvshuRain();
+        }, 500);
+        setTimeout(() => {
+          createLightParticles();
+        }, 1000);
         let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                const container = document.getElementById('nvshu-rain');
-                if (container) container.innerHTML = '';
-                initNvshuRain();
-                createLightParticles();
-            }, 300);
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            const container = document.getElementById("nvshu-rain");
+            if (container) container.innerHTML = "";
+            initNvshuRain();
+            createLightParticles();
+          }, 300);
         });
-    });
-    
-    // 页面入场动画
-    function initPageEntranceAnimation() {
-        const mainContainer = document.getElementById('mainPageContainer');
-        const circlesContainer = document.querySelector('[data-component="circles-container"]');
-        
-        if (typeof gsap !== 'undefined' && mainContainer) {
-            // 设置初始状态
-            gsap.set(mainContainer, { opacity: 0 });
-            
-            // 主容器fade in
-            gsap.to(mainContainer, { 
-                opacity: 1, 
-                duration: 0.8, 
-                ease: 'power2.out',
-                delay: 0.2
+      });
+
+      // 页面入场动画
+      function initPageEntranceAnimation() {
+        const mainContainer = document.getElementById("mainPageContainer");
+        const circlesContainer = document.querySelector(
+          '[data-component="circles-container"]'
+        );
+
+        if (typeof gsap !== "undefined" && mainContainer) {
+          // 设置初始状态
+          gsap.set(mainContainer, { opacity: 0 });
+
+          // 主容器fade in
+          gsap.to(mainContainer, {
+            opacity: 1,
+            duration: 0.8,
+            ease: "power2.out",
+            delay: 0.2,
+          });
+
+          // 两个圆形依次出现
+          if (circlesContainer) {
+            const circles = circlesContainer.querySelectorAll(
+              '[data-component="video-recording-circle"], [data-component="file-upload-circle"]'
+            );
+            gsap.set(circles, { opacity: 0, scale: 0.9, y: 30 });
+            circles.forEach((circle, index) => {
+              gsap.to(circle, {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.6,
+                ease: "back.out(1.7)",
+                delay: 0.5 + index * 0.2,
+              });
             });
-            
-            // 两个圆形依次出现
-            if (circlesContainer) {
-                const circles = circlesContainer.querySelectorAll('[data-component="video-recording-circle"], [data-component="file-upload-circle"]');
-                gsap.set(circles, { opacity: 0, scale: 0.9, y: 30 });
-                circles.forEach((circle, index) => {
-                    gsap.to(circle, { 
-                        opacity: 1, 
-                        scale: 1, 
-                        y: 0,
-                        duration: 0.6,
-                        ease: 'back.out(1.7)',
-                        delay: 0.5 + (index * 0.2)
-                    });
-                });
-            }
+          }
         } else if (mainContainer) {
-            // 如果没有GSAP，直接显示
-            mainContainer.style.opacity = '1';
+          // 如果没有GSAP，直接显示
+          mainContainer.style.opacity = "1";
         }
-    }
-    
-    // 确保页面加载后立即执行动画，不仅仅是DOMContentLoaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPageEntranceAnimation);
-    } else {
+      }
+
+      // 确保页面加载后立即执行动画，不仅仅是DOMContentLoaded
+      if (document.readyState === "loading") {
+        document.addEventListener(
+          "DOMContentLoaded",
+          initPageEntranceAnimation
+        );
+      } else {
         // 如果页面已经加载完成（从其他页面跳转过来的情况）
         initPageEntranceAnimation();
-    }
+      }
     </script>
-</body>
+  </body>
 </html>
