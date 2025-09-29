@@ -533,8 +533,8 @@ def frame_11_from_dict():
         char_3dim = char_data.get('char_3dim', [])
         char_translate = char_data.get('char_translate', char)
         img_path = char_data.get('char_img_path')
-        poem = char_data.get('poem', f"这是从字典中选择的字符：{char}")
-        poem_eng = char_data.get('poem_eng', f"This is a character selected from dictionary: {char}")
+        poem = char_data.get('poem', "代码千行密，测试一线明")
+        poem_eng = char_data.get('poem_eng', "Code sprawls in tangled lines, yet testing brings one light.")
         # media_url = char_data.get('media_url')
         creator = char_data.get('creator', 'default')
         
