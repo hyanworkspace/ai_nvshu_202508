@@ -96,6 +96,8 @@
                     <div class="text-4xl text-center text-black vertical-text" id="revealing-text" data-component="revealing-text" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap;"></div>
                     <!-- 英文翻译 -->
                     <div class="absolute bottom-16 right-25 text-s text-black opacity-70 font-medium" id="listener-translate" data-component="listener-translate"></div>
+                    <!-- Guess poem English translation -->
+                    <div class="listener-poem-translate" id="listener-poem-translate" data-component="listener-poem-translate"></div>
                 </div>
             </div>
             <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="listener-label">Listener</div>
@@ -173,6 +175,57 @@
         #english-desc,
         .poem-english {
             font-family: var(--font-inknut), serif;
+        }
+
+        #listener-poem-translate {
+            position: absolute;
+            left: 50%;
+            bottom: 12px;
+            transform: translateX(-50%);
+            max-width: 80%;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 0.85rem;
+            line-height: 1.3;
+            text-align: center;
+            font-family: var(--font-inknut), serif;
+            pointer-events: none;
+        }
+
+        /* Consensus title typing effect */
+        #consensus-title {
+            position: relative;
+        }
+
+        .typing-effect {
+            position: relative;
+            display: inline-block;
+            padding-right: 0.25em;
+        }
+
+        .typing-effect::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 1.2em;
+            background-color: #FFFDE9;
+            animation: typingCaret 0.7s steps(1, end) infinite;
+        }
+
+        .typing-effect.typing-complete::after {
+            animation: none;
+            opacity: 0;
+        }
+
+        @keyframes typingCaret {
+            0%, 50% {
+                opacity: 1;
+            }
+            50.01%, 100% {
+                opacity: 0;
+            }
         }
 
         @keyframes breathing {

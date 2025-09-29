@@ -7,6 +7,54 @@ let charData = null;
 let replaceData = null;
 let guessInterval = null;
 let showingTextOverlay = true;
+let consensusTypingTimeoutId = null;
+let consensusTypingRunId = 0;
+
+function showConsensusTypingAnimation() {
+    const title = document.getElementById('consensus-title');
+    if (!title) {
+        return;
+    }
+
+    const fullText = title.dataset.fullText || title.textContent.trim() || 'Consensus Reached!';
+    title.dataset.fullText = fullText;
+
+    consensusTypingRunId += 1;
+    const currentRunId = consensusTypingRunId;
+
+    if (consensusTypingTimeoutId) {
+        clearTimeout(consensusTypingTimeoutId);
+        consensusTypingTimeoutId = null;
+    }
+
+    title.classList.remove('hidden');
+    title.classList.add('typing-effect');
+    title.classList.remove('typing-complete');
+    title.textContent = '';
+
+    let index = 0;
+
+    const typeNext = () => {
+        if (currentRunId !== consensusTypingRunId) {
+            return;
+        }
+
+        title.textContent = fullText.slice(0, index + 1);
+        index += 1;
+
+        if (index >= fullText.length) {
+            title.textContent = fullText;
+            title.classList.add('typing-complete');
+            consensusTypingTimeoutId = null;
+            return;
+        }
+
+        consensusTypingTimeoutId = setTimeout(typeNext, 90);
+    };
+
+    typeNext();
+}
+
 
 // 新增函数：处理自定义格式的字符串
 function parseCustomFormat(str) {
@@ -465,8 +513,10 @@ function startAutomaticRevelation() {
     
     const pos = charData.char_pos;
     const guessChars = charData.guess_char;
-    const guessCharsEng = charData.guess_char_eng
-    const guessPoemsEng = charData.guess_poems_eng //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
+    const guessCharsEng = charData.guess_char_eng;
+    const guessPoemsEng = Array.isArray(charData.guess_poems_eng)
+        ? charData.guess_poems_eng
+        : (charData.guess_poems_eng ? [charData.guess_poems_eng] : []); //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
     const poem_list = replaceData.poem_in_list;
     const revealingText = document.getElementById('revealing-text'); // 这个时候的 revealing-text 是已经格式化后的，没有标点符号
     
@@ -475,6 +525,8 @@ function startAutomaticRevelation() {
     // 获取媒体文件路径
     const mediaUrl = document.getElementById('media-url').value;
     const listenerCircle = document.querySelector('[data-component="listener-circle"]');
+    const listenerTranslate = document.getElementById('listener-translate');
+    const listenerPoemTranslate = document.getElementById('listener-poem-translate');
     
     // 创建临时背景图片元素
     let tempBackgroundImg = null;
@@ -505,7 +557,10 @@ function startAutomaticRevelation() {
     highlightCharacter(pos);
     highlightRevealingCharacter(pos);
 
-    
+    if (listenerPoemTranslate) {
+        listenerPoemTranslate.textContent = guessPoemsEng.length > 0 ? guessPoemsEng[0] : '';
+    }
+
     // 创建时间线以便更好地控制动画序列
     const tl = gsap.timeline({
         defaults: { duration: 0.8, ease: "power2.inOut" }
@@ -528,9 +583,11 @@ function startAutomaticRevelation() {
                 revealingText.innerHTML = renderMixedContent(parsedData).replace(/\n/g, '<br>');
                 
                 // 更新翻译内容
-                const listenerTranslate = document.getElementById('listener-translate');
-                if (listenerTranslate && guessCharsEng[index]) {
+                if (listenerTranslate && guessCharsEng && guessCharsEng[index]) {
                     listenerTranslate.textContent = guessCharsEng[index].toLowerCase();
+                }
+                if (listenerPoemTranslate) {
+                    listenerPoemTranslate.textContent = guessPoemsEng[index] || '';
                 }
                 
                 // 在内容更新后重新高亮
@@ -586,9 +643,12 @@ function startAutomaticRevelation() {
              revealingText.innerHTML = renderMixedContent(parsedData).replace(/\n/g, '<br>');
              
              // 更新为最终翻译
-             const listenerTranslate = document.getElementById('listener-translate');
              if (listenerTranslate && charData.char_translate) {
                  listenerTranslate.textContent = charData.char_translate ? charData.char_translate.toLowerCase() : '';
+             }
+             if (listenerPoemTranslate) {
+                 const finalPoemTranslation = guessPoemsEng.length > 0 ? guessPoemsEng[guessPoemsEng.length - 1] : '';
+                 listenerPoemTranslate.textContent = finalPoemTranslation;
              }
              
              // 在内容更新后重新高亮
@@ -813,8 +873,8 @@ function displayCharacterImage() {
         document.getElementById('encoding-text').style.display = 'none';
         document.getElementById('guessing-text').style.display = 'none';
         
-        // Show the consensus title and change circle style
-        document.getElementById('consensus-title').classList.remove('hidden');
+        // Show the consensus title with a typing animation and change circle style
+        showConsensusTypingAnimation();
         
         // Change the listener circle from animated to static style
         const listenerCircle = document.querySelector('.radial-fade-listener');
