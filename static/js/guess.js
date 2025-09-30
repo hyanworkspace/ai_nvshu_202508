@@ -458,6 +458,24 @@ function updateEncodingTextDisplay() {
     }
 }
 
+function setListenerTranslation(poemTranslation, charTranslation) {
+    const resolvedText = poemTranslation
+        ? poemTranslation
+        : charTranslation
+        ? String(charTranslation).toLowerCase()
+        : '';
+
+    const elements = [
+        document.getElementById('listener-translate'),
+        document.getElementById('listener-translate-display')
+    ];
+
+    elements.forEach((el) => {
+        if (!el) return;
+        el.textContent = resolvedText;
+    });
+}
+
 function startAutomaticRevelation() {
     console.log('Starting startAutomaticRevelation function');
     console.log('charData:', charData);
@@ -465,8 +483,12 @@ function startAutomaticRevelation() {
     
     const pos = charData.char_pos;
     const guessChars = charData.guess_char;
-    const guessCharsEng = charData.guess_char_eng
-    const guessPoemsEng = charData.guess_poems_eng //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
+    const guessCharsEng = Array.isArray(charData.guess_char_eng)
+        ? charData.guess_char_eng
+        : [];
+    const guessPoemsEng = Array.isArray(charData.guess_poems_eng)
+        ? charData.guess_poems_eng
+        : []; //  NOTA 20250901 这里改成猜字对应新诗句的翻译了
     const poem_list = replaceData.poem_in_list;
     const revealingText = document.getElementById('revealing-text'); // 这个时候的 revealing-text 是已经格式化后的，没有标点符号
     
@@ -528,10 +550,9 @@ function startAutomaticRevelation() {
                 revealingText.innerHTML = renderMixedContent(parsedData).replace(/\n/g, '<br>');
                 
                 // 更新翻译内容
-                const listenerTranslate = document.getElementById('listener-translate');
-                if (listenerTranslate && guessCharsEng[index]) {
-                    listenerTranslate.textContent = guessCharsEng[index].toLowerCase();
-                }
+                const poemTranslation = guessPoemsEng[index];
+                const charTranslation = guessCharsEng[index];
+                setListenerTranslation(poemTranslation, charTranslation);
                 
                 // 在内容更新后重新高亮
                 highlightRevealingCharacter(pos);
@@ -586,10 +607,8 @@ function startAutomaticRevelation() {
              revealingText.innerHTML = renderMixedContent(parsedData).replace(/\n/g, '<br>');
              
              // 更新为最终翻译
-             const listenerTranslate = document.getElementById('listener-translate');
-             if (listenerTranslate && charData.char_translate) {
-                 listenerTranslate.textContent = charData.char_translate ? charData.char_translate.toLowerCase() : '';
-             }
+             const finalPoemTranslation = guessPoemsEng[guessPoemsEng.length - 1];
+             setListenerTranslation(finalPoemTranslation, charData.char_translate);
              
              // 在内容更新后重新高亮
              highlightRevealingCharacter(pos);
@@ -926,4 +945,3 @@ function showConsensusReached() {
         addGenerateResultButton();
     }, 1000);
 }
-
