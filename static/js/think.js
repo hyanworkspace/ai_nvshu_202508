@@ -324,73 +324,86 @@ class StatusTextAnimator {
     this.isAnimating = false;
     this.animationFrames = [];
     this.thinkingInterval = null;
+    this.typingTimeout = null;
+
+    // Ensure we always render into a dedicated span so we can append a cursor element
+    if (!textElement.dataset.animatorInit) {
+      const textSpan = document.createElement("span");
+      textSpan.className = "status-text__content";
+      textSpan.textContent = this.originalText;
+
+      const cursor = document.createElement("span");
+      cursor.className = "typing-cursor";
+      cursor.setAttribute("aria-hidden", "true");
+
+      textElement.textContent = "";
+      textElement.appendChild(textSpan);
+      textElement.appendChild(cursor);
+
+      textElement.dataset.animatorInit = "true";
+    }
+
+    this.textSpan =
+      textElement.querySelector(".status-text__content") || textElement;
+    this.cursorElement = textElement.querySelector(".typing-cursor");
+
+    this.textElement.classList.add("has-typing-cursor");
   }
 
   startThinkingAnimation() {
     if (this.isAnimating) return;
     this.isAnimating = true;
 
+    this.textElement.classList.add("is-typing");
+
+    if (!this.cursorElement && this.textElement.dataset.animatorInit) {
+      this.cursorElement = this.textElement.querySelector(".typing-cursor");
+    }
+
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+      this.typingTimeout = null;
+    }
+
     const text = this.originalText;
-    const chars = text.split("");
-    let frameCount = 0;
-    const maxFrames = 45; // Number of scramble iterations
-    const scrambleSpeed = 80; // Milliseconds between frames
+    const minDelay = 45;
+    const maxAdditionalDelay = 90;
+    let index = 0;
 
-    const animate = () => {
-      if (frameCount < maxFrames && this.isAnimating) {
-        // Scramble characters randomly with progressive reveal
-        const scrambledText = chars
-          .map((char, index) => {
-            if (char === " ") return " ";
+    if (this.textSpan) {
+      this.textSpan.textContent = "";
+    } else {
+      this.textElement.textContent = "";
+    }
 
-            // Progressive reveal: reveal characters from left to right
-            const revealProgress = frameCount / maxFrames;
-            const charProgress = index / chars.length;
+    const typeNext = () => {
+      if (!this.isAnimating) {
+        if (this.textSpan) this.textSpan.textContent = this.originalText;
+        else this.textElement.textContent = this.originalText;
+        this.typingTimeout = null;
+        return;
+      }
 
-            // Add some randomness to the reveal pattern
-            const shouldReveal =
-              charProgress < revealProgress + Math.random() * 0.1;
-
-            if (shouldReveal) {
-              return char;
-            } else {
-              // Use different character sets for different phases
-              const phase = Math.floor(frameCount / (maxFrames / 3));
-              let charSet = lettersAndSymbols;
-
-              if (phase === 0) {
-                // Early phase: more symbols and numbers
-                charSet = ["#", "@", "$", "%", "&", "*", "+", "=", "~", "?"];
-              } else if (phase === 1) {
-                // Middle phase: mix of letters and symbols
-                charSet = [
-                  ...lettersAndSymbols.slice(0, 26),
-                  "!",
-                  "@",
-                  "#",
-                  "$",
-                ];
-              }
-              // Final phase uses full character set
-
-              return charSet[Math.floor(Math.random() * charSet.length)];
-            }
-          })
-          .join("");
-
-        this.textElement.textContent = scrambledText;
-        frameCount++;
-
-        setTimeout(animate, scrambleSpeed);
+      if (index < text.length) {
+        index += 1;
+        if (this.textSpan) {
+          this.textSpan.textContent = text.slice(0, index);
+        } else {
+          this.textElement.textContent = text.slice(0, index);
+        }
+        const nextDelay =
+          minDelay + Math.random() * maxAdditionalDelay;
+        this.typingTimeout = setTimeout(typeNext, nextDelay);
       } else {
-        // Animation complete, show final text
-        this.textElement.textContent = this.originalText;
+        if (this.textSpan) this.textSpan.textContent = text;
+        else this.textElement.textContent = text;
+        this.typingTimeout = null;
         this.isAnimating = false;
-        this.animationFrames = [];
+        this.textElement.classList.remove("is-typing");
       }
     };
 
-    animate();
+    this.typingTimeout = setTimeout(typeNext, 140);
   }
 
   startContinuousThinking() {
@@ -399,11 +412,17 @@ class StatusTextAnimator {
     const dots = ["", ".", "..", "..."];
     let dotIndex = 0;
 
+    this.textElement.classList.add("is-typing");
+
     this.thinkingInterval = setInterval(() => {
       if (this.isAnimating) return; // Don't interfere with scramble animation
 
       const baseText = this.originalText.replace(/\.+$/, ""); // Remove existing dots
-      this.textElement.textContent = baseText + dots[dotIndex];
+      if (this.textSpan) {
+        this.textSpan.textContent = baseText + dots[dotIndex];
+      } else {
+        this.textElement.textContent = baseText + dots[dotIndex];
+      }
       dotIndex = (dotIndex + 1) % dots.length;
     }, 500);
   }
@@ -413,18 +432,27 @@ class StatusTextAnimator {
     this.animationFrames.forEach((frameId) => cancelAnimationFrame(frameId));
     this.animationFrames = [];
 
+    this.textElement.classList.remove("is-typing");
+
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+      this.typingTimeout = null;
+    }
+
     if (this.thinkingInterval) {
       clearInterval(this.thinkingInterval);
       this.thinkingInterval = null;
     }
 
-    this.textElement.textContent = this.originalText;
+    if (this.textSpan) this.textSpan.textContent = this.originalText;
+    else this.textElement.textContent = this.originalText;
   }
 
   updateText(newText) {
     this.originalText = newText;
     if (!this.isAnimating) {
-      this.textElement.textContent = newText;
+      if (this.textSpan) this.textSpan.textContent = newText;
+      else this.textElement.textContent = newText;
     }
   }
 }
