@@ -268,7 +268,9 @@
       const ITEMS_PER_PAGE = 20; // 10 columns × 2 rows
       let currentPage = 1;
       let currentDictionary = {};
+      let currentKeysOrder = [];
       let filteredDictionary = {};
+      let filteredKeysOrder = [];
 
       // Function to generate image path from dimensions
       function getImagePath(dimensions) {
@@ -284,7 +286,11 @@
           Object.keys(filteredDictionary).length > 0
             ? filteredDictionary
             : currentDictionary;
-        const totalChars = Object.keys(dictToRender).length;
+        const keysOrderToRender =
+          filteredKeysOrder.length > 0
+            ? filteredKeysOrder
+            : currentKeysOrder;
+        const totalChars = keysOrderToRender.length;
 
         if (totalChars === 0) {
           grid.innerHTML =
@@ -292,8 +298,8 @@
           return;
         }
 
-        // Sort characters alphabetically
-        const sortedCharacters = Object.keys(dictToRender).sort();
+        // Get characters in reverse order of their appearance in the original dictionary
+        const sortedCharacters = [...keysOrderToRender].reverse();
 
         // Calculate pagination
         const totalPages = Math.ceil(totalChars / ITEMS_PER_PAGE);
@@ -496,8 +502,11 @@
           if (!response.ok) {
             throw new Error("Failed to load dictionary");
           }
-          currentDictionary = await response.json();
+          const responseData = await response.json();
+          currentDictionary = responseData.data;
+          currentKeysOrder = responseData.keys_order;
           filteredDictionary = {};
+          filteredKeysOrder = [];
           currentPage = 1;
 
           // Add a slight delay to show loading state
@@ -533,12 +542,17 @@
         searchTimeout = setTimeout(() => {
           if (searchTerm === "") {
             filteredDictionary = {};
+            filteredKeysOrder = [];
           } else {
             filteredDictionary = Object.fromEntries(
               Object.entries(currentDictionary).filter(([char, charData]) => {
                 // 只搜索中文字符
                 return char.toLowerCase().includes(searchTerm);
               })
+            );
+            // 保持原始顺序的过滤
+            filteredKeysOrder = currentKeysOrder.filter(char => 
+              char.toLowerCase().includes(searchTerm)
             );
           }
 
@@ -591,12 +605,12 @@
       });
 
       document.getElementById("next-page").addEventListener("click", () => {
-        const dictToRender =
-          Object.keys(filteredDictionary).length > 0
-            ? filteredDictionary
-            : currentDictionary;
+        const keysOrderToRender =
+          filteredKeysOrder.length > 0
+            ? filteredKeysOrder
+            : currentKeysOrder;
         const totalPages = Math.ceil(
-          Object.keys(dictToRender).length / ITEMS_PER_PAGE
+          keysOrderToRender.length / ITEMS_PER_PAGE
         );
 
         if (currentPage < totalPages) {

@@ -585,7 +585,12 @@ def about():
 def get_dictionary():
     try:
         dictionary = load_dict_from_file(app.config['DICTIONARY_PATH'])
-        return jsonify(dictionary)
+        # 保持字典的原始顺序，转换为有序列表格式
+        ordered_dict = {
+            'data': dictionary,
+            'keys_order': list(dictionary.keys())
+        }
+        return jsonify(ordered_dict)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
