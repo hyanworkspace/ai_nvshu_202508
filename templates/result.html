@@ -52,13 +52,81 @@
         [data-component="char-image"] {
             transition: all 0.3s ease;
             filter: drop-shadow(0 0 10px rgba(255, 253, 233, 0.3));
+            mix-blend-mode: difference;
         }
-        
+
         [data-component="char-image"]:hover {
             transform: scale(1.05);
             filter: drop-shadow(0 0 15px rgba(255, 253, 233, 0.5));
         }
-        
+
+        /* 字典卡片风格 */
+        .dictionary-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 251, 233, 0.18);
+            background: rgba(255, 251, 233, 0.08);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dictionary-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 253, 233, 0.18), transparent 65%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .dictionary-card:hover {
+            transform: translateY(-6px) scale(1.015);
+            border-color: rgba(255, 251, 233, 0.4);
+            box-shadow: 0 24px 54px rgba(0, 0, 0, 0.45);
+        }
+
+        .dictionary-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-translation,
+        .card-dimensions {
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .dictionary-card:hover .card-translation {
+            color: rgba(255, 253, 233, 0.95);
+            text-shadow: 0 0 12px rgba(255, 253, 233, 0.35);
+        }
+
+        .dictionary-card:hover .card-dimensions {
+            opacity: 1;
+        }
+
+        .card-image-wrapper {
+            width: 100%;
+            padding: 1.75rem 1.5rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .card-image-wrapper::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 253, 233, 0.2), transparent 70%);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
         /* 维度显示的微妙效果 */
         [data-component="dimensions-display"] {
             transition: opacity 0.3s ease;
@@ -77,7 +145,7 @@
         <!-- 左边区域 -->
         <div class="flex-1 flex flex-col items-center gap-4" data-component="left-panel">
             <!-- 视频和字符的容器 -->
-            <div class="relative flex flex-col items-center isolate" data-component="media-container">
+            <div class="relative flex flex-col items-center isolate pb-32" data-component="media-container">
                 <!-- 视频圆形容器-底部 -->
                 <div class="absolute w-72 h-72 z-10 grayscale invert rounded-full mask-radial-fading radial-fade" data-component="video-circle">
                     {% if video_url %}
@@ -88,31 +156,32 @@
                     <p>No video available</p>
                     {% endif %}
                 </div>
+                
 
                 <!-- 女书字符中间层 -->
-                <div class="absolute flex items-center justify-center" style="top: -70px; z-index: 15;" data-component="char-overlay">
-                    <img src="{{ char_img_path }}" alt="Generated Nüshu Character"
-                        class="w-[90%] h-[90%] object-contain mix-blend-difference justify-center" data-component="char-image">
+                <div class="absolute" style="top: -80px; left: 50%; transform: translateX(-50%); z-index: 25;" data-component="char-overlay">
+                    <div class="dictionary-card rounded-2xl text-[#FFFDE9] w-[min(340px,80vw)]" data-component="char-meta">
+                        <div class="card-image-wrapper">
+                            <img src="{{ char_img_path }}" alt="Generated Nüshu Character"
+                                class="w-[82%] h-auto object-contain mix-blend-difference" data-component="char-image">
+                        </div>
+                        <div class="px-6 pb-6 flex flex-col items-center text-center gap-3">
+                            <p class="card-translation text-lg leading-relaxed tracking-wide" data-component="char-translate">"{{ char_translate }}"</p>
+                            <div class="card-dimensions text-[0.68rem] uppercase tracking-[0.35em]">3D Dimensions</div>
+                            <div class="card-dimensions text-sm" data-component="dimensions-display">
+                                {% if char_3dim %}
+                                <p data-component="dimensions-text">{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}</p>
+                                {% else %}
+                                <p>No dimensions data available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 顶部圆形 -->
-                <div class="absolute w-72 h-72 z-20 inset-0 rounded-full radial-fade mix-blend-difference" data-component="top-overlay"></div>
-
+              
                 <!-- 占位div确保容器高度 -->
                 <div class="w-72 h-72 invisible" data-component="spacer"></div>
-            </div>
-
-            <!-- 角色翻译与维度信息 -->
-            <div class="flex flex-col items-center text-center gap-3 mt-16 text-[#FFFDE9]" data-component="char-meta">
-                <p class="text-xl leading-relaxed max-w-[18rem] font-medium tracking-wide" data-component="char-translate">"{{ char_translate }}"</p>
-                <div class="text-sm opacity-60" data-component="dimensions-display">
-                    {% if char_3dim %}
-                    <p data-component="dimensions-text">{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}</p>
-                    {% else %}
-                    <p>No dimensions data available</p>
-                    {% endif %}
-                    <h3 class="uppercase tracking-[0.4em] text-xs mt-1" data-component="dimensions-title">3D Dimensions</h3>
-                </div>
             </div>
         </div>
 
