@@ -95,9 +95,6 @@
                         class="w-[90%] h-[90%] object-contain mix-blend-difference justify-center" data-component="char-image">
                 </div>
 
-                <!-- TODO 要修改/美化的 -->
-                <p data-component="char-translate">"{{ char_translate }}"</p>
-
                 <!-- 顶部圆形 -->
                 <div class="absolute w-72 h-72 z-20 inset-0 rounded-full radial-fade mix-blend-difference" data-component="top-overlay"></div>
 
@@ -105,14 +102,17 @@
                 <div class="w-72 h-72 invisible" data-component="spacer"></div>
             </div>
 
-            <!-- 显示char_3dim -->
-            <div class="pt-20 text-center text-[#FFFDE9] text-sm mt-4 opacity-50" data-component="dimensions-display">
-                {% if char_3dim %}
-                <p data-component="dimensions-text">{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}</p>
-                {% else %}
-                <p>No dimensions data available</p>
-                {% endif %}
-                <h3 data-component="dimensions-title">3D Dimensions</h3>
+            <!-- 角色翻译与维度信息 -->
+            <div class="flex flex-col items-center text-center gap-3 mt-16 text-[#FFFDE9]" data-component="char-meta">
+                <p class="text-xl leading-relaxed max-w-[18rem] font-medium tracking-wide" data-component="char-translate">"{{ char_translate }}"</p>
+                <div class="text-sm opacity-60" data-component="dimensions-display">
+                    {% if char_3dim %}
+                    <p data-component="dimensions-text">{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}</p>
+                    {% else %}
+                    <p>No dimensions data available</p>
+                    {% endif %}
+                    <h3 class="uppercase tracking-[0.4em] text-xs mt-1" data-component="dimensions-title">3D Dimensions</h3>
+                </div>
             </div>
         </div>
 
