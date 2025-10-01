@@ -118,19 +118,19 @@
                 <p data-component="question-text">Do you want to store it in a public dictionary?</p>
                 <div class="flex gap-4" data-component="storage-options">
                     <input type="radio" name="storage" value="yes" class="hidden" id="storage-yes">
-                    <label for="storage-yes" data-component="yes-option"
+                    <label for="storage-yes" data-component="yes-option" onclick="window.location.href='{{ url_for('dictionary') }}'"
                         class="px-4 md:px-6 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] cursor-pointer text-sm md:text-base">Yes
                         :)</label>
                     <input type="radio" name="storage" value="no" class="hidden" id="storage-no">
-                    <label for="storage-no" data-component="no-option"
+                    <label for="storage-no" data-component="no-option" onclick="window.location.href='{{ url_for('dictionary') }}'"
                         class="px-4 md:px-6 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] cursor-pointer text-sm md:text-base">No
                         :(</label>
                 </div>
-                <button id="go-to-dictionary-btn" data-dictionary-url="{{ url_for('dictionary') }}" data-component="dictionary-button"
+                <!-- <button id="go-to-dictionary-btn" data-dictionary-url="{{ url_for('dictionary') }}" data-component="dictionary-button"
                 onclick="window.location.href='{{ url_for('dictionary') }}'"
                 class="w-full md:w-auto px-6 md:px-8 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] text-sm md:text-base">
                 Go to Dictionary
-            </button>
+            </button> -->
             </div>
 
             <!-- Action buttons and share -->
