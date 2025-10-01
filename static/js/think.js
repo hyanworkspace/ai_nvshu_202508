@@ -239,7 +239,12 @@ async function typeWriterSimultaneously(
     // 中文打字机效果（较慢）
     function typeChinese() {
       if (chineseIndex < chineseText.length) {
-        chineseLineElement.innerHTML += chineseText.charAt(chineseIndex);
+        const char = chineseText.charAt(chineseIndex);
+        if (char === "\n") {
+          chineseLineElement.innerHTML += "<br />";
+        } else {
+          chineseLineElement.innerHTML += char;
+        }
         chineseIndex++;
         setTimeout(typeChinese, 80); // 中文 80ms 间隔
       } else {
@@ -251,7 +256,12 @@ async function typeWriterSimultaneously(
     // 英文打字机效果（较快）
     function typeEnglish() {
       if (englishIndex < englishText.length) {
-        englishLineElement.innerHTML += englishText.charAt(englishIndex);
+        const char = englishText.charAt(englishIndex);
+        if (char === "\n") {
+          englishLineElement.innerHTML += "<br />";
+        } else {
+          englishLineElement.innerHTML += char;
+        }
         englishIndex++;
         setTimeout(typeEnglish, 40); // 英文 40ms 间隔
       } else {
@@ -486,7 +496,7 @@ function addStatusItem(
 
   statusItem.innerHTML = `
         <div class="status-icon">${
-          isCompleted ? "✓" : isActive ? "◐" : "○"
+          isCompleted ? "✓" : isActive ? "" : ""
         }</div>
         <div class="status-item-content">
             <div class="status-text" data-thinking-text>${text}</div>
@@ -551,16 +561,112 @@ function addStatusItem(
         ease: "power2.out",
         delay: 0.1,
         onComplete: () => {
-          statusItem.style.opacity = targetOpacity;
+          setStatusOpacity(statusItem, targetOpacity, false);
           gsap.set(statusItem, { clearProps: "transform" });
         },
       }
     );
   } else {
-    statusItem.style.opacity = targetOpacity;
+    setStatusOpacity(statusItem, targetOpacity, false);
   }
 
   return statusItem;
+}
+
+function setStatusOpacity(item, value, animate = true) {
+  if (!item) return;
+  if (animate && typeof gsap !== "undefined") {
+    gsap.to(item, {
+      opacity: value,
+      duration: 0.45,
+      ease: "power2.out",
+    });
+  } else {
+    item.style.opacity = value;
+  }
+}
+
+function animateStatusIcon(iconEl) {
+  if (!iconEl || typeof gsap === "undefined") return;
+  gsap.fromTo(
+    iconEl,
+    { scale: 0.85, transformOrigin: "50% 50%" },
+    { scale: 1, duration: 0.45, ease: "back.out(1.8)" }
+  );
+}
+
+function renderPoemColumns(chineseElement, poemText) {
+  if (!chineseElement) return;
+  const raw = (poemText || "").trim();
+  if (!raw) return;
+
+  const lines = raw
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (!lines.length) return;
+
+  const columnCount = Math.min(2, lines.length);
+  const perColumn = Math.ceil(lines.length / columnCount);
+  const columns = [];
+
+  for (let i = 0; i < columnCount; i++) {
+    const slice = lines.slice(i * perColumn, (i + 1) * perColumn);
+    if (slice.length) {
+      columns.push(slice);
+    }
+  }
+
+  const buildColumns = () => {
+    chineseElement.innerHTML = "";
+    chineseElement.classList.add("poem-columns");
+
+    columns.forEach((colLines) => {
+      const columnEl = document.createElement("div");
+      columnEl.className = "poem-column";
+
+      colLines.forEach((line) => {
+        const lineEl = document.createElement("span");
+        lineEl.className = "poem-line";
+        lineEl.textContent = line;
+        columnEl.appendChild(lineEl);
+      });
+
+      chineseElement.appendChild(columnEl);
+    });
+
+    if (typeof gsap !== "undefined") {
+      gsap.fromTo(
+        chineseElement.querySelectorAll(".poem-column"),
+        { opacity: 0, y: 12 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          stagger: 0.12,
+        }
+      );
+    }
+  };
+
+  if (typeof gsap !== "undefined") {
+    gsap.to(chineseElement, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power1.in",
+      onComplete: () => {
+        buildColumns();
+        gsap.to(chineseElement, {
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+        });
+      },
+    });
+  } else {
+    buildColumns();
+  }
 }
 
 function updateStatusIndicators() {
@@ -624,13 +730,17 @@ function scrollToStatusItem(index) {
     if (i === index) {
       if (item.classList.contains("completed")) {
         item.setAttribute("aria-current", "false");
-        item.style.opacity = 0.6;
+        setStatusOpacity(item, 0.6);
       } else {
         // Set current item to processing
         item.className = "status-item processing";
-        item.querySelector(".status-icon").innerHTML = "◐";
+        const icon = item.querySelector(".status-icon");
+        if (icon) {
+        icon.innerHTML = "";
+          animateStatusIcon(icon);
+        }
         item.setAttribute("aria-current", "step");
-        item.style.opacity = 1;
+        setStatusOpacity(item, 1);
       }
     } else {
       if (
@@ -638,13 +748,17 @@ function scrollToStatusItem(index) {
         !item.classList.contains("completed")
       ) {
         item.className = "status-item pending";
-        item.querySelector(".status-icon").innerHTML = "○";
+        const icon = item.querySelector(".status-icon");
+        if (icon) {
+          icon.innerHTML = "○";
+          animateStatusIcon(icon);
+        }
       }
       item.setAttribute("aria-current", "false");
       if (item.classList.contains("completed")) {
-        item.style.opacity = 0.6;
+        setStatusOpacity(item, 0.6);
       } else if (item.classList.contains("pending")) {
-        item.style.opacity = 0.24;
+        setStatusOpacity(item, 0.24);
       }
     }
   });
@@ -795,7 +909,7 @@ function updateStatusItem(
   const stepLabel = String(stepNumber).padStart(2, "0");
   item.dataset.stepNumber = stepNumber;
   item.setAttribute("aria-current", isCompleted ? "false" : "step");
-  item.style.opacity = isCompleted ? 0.6 : 1;
+  setStatusOpacity(item, isCompleted ? 0.6 : 1);
 
   item.innerHTML = `
         <div class="status-icon">${isCompleted ? "✓" : "◐"}</div>
@@ -810,14 +924,17 @@ function updateStatusItem(
         </div>
     `;
 
+  const iconEl = item.querySelector(".status-icon");
+  animateStatusIcon(iconEl);
+
   // Recreate text animator for the new text element
   const textElement = item.querySelector(".status-text");
   const animator = new StatusTextAnimator(textElement);
   item.textAnimator = animator;
 
   // Add completion animation
-  if (isCompleted && typeof gsap !== "undefined") {
-    gsap.to(item.querySelector(".status-icon"), {
+  if (isCompleted && typeof gsap !== "undefined" && iconEl) {
+    gsap.to(iconEl, {
       scale: 1.2,
       duration: 0.3,
       ease: "back.out(1.7)",
@@ -837,9 +954,13 @@ function updateStatusItem(
         // 激活下一个状态项
         const nextItem = statusItems[nextIndex];
         nextItem.className = "status-item processing";
-        nextItem.querySelector(".status-icon").innerHTML = "◐";
+        const nextIcon = nextItem.querySelector(".status-icon");
+        if (nextIcon) {
+          nextIcon.innerHTML = "";
+          animateStatusIcon(nextIcon);
+        }
         nextItem.setAttribute("aria-current", "step");
-        nextItem.style.opacity = 1;
+        setStatusOpacity(nextItem, 1);
 
         // 启动文本动画
         if (nextItem.textAnimator) {
@@ -1017,9 +1138,13 @@ async function findSimilarPoems(description) {
   if (thinkingItem) {
     // Activate the existing thinking item
     thinkingItem.className = "status-item processing";
-    thinkingItem.querySelector(".status-icon").innerHTML = "◐";
+    const thinkingIcon = thinkingItem.querySelector(".status-icon");
+    if (thinkingIcon) {
+      thinkingIcon.innerHTML = "";
+      animateStatusIcon(thinkingIcon);
+    }
     thinkingItem.setAttribute("aria-current", "step");
-    thinkingItem.style.opacity = 1;
+    setStatusOpacity(thinkingItem, 1);
     if (thinkingItem.textAnimator) {
       thinkingItem.textAnimator.startThinkingAnimation();
     }
@@ -1141,9 +1266,13 @@ async function generatePoem(description, poems) {
   if (reflectingItem) {
     // Activate the existing reflecting item
     reflectingItem.className = "status-item processing";
-    reflectingItem.querySelector(".status-icon").innerHTML = "◐";
+    const reflectingIcon = reflectingItem.querySelector(".status-icon");
+    if (reflectingIcon) {
+      reflectingIcon.innerHTML = "";
+      animateStatusIcon(reflectingIcon);
+    }
     reflectingItem.setAttribute("aria-current", "step");
-    reflectingItem.style.opacity = 1;
+    setStatusOpacity(reflectingItem, 1);
     if (reflectingItem.textAnimator) {
       reflectingItem.textAnimator.startThinkingAnimation();
     }
@@ -1212,12 +1341,12 @@ async function generatePoem(description, poems) {
 
     // 更新覆盖层内容为生成的诗句
     descriptionOverlay.innerHTML = `
-            <div class="flex items-center justify-center p-2 text-center relative w-full h-full">
-                <div class="text-gray-800 text-2xl vertical-text break-words">
-                    <div id="chinese-poem" class="poem"></div>
+            <div class="poem-overlay">
+                <div class="poem-english-container">
+                    <div id="english-poem" class="poem poem-english"></div>
                 </div>
-                <div class="absolute bottom-4 text-gray-600 text-xs break-words">
-                    <div id="english-poem" class="poem"></div>
+                <div class="poem-columns-wrapper">
+                    <div id="chinese-poem" class="poem poem-chinese"></div>
                 </div>
             </div>
         `;
@@ -1235,6 +1364,10 @@ async function generatePoem(description, poems) {
       formattedPoem,
       data.poem_eng
     );
+
+    englishPoem.classList.add("poem-english");
+    englishPoem.innerHTML = (data.poem_eng || "").replace(/\n/g, "<br />");
+    renderPoemColumns(chinesePoem, formattedPoem);
     // Calculate remaining time to reach MIN_DISPLAY_TIME
     const elapsed = Date.now() - lastStepTime;
     const remainingTime = Math.max(0, MIN_DISPLAY_TIME - elapsed);

@@ -97,16 +97,19 @@
                     <!-- 视频圆形-->
                     <div class="absolute inset-0 z-10 rounded-full mask-radial-fading grayscale overflow-hidden" data-component="video-circle">
                         {% if media_url %}
-                        <video class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="video-element"
-                            src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
+                            {% if media_type == 'video' %}
+                                <video class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="video-element"
+                                    src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
+                            {% else %}
+                                <img src="{{ media_url }}" alt="Uploaded media" class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="media-image">
+                            {% endif %}
+                            <div class="absolute inset-0 z-20 rounded-full radial-fade mix-blend-difference" data-component="video-overlay"></div>
                         {% else %}
                         <div class="w-full h-full flex items-center justify-center text-[#FFFDE9] text-sm">
                             <p>From Dictionary</p>
                         </div>
                         {% endif %}
                     </div>
-                    <!-- 顶部淡黄色遮罩：上层 -->
-                    <div class="absolute inset-0 z-20 rounded-full radial-fade mix-blend-difference" data-component="video-overlay"></div>
                 </div>
 
                 <!-- Original Characters -->
