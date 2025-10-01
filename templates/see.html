@@ -793,8 +793,8 @@
           this.reducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
           ).matches;
-          this.init();
-          this.resizeObserver = new ResizeObserver(() => this.init());
+          this.scheduleInit();
+          this.resizeObserver = new ResizeObserver(() => this.scheduleInit());
           this.resizeObserver.observe(this);
           this._parent.addEventListener("mouseenter", this);
           this._parent.addEventListener("mouseleave", this);
@@ -805,6 +805,10 @@
         }
 
         disconnectedCallback() {
+          if (this.initRaf) {
+            cancelAnimationFrame(this.initRaf);
+            this.initRaf = null;
+          }
           this.resizeObserver.disconnect();
           this._parent.removeEventListener("mouseenter", this);
           this._parent.removeEventListener("mouseleave", this);
@@ -842,10 +846,24 @@
           this.animation = this.animate(name);
         }
 
+        scheduleInit() {
+          if (this.initRaf) {
+            cancelAnimationFrame(this.initRaf);
+          }
+          this.initRaf = requestAnimationFrame(() => {
+            this.initRaf = null;
+            this.init();
+          });
+        }
+
         init() {
           const rect = this.getBoundingClientRect();
           const width = Math.floor(rect.width);
           const height = Math.floor(rect.height);
+          if (!width || !height) {
+            this.scheduleInit();
+            return;
+          }
           this.pixels = [];
           this.canvas.width = width;
           this.canvas.height = height;

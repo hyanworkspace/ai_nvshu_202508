@@ -182,8 +182,8 @@ function initializeMediaDisplay(mediaUrl, mediaType) {
     });
 
     // 添加鼠标悬停提示
-    mediaCircle.title =
-      "Click to toggle between original media and analysis results";
+    // mediaCircle.title =
+    //   "Click to toggle between original media and analysis results";
   }
 }
 
