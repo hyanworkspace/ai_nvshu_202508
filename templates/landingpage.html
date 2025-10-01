@@ -703,7 +703,7 @@
               ease: "power2.inOut",
               onComplete: () => {
                 seeRoot.style.display = "none";
-                landingRoot.style.display = "block";
+                landingRoot.style.removeProperty("display");
                 gsap.fromTo(
                   landingRoot,
                   { opacity: 0 },
