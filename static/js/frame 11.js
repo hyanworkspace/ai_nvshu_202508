@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.checked = false;
     });
     // 保存图片功能 - 修改为截取正确的虚线框容器
-    document.getElementById('save-image-btn').addEventListener('click', function() {
+    const saveImageBtn = document.getElementById('save-image-btn');
+    if (saveImageBtn) {
+        saveImageBtn.addEventListener('click', function() {
         // First capture the main container as image
         const element = document.querySelector('.max-w-\\[1200px\\].w-full.mx-auto.border-\\[2px\\].border-dashed.border-\\[\\#FFFDE9\\].rounded-\\[20px\\]');
         
@@ -17,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }).then(canvas => {
             window.print();
         });
-    });
+        });
+    }
     
     // Add print-specific styles
     const style = document.createElement('style');
@@ -42,15 +45,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
 
     // 跳转到字典页面
-    document.getElementById('go-to-dictionary-btn').addEventListener('click', function() {
-        const button = this;
-        const dictionaryUrl = button.dataset.dictionaryUrl;
-        if (dictionaryUrl) {
-            window.location.href = dictionaryUrl;
-        } else {
-            console.error('Dictionary URL not found on the button.');
-        }
-    });
+    const goToDictionaryBtn = document.getElementById('go-to-dictionary-btn');
+    if (goToDictionaryBtn) {
+        goToDictionaryBtn.addEventListener('click', function() {
+            const button = this;
+            const dictionaryUrl = button.dataset.dictionaryUrl;
+            if (dictionaryUrl) {
+                window.location.href = dictionaryUrl;
+            } else {
+                console.error('Dictionary URL not found on the button.');
+            }
+        });
+    }
 
     // 分享到微信 - 使用微信JS-SDK的简化实现
     window.shareToWeChat = function() {
@@ -245,12 +251,16 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('click', async function() {
             // 防止重复提交
             if (isProcessing) {
+                console.log('Already processing, ignoring click');
                 return;
             }
             isProcessing = true;
             
+            console.log('Storage preference selected:', this.value);
+            
             try {
                 // 保存用户选择
+                console.log('Saving storage preference...');
                 const response = await fetch('/save_storage_preference', {
                     method: 'POST',
                     headers: {
@@ -259,27 +269,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ storage_preference: this.value })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`Failed to save preference: ${response.status}`);
+                }
+                console.log('Storage preference saved successfully');
+
                 // 如果用户选择 Yes，调用 add_to_dictionary
                 if (this.value === 'yes') {
-                    await fetch('/add_to_dictionary', {
+                    console.log('Adding to dictionary...');
+                    const addResponse = await fetch('/add_to_dictionary', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         }
                     });
+                    
+                    if (!addResponse.ok) {
+                        throw new Error(`Failed to add to dictionary: ${addResponse.status}`);
+                    }
+                    console.log('Successfully added to dictionary');
                 }
 
                 // 无论选择 Yes 还是 No，都跳转到字典页面
-                const dictionaryBtn = document.getElementById('go-to-dictionary-btn');
-                const dictionaryUrl = dictionaryBtn.dataset.dictionaryUrl;
-                if (dictionaryUrl) {
-                    window.location.href = dictionaryUrl;
-                } else {
-                    console.error('Dictionary URL not found.');
-                }
+                console.log('Redirecting to dictionary...');
+                window.location.href = '/dictionary';
             } catch (error) {
                 console.error('Error:', error);
                 isProcessing = false; // 出错时重置状态
+                alert('操作失败，请重试: ' + error.message);
             }
         });
     });
