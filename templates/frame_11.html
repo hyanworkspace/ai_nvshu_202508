@@ -34,14 +34,33 @@
         }
 
         .highlight {
-            color: white !important;
-            background-color: black !important;
+            position: relative;
             display: inline-flex;
-            box-shadow: 0 0 0 0.5px white;
+            align-items: center;
+            justify-content: center;
+            padding: 0.15em 0.3em;
+            border-radius: 6px;
+            color: #171313 !important;
+            background: rgba(255, 239, 197, 0.45);
+            box-shadow: 0 0 0 0.5px rgba(255, 253, 233, 0.7);
+            animation: highlightPulse 2.6s ease-in-out infinite;
         }
 
         .highlight::after {
             display: none;
+        }
+
+        @keyframes highlightPulse {
+            0%,
+            100% {
+                background: rgba(255, 239, 197, 0.35);
+                box-shadow: 0 0 0 0.5px rgba(255, 253, 233, 0.6), 0 0 12px rgba(255, 221, 135, 0.0);
+            }
+
+            50% {
+                background: rgba(255, 221, 135, 0.85);
+                box-shadow: 0 0 0 0.5px rgba(255, 253, 233, 0.85), 0 0 24px rgba(255, 221, 135, 0.55);
+            }
         }
     </style>
 </head>
