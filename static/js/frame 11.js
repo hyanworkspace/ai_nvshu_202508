@@ -44,6 +44,17 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 
+    const getOriginalChar = () => {
+        const titles = document.querySelectorAll('[data-component="character-title"]');
+        if (titles.length < 2) {
+            return null;
+        }
+        const text = titles[1].textContent || '';
+        const match = text.match(/"(.+?)"/);
+        return match ? match[1] : null;
+    };
+    const originalChar = getOriginalChar();
+
     // 跳转到字典页面
     const goToDictionaryBtn = document.getElementById('go-to-dictionary-btn');
     if (goToDictionaryBtn) {
@@ -288,6 +299,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         throw new Error(`Failed to add to dictionary: ${addResponse.status}`);
                     }
                     console.log('Successfully added to dictionary');
+                    if (originalChar) {
+                        sessionStorage.setItem('dictionaryHighlightChar', originalChar);
+                    }
+                } else {
+                    sessionStorage.removeItem('dictionaryHighlightChar');
                 }
 
                 // 无论选择 Yes 还是 No，都跳转到字典页面
