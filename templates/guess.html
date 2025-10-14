@@ -95,8 +95,9 @@
                     </div>
                     <!-- 诗句 -->
                     <div class="text-4xl text-center text-black vertical-text" id="revealing-text" data-component="revealing-text" style="writing-mode: vertical-rl; text-orientation: upright; justify-content: center; align-items: center; white-space: pre-wrap;"></div>
-                    <!-- 英文翻译 -->
-                    <div class="absolute bottom-16  max-w-[250px] right-25 text-sm text-black opacity-70 " id="listener-translate" data-component="listener-translate"></div>
+                    <!-- 翻译信息 -->
+                    <div class="absolute bottom-16 max-w-[250px] right-25 text-sm text-black opacity-70 text-right leading-relaxed" id="listener-translate" data-component="listener-translate"></div>
+                    <div class="absolute bottom-36 max-w-[200px] right-20 text-sm text-black opacity-60 text-right italic" id="listener-char-translation" data-component="listener-char-translation"></div>
                 </div>
             </div>
             <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="listener-label">Listener</div>
@@ -308,6 +309,7 @@
         #simple-el-display img {
             filter: brightness(1.2) contrast(1.1);
         }
+
     </style>
 
     <!-- Hidden input for media URL -->

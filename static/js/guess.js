@@ -458,22 +458,38 @@ function updateEncodingTextDisplay() {
     }
 }
 
+function normalizeTranslation(value) {
+    if (!value && value !== 0) {
+        return '';
+    }
+    if (Array.isArray(value)) {
+        return value
+            .flat()
+            .filter((item) => item !== null && item !== undefined && String(item).trim() !== '')
+            .join(', ');
+    }
+    return String(value).trim();
+}
+
 function setListenerTranslation(poemTranslation, charTranslation) {
-    const resolvedText = poemTranslation
-        ? poemTranslation
-        : charTranslation
-        ? String(charTranslation).toLowerCase()
-        : '';
+    const poemText = normalizeTranslation(poemTranslation);
+    const characterText = normalizeTranslation(charTranslation);
 
-    const elements = [
-        document.getElementById('listener-translate'),
-        document.getElementById('listener-translate-display')
-    ];
+    const poemElement = document.getElementById('listener-translate');
+    if (poemElement) {
+        poemElement.textContent = poemText;
+    }
 
-    elements.forEach((el) => {
-        if (!el) return;
-        el.textContent = resolvedText;
-    });
+    const charElement = document.getElementById('listener-char-translation');
+    if (charElement) {
+        if (characterText) {
+            charElement.textContent = characterText;
+            charElement.style.opacity = '0.65';
+        } else {
+            charElement.textContent = '';
+            charElement.style.opacity = '0';
+        }
+    }
 }
 
 function startAutomaticRevelation() {
