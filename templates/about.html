@@ -25,62 +25,123 @@
             <h1 class="text-5xl font-bold mb-6" style="font-family: 'Inknut Antiqua', serif;">
                 About AI Nüshu
             </h1>
-            <p class="text-xl opacity-80 font-light">
-                Exploring the intersection of AI, language, and feminist history
-            </p>
+  
         </div>
-
         <div class="space-y-12">
-            <!-- 项目介绍 -->
-            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
-                <h2 class="text-3xl font-semibold mb-6">The Project</h2>
-                <div class="space-y-4 text-lg leading-relaxed opacity-90">
-                    <p>
-                        AI Nüshu is an experimental project that explores how artificial intelligence can learn from and honor the legacy of Nüshu (女书), the secret women's script from Hunan Province, China.
-                    </p>
-                    <p>
-                        This project trains AI agents to create new language systems inspired by the historical context of illiterate women in ancient China who developed their own secret communication method as an act of resistance against patriarchal constraints.
-                    </p>
+            <section class="  p-8 ">
+                <div class="grid gap-8 md:grid-cols-2 md:items-start">
+                    <div class="md:col-span-2">
+                        <div class="aspect-[5/3]  rounded-xl flex items-center justify-center text-xs uppercase tracking-[0.3em] text-[#FFFDE9]/60">
+                            <img src="{{ url_for('static', filename='images/about_1.png') }}" alt="AI Nüshu" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 space-y-4 text-lg leading-relaxed opacity-90">
+                        <p>
+                            Nüshu (女书), also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.
+                        </p>
+                        <p class="italic">
+                            Can AI learn from ancient Chinese women and create their own secret language?
+                        </p>
+                        <p>
+                            This project trains AI agents to imitate illiterate women in pre-modern China to create a new language system, symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.
+                        </p>
+                    </div>
+                   
+                </div>
+                <div class="mt-10">
+                    <div class="aspect-video relative overflow-hidden rounded-xl ">
+                        <iframe
+                            class="absolute inset-0 h-full w-full"
+                            src="https://www.youtube.com/embed/Iyrh_OPA2L0?si=gk1i3kMYcGLto3iO"
+                            title="AI Nüshu"
+                            allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+                        </iframe>
+                    </div>
                 </div>
             </section>
 
-            <!-- 历史背景 -->
-            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
-                <h2 class="text-3xl font-semibold mb-6">Historical Context</h2>
-                <div class="space-y-4 text-lg leading-relaxed opacity-90">
+            <section class="  p-8  ">
+                <div class="space-y-8 text-lg leading-relaxed opacity-90">
                     <p>
-                        Nüshu (女书), literally meaning "women's script," was a syllabic script used exclusively by women in Jiangyong County, Hunan Province, China. For centuries, it served as a secret form of communication among women who were denied formal education.
+                        This is the first art project to interpret Nüshu from a computational linguistics perspective. Two AI agents simulate how ancient women developed a unique language under the constraints of a patriarchal society. This cultural phenomenon resonates with the emergence of non-human machine language under human authority, both metaphorically and practically. Essentially, we integrate cultural phenomena into an AI system.
+                    </p>
+                    <div class="grid gap-6 md:grid-cols-1">
+                            <div class="aspect-[5/3]  rounded-xl flex items-center justify-center text-xs uppercase tracking-[0.3em] text-[#FFFDE9]/60">
+                                <img src="{{ url_for('static', filename='images/about_2.png') }}" alt="AI Nüshu" class="w-full h-full object-cover">
+                            </div>
+                        <div class="aspect-[6/3]  rounded-xl flex items-center justify-center text-xs uppercase tracking-[0.3em]  text-[#FFFDE9]/60">
+                            <img src="{{ url_for('static', filename='images/about_3.png') }}" alt="AI Nüshu" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <p>
+                        Contrary to the predefined rules like Morse code, Markov chains, and fictional constructed languages, AI Nüshu evolves organically from the machine's environmental observations and feedback, mirroring the natural formation of human languages. The meaning of language in vector space gradually emerges into the symbols in the system.
                     </p>
                     <p>
-                        This unique writing system allowed women to express their thoughts, emotions, and experiences in a world where they had limited voice. It represents one of the most remarkable examples of linguistic resistance and female solidarity in history.
+                        As this new language is decipherable and learnable by humans, especially Chinese speakers, it inherently challenges the existing paradigm where humans are the linguistic authorities and machines are the learners.
                     </p>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="aspect-[5/3]  rounded-xl flex items-center justify-center text-xs uppercase tracking-[0.3em] text-[#FFFDE9]/60">
+                          <img src="{{ url_for('static', filename='images/about_4.png') }}" alt="AI Nüshu" class="w-full h-full object-cover">
+                        </div>
+                        <div class="aspect-[5/3]  rounded-xl flex items-center justify-center text-xs uppercase tracking-[0.3em] text-[#FFFDE9]/60">
+                            <img src="{{ url_for('static', filename='images/about_5.png') }}" alt="AI Nüshu" class="w-full h-full object-cover">
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- 技术方法 -->
-            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
-                <h2 class="text-3xl font-semibold mb-6">Technical Approach</h2>
-                <div class="space-y-4 text-lg leading-relaxed opacity-90">
-                    <p>
-                        Our AI system analyzes various input sources - text, images, videos - and generates new Nüshu-inspired characters that capture the essence and meaning of the original content.
-                    </p>
-                    <p>
-                        By combining machine learning with historical linguistic patterns, we create a bridge between ancient wisdom and modern technology, asking: Can AI learn the art of resistance and secret communication?
-                    </p>
+            <section class="  p-8  ">
+                <div class="grid gap-10 md:grid-cols-1 text-lg leading-relaxed opacity-90">
+                    <div>
+                        <h2 class="text-3xl font-semibold mb-6">Awards</h2>
+                        <ul class="space-y-3">
+                            <li>2025 Lumen Prize, Carla Rapoport Award, winner</li>
+                            <li>2025 Red Dot Design Concept Award, winner</li>
+                            <li>Ars Electronica 2026, Digital Humanity Award, honorary mention</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-semibold mb-6">Publications</h2>
+                        <ul class="space-y-3">
+                            <li>
+                                Yuqian Sun, Yuying Tang, Ze Gao, Zhijun Pan, Chuyan Xu et al. 2023.
+                                <em>AI Nüshu: An Exploration of Language Emergence in Sisterhood Through the Lens of Computational Linguistics.</em>
+                                In SIGGRAPH Asia 2023 Art Papers (SA '23). Association for Computing Machinery, New York, NY, USA, Article 4, 1–7.
+                                <a class="underline" href="https://doi.org/10.1145/3610591.3616427" target="_blank" rel="noopener noreferrer">https://doi.org/10.1145/3610591.3616427</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </section>
 
-            <!-- 文化意义 -->
-            <section class="bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-[#FFFDE9]/20">
-                <h2 class="text-3xl font-semibold mb-6">Cultural Significance</h2>
-                <div class="space-y-4 text-lg leading-relaxed opacity-90">
-                    <p>
-                        This project is not just about technology - it's about preserving and reimagining cultural heritage in the digital age. It honors the creativity and resilience of women who created their own language system against all odds.
-                    </p>
-                    <p>
-                        By using AI to continue this tradition of linguistic innovation, we explore themes of resistance, communication, and the emergence of language in non-Western, feminist contexts.
-                    </p>
-                </div>
+            <section class="  p-8   text-sm leading-relaxed opacity-90">
+                <h2 class="text-3xl font-semibold mb-6">Credits</h2>
+                <ul class="space-y-2">
+                    <li>Artist: Yuqian Sun</li>
+                    <li>AI language system development: Zhijun Pan, Yuqian Sun</li>
+                    <li>Unity development: Chuyan Xu</li>
+                    <li>Website development: <a class="underline" href="https://bento.me/siyuhu" target="_blank" rel="noopener noreferrer">Siyu Hu</a>, Hui Yan, Weizheng (Katheryne) Xu, Huichuan Wang</li>
+                    <li>Research work: Yuqian Sun, Yuying Tang, Yanrang Wang</li>
+                    <li>Advisors: Tristan Braud, Zhigang Wang, Chang Hee Lee, Ali Asadipour</li>
+                    <li>Supported by Lumen Prize - Carla Rapoport Award.</li>
+                </ul>
+
+                <h3 class="text-3xl font-semibold mt-8 mb-4">About the artist</h3>
+                <p>
+                    Yuqian (Uchan) Sun (CN), also known as CheeseTalk, is an artist, game developer and AI researcher based in London. Yuqian aims to create "alive" narrative experiences that extend beyond video games and into our daily lives through conversational AI agents.
+                </p>
+                <p class="mt-4">
+                    Yuqian's interdisciplinary arts and research have been featured in galleries and tech conferences, including SIGGRAPH, CVPR, NeurIPS, GDC and New York Times Square. She won the Red Dot Design Award and Lumen Prize in 2024.
+                </p>
+                <p class="mt-4">
+                    Personal website:
+                    <a class="underline" href="https://fakecheese.me/" target="_blank" rel="noopener noreferrer">https://fakecheese.me/</a>
+                </p>
+                <p class="mt-2">
+                    IG:
+                    <a class="underline" href="https://www.instagram.com/cheesetalk1997" target="_blank" rel="noopener noreferrer">@cheesetalk1997</a>
+                </p>
             </section>
         </div>
 
