@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI女书 (AI Nüshu)</title>
+    <title>AI女书 ()</title>
     <link
       rel="icon"
       type="image/png"
@@ -50,7 +50,7 @@
         }
         
         /* 女书字符雨效果 */
-        .nvshu-rain-container {
+        .Nüshu-rain-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -61,7 +61,7 @@
             overflow: hidden;
         }
         
-        .nvshu-column {
+        .Nüshu-column {
             position: absolute;
             top: -300px;
             display: flex;
@@ -71,7 +71,7 @@
             z-index: 2;
         }
         
-        .nvshu-column .char-img {
+        .Nüshu-column .char-img {
             display: block;
             width: var(--size, 60px);
             height: auto;
@@ -82,51 +82,51 @@
             transition: all 0.3s ease;
         }
         
-        .nvshu-column .char-img:first-child {
+        .Nüshu-column .char-img:first-child {
             opacity: 1;
             filter: brightness(2) contrast(1.5) drop-shadow(0 0 15px rgba(255, 253, 233, 0.8));
             width: var(--size-head, 70px);
         }
         
-        .nvshu-column .char-img:nth-child(2) {
+        .Nüshu-column .char-img:nth-child(2) {
             opacity: 0.9;
             width: var(--size-second, 64px);
         }
         
-        .nvshu-column .char-img:nth-child(3) {
+        .Nüshu-column .char-img:nth-child(3) {
             opacity: 0.7;
             width: var(--size, 60px);
         }
         
-        .nvshu-column .char-img:nth-child(4) {
+        .Nüshu-column .char-img:nth-child(4) {
             opacity: 0.5;
             width: var(--size-small, 55px);
         }
         
-        .nvshu-column .char-img:nth-child(n+5) {
+        .Nüshu-column .char-img:nth-child(n+5) {
             opacity: 0.3;
             width: var(--size-tiny, 50px);
         }
         
-        .nvshu-column .char:first-child {
+        .Nüshu-column .char:first-child {
             color: rgba(255, 253, 233, 1);
             text-shadow: 0 0 20px rgba(255, 253, 233, 0.8);
             font-size: 24px;
         }
         
-        .nvshu-column .char:nth-child(2) {
+        .Nüshu-column .char:nth-child(2) {
             opacity: 0.8;
         }
         
-        .nvshu-column .char:nth-child(3) {
+        .Nüshu-column .char:nth-child(3) {
             opacity: 0.6;
         }
         
-        .nvshu-column .char:nth-child(4) {
+        .Nüshu-column .char:nth-child(4) {
             opacity: 0.4;
         }
         
-        .nvshu-column .char:nth-child(n+5) {
+        .Nüshu-column .char:nth-child(n+5) {
             opacity: 0.2;
         }
         
@@ -208,29 +208,29 @@
         }
         
         /* 优化女书字符雨的视觉效果 */
-        .nvshu-column:hover {
+        .Nüshu-column:hover {
             transform: scale(1.1);
             transition: all 0.3s ease;
         }
         
-        .nvshu-column:hover .char-img {
+        .Nüshu-column:hover .char-img {
             filter: brightness(2.5) contrast(1.8) drop-shadow(0 0 20px rgba(255, 253, 233, 0.9)) !important;
         }
         
         /* 随机化字符雨的速度 */
-        .nvshu-column:nth-child(2n) {
+        .Nüshu-column:nth-child(2n) {
             animation-duration: 12s;
         }
         
-        .nvshu-column:nth-child(3n) {
+        .Nüshu-column:nth-child(3n) {
             animation-duration: 8s;
         }
         
-        .nvshu-column:nth-child(4n) {
+        .Nüshu-column:nth-child(4n) {
             animation-duration: 15s;
         }
         
-        .nvshu-column:nth-child(5n) {
+        .Nüshu-column:nth-child(5n) {
             animation-duration: 10s;
         }
         
@@ -263,7 +263,7 @@
 </head>
 <body class="bg-black text-[#FFFDE9] min-h-screen">
     <!-- 女书字符雨背景 -->
-    <div id="nvshu-rain" class="nvshu-rain-container"></div>
+    <div id="Nüshu-rain" class="Nüshu-rain-container"></div>
     <!-- 背景视频（黄调风格化） -->
     <div class="bg-video-container">
         <video autoplay muted loop playsinline preload="auto" poster="{{ url_for('static', filename='images/bg1.png') }}">
@@ -289,7 +289,7 @@
 
         <!-- 副标题 -->
         <!-- <p id="subtitle" class="text-lg md:text-xl text-center mb-10 font-light tracking-wide opacity-0">
-            Share a source to Generate an AI Nvshu character
+            Share a source to Generate an AI Nüshu character
         </p> -->
 
         <!-- 操作按钮 -->
@@ -301,22 +301,17 @@
                 </div>
             </a>
 
-            <!-- <a href="/dictionary" class="action-button relative block px-6 py-4 bg-black/20 border border-[#FFFDE9]/40 rounded-lg text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
-                <div class="glow-effect"></div>
-                <div class="relative z-10">
-                    <div class="text-xs opacity-80 font-light tracking-wider">Nüshu Dictionary</div>
-                </div>
-            </a> -->
+          
         </div>
 
         <!-- 项目描述 -->
         <div id="description" class="max-w-lg text-start bg-black/40 backdrop-blur-sm p-6 border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5">
             <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">
-                Nüshu (女书)
+                Nüshu （女书）
             </h2>
             <div class="space-y-3 text-sm leading-relaxed opacity-90">
                 <p>
-                  Nüshu (女书), Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.</p>
+                  Nüshu （女书）, Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.</p>
 
                 <p>
                   Can AI learn from ancient Chinese women and create their own secret language?
@@ -330,7 +325,7 @@
 
     <script>
         // 女书字符PNG图片列表
-        const nvshuImages = [
+        const NüshuImages = [
             'combined_10-0-23_vertical_trim.png',
             'combined_16-3-22_vertical_trim.png',
             'combined_21-1-20_vertical_trim.png',
@@ -384,11 +379,11 @@
         }
 
         // 创建女书字符雨列
-        function createNvshuColumn(x, index) {
+        function createNüshuColumn(x, index) {
             console.log('Creating image column at x:', x); // 调试日志
             
             const column = document.createElement('div');
-            column.className = 'nvshu-column';
+            column.className = 'Nüshu-column';
             
             const duration = gsap.utils.random(8, 15);
             const delay = gsap.utils.random(0, 4);
@@ -409,7 +404,7 @@
             for (let i = 0; i < length; i++) {
                 const imgElement = document.createElement('img');
                 imgElement.className = 'char-img';
-                imgElement.src = `/static/nvshu_images/${nvshuImages[Math.floor(Math.random() * nvshuImages.length)]}`;
+                imgElement.src = `/static/Nüshu_images/${NüshuImages[Math.floor(Math.random() * NüshuImages.length)]}`;
                 imgElement.style.animationDelay = (i * 0.1) + 's';
                 
                 // 直接设置这个字符的大小
@@ -425,7 +420,7 @@
                 column.appendChild(imgElement);
             }
             
-            const container = document.getElementById('nvshu-rain');
+            const container = document.getElementById('Nüshu-rain');
             if (container) {
                 container.appendChild(column);
                 console.log('Image column added to container'); // 调试日志
@@ -435,7 +430,7 @@
                 setTimeout(() => {
                     if (column.parentNode) {
                         column.parentNode.removeChild(column);
-                        createNvshuColumn(x, index);
+                        createNüshuColumn(x, index);
                     }
                 }, totalDuration);
             } else {
@@ -444,10 +439,10 @@
         }
         
         // 创建多个字符雨列
-      function initNvshuRain() {
-        const container = document.getElementById("nvshu-rain");
+      function initNüshuRain() {
+        const container = document.getElementById("Nüshu-rain");
         if (!container) {
-          console.error("Nvshu rain container not found!");
+          console.error("Nüshu rain container not found!");
           return;
         }
 
@@ -460,7 +455,7 @@
           screenWidth,
           "Creating",
           numColumns,
-          "nvshu image rain columns"
+          "Nüshu image rain columns"
         );
 
         // 清空现有内容
@@ -469,14 +464,14 @@
         for (let i = 0; i < numColumns; i++) {
           const x = i * columnWidth + Math.random() * 90 - 15; // 添加一些随机偏移
           setTimeout(() => {
-            createNvshuColumn(x, i);
+            createNüshuColumn(x, i);
           }, i * 150); // 错开创建时间
         }
       }
 
       // 创建额外的光点效果
       function createLightParticles() {
-        const container = document.getElementById("nvshu-rain");
+        const container = document.getElementById("Nüshu-rain");
         if (!container) return;
 
         for (let i = 0; i < 15; i++) {
@@ -751,7 +746,7 @@
 
       // 初始化
       document.addEventListener("DOMContentLoaded", () => {
-        console.log("DOM loaded, initializing Matrix-style Nvshu rain..."); // 调试日志
+        console.log("DOM loaded, initializing Matrix-style Nüshu rain..."); // 调试日志
 
         // 检查GSAP是否加载
         if (typeof gsap === "undefined") {
@@ -760,17 +755,17 @@
         }
 
         // 检查容器是否存在
-        const container = document.getElementById("nvshu-rain");
+        const container = document.getElementById("Nüshu-rain");
         if (!container) {
-          console.error("Nvshu rain container not found!");
+          console.error("Nüshu rain container not found!");
           return;
         }
 
-        console.log("Creating Nvshu character rain...");
+        console.log("Creating Nüshu character rain...");
 
         // 初始化女书字符雨
         setTimeout(() => {
-          initNvshuRain();
+          initNüshuRain();
         }, 500);
 
         // 创建光点粒子
@@ -791,7 +786,7 @@
             // 清空现有的雨滴
             container.innerHTML = "";
             // 重新初始化
-            initNvshuRain();
+            initNüshuRain();
             createLightParticles();
           }, 300);
         });

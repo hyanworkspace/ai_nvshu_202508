@@ -1,6 +1,8 @@
 // Minimum display time for each step (in milliseconds)
 // const MIN_DISPLAY_TIME = 10000; // 10 seconds
 const MIN_DISPLAY_TIME = 5000;
+// Additional dwell time after the final poem is rendered so visitors can read it
+const POEM_POST_DISPLAY_TIME = 6000;
 let lastStepTime = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -1372,11 +1374,10 @@ async function generatePoem(description, poems) {
     const elapsed = Date.now() - lastStepTime;
     const remainingTime = Math.max(0, MIN_DISPLAY_TIME - elapsed);
 
-    // After minimum display time, mark as completed
+    // After minimum display time, mark as completed and hold an extra beat
     setTimeout(() => {
-      // Add transition effect before navigating to guess page
       transitionToGuessPage(data.poem);
-    }, remainingTime);
+    }, Math.max(remainingTime, POEM_POST_DISPLAY_TIME));
   } catch (error) {
     updateStatusItem(reflectingItem, `Error: ${error.message}`);
     console.error("Error:", error);

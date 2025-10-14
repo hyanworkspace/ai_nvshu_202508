@@ -45,14 +45,17 @@
       .recording-circle-enhanced {
         position: relative;
         overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+          filter 0.4s ease, box-shadow 0.4s ease;
+        filter: brightness(0.95) saturate(0.95);
       }
 
       .recording-circle-enhanced:hover {
-        transform: scale(1.08) rotate(1deg);
-        box-shadow: 0 20px 40px rgba(255, 253, 233, 0.15),
-          0 0 60px rgba(255, 253, 233, 0.1),
-          inset 0 0 30px rgba(255, 253, 233, 0.05);
+        transform: translateY(-10px) scale(1.08) rotate(1deg);
+        filter: brightness(1.15) saturate(1.1);
+        box-shadow: 0 24px 48px rgba(255, 253, 233, 0.22),
+          0 0 80px rgba(255, 253, 233, 0.18),
+          inset 0 0 40px rgba(255, 253, 233, 0.1);
       }
 
       .recording-circle-enhanced:hover pixel-canvas {
@@ -81,6 +84,7 @@
 
       .recording-circle-enhanced:hover::before {
         opacity: 1;
+        filter: blur(0.5px);
       }
 
       @keyframes rotate {
@@ -139,6 +143,32 @@
           transform: scale(1.05);
           opacity: 0.6;
         }
+      }
+
+      .recording-circle-enhanced .rotating-border {
+        opacity: 0.6;
+        transition: opacity 0.3s ease, border-color 0.3s ease;
+      }
+
+      .recording-circle-enhanced:hover .rotating-border {
+        opacity: 1;
+        border-color: rgba(255, 253, 233, 0.85);
+      }
+
+      .recording-circle-enhanced img,
+      .recording-circle-enhanced p {
+        transition: transform 0.3s ease, color 0.3s ease,
+          filter 0.3s ease, letter-spacing 0.3s ease;
+      }
+
+      .recording-circle-enhanced:hover img {
+        transform: translateY(-4px);
+        filter: brightness(1.1) drop-shadow(0 0 12px rgba(255, 253, 233, 0.45));
+      }
+
+      .recording-circle-enhanced:hover p {
+        color: rgba(0, 0, 0, 0.85);
+        letter-spacing: 0.05em;
       }
 
       /* Background video container and tint */
