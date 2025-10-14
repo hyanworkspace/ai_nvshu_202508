@@ -519,14 +519,15 @@ def frame_11():
         char_translate=session['char_translate'],
         poem=session['poem'],
         poem_eng=session['poem_eng'],
-        char=session['char']  # 加上 char 这个中文字
+        char=session['char'],  # 加上 char 这个中文字
+        from_dictionary='false'
     )
 
 @app.route('/frame_11_from_dict')
 def frame_11_from_dict():
     # 从URL参数获取字符信息
     char = request.args.get('char', '')
-    from_dictionary = request.args.get('from_dictionary', 'false')
+    from_dictionary = request.args.get('from_dictionary', 'true')
     
     try:
         from dict_io import get_char_full_data
@@ -717,4 +718,3 @@ if __name__ == '__main__':
     # 使用 Flask 内置的调试重载器
     # app.run(host='0.0.0.0', port=5001, debug=True)
     app.run(debug=False)
-
