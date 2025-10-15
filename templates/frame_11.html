@@ -34,14 +34,20 @@
         }
 
         .highlight {
-            color: white !important;
-            background-color: black !important;
+            color: black !important;
+            background-color: rgba(255, 253, 233, 0.92) !important;
             display: inline-flex;
-            box-shadow: 0 0 0 0.5px white;
+            box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.3);
         }
 
         .highlight::after {
             display: none;
+        }
+
+        [data-component="poem-display"] .highlight {
+            color: white !important;
+            background-color: black !important;
+            box-shadow: 0 0 0 0.5px white;
         }
     </style>
 </head>
@@ -101,13 +107,11 @@
                                 <video class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="video-element"
                                     src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
                             {% else %}
-                                <img src="{{ media_url }}" alt="Uploaded media" class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="media-image">
+                                <img src="{{ media_url }}" alt="Uploaded media" class="w-full h-full object-cover mask-image-radial-fading" data-component="media-image">
                             {% endif %}
                             <div class="absolute inset-0 z-20 rounded-full radial-fade mix-blend-difference" data-component="video-overlay"></div>
                         {% else %}
-                        <div class="w-full h-full flex items-center justify-center text-[#FFFDE9] text-sm">
-                            <p>From Dictionary</p>
-                        </div>
+                        
                         {% endif %}
                     </div>
                 </div>
