@@ -104,12 +104,16 @@
                     <div class="absolute inset-0 z-10 rounded-full mask-radial-fading grayscale overflow-hidden" data-component="video-circle">
                         {% if media_url %}
                             {% if media_type == 'video' %}
-                                <video class="w-full h-full object-cover mask-image-radial-fading mix-blend-difference" data-component="video-element"
+                                <video class="w-full h-full object-cover mask-image-radial-fading" data-component="video-element"
+                                    style="filter: grayscale(1);"
                                     src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
                             {% else %}
-                                <img src="{{ media_url }}" alt="Uploaded media" class="w-full h-full object-cover mask-image-radial-fading" data-component="media-image">
+                                <img src="{{ media_url }}" alt="Uploaded media"
+                                    class="w-full h-full object-cover mask-image-radial-fading"
+                                    style="filter: grayscale(1);"
+                                    data-component="media-image">
                             {% endif %}
-                            <div class="absolute inset-0 z-20 rounded-full radial-fade mix-blend-difference" data-component="video-overlay"></div>
+                            <div class="absolute inset-0 z-20 rounded-full radial-fade" data-component="video-overlay"></div>
                         {% else %}
                         
                         {% endif %}
