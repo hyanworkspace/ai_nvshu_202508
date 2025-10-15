@@ -101,7 +101,7 @@
                 <!-- 包裹容器：相对定位 -->
                 <div class="relative w-40 h-40 md:w-48 md:h-48 lg:-ml-24" data-component="video-wrapper">
                     <!-- 视频圆形-->
-                    <div class="absolute inset-0 z-10 rounded-full mask-radial-fading grayscale overflow-hidden" data-component="video-circle">
+                    <div class="absolute inset-0 z-10 rounded-full mask-radial-fading grayscale overflow-hidden" data-component="video-circle" style="background-color: #000;">
                         {% if media_url %}
                             {% if media_type == 'video' %}
                                 <video class="w-full h-full object-cover mask-image-radial-fading" data-component="video-element"
@@ -113,7 +113,7 @@
                                     style="filter: grayscale(1);"
                                     data-component="media-image">
                             {% endif %}
-                            <div class="absolute inset-0 z-20 rounded-full radial-fade" data-component="video-overlay"></div>
+                            
                         {% else %}
                         
                         {% endif %}
