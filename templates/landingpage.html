@@ -276,56 +276,68 @@
     {% include 'components/header.html' %}
     
     <!-- 主内容 -->
-    <div id="landing-root" class="relative z-20 min-h-screen flex flex-col items-end justify-center px-6 -mt-20 max-w-6xl mx-auto">
-        <!-- 主标题 -->
-        <div id="main-title" class="text-center mb-6 opacity-0">
-            <h1 class="text-4xl md:text-5xl font-bold mb-3" style="font-family: 'Inknut Antiqua', serif;">
-                AI Nüshu
-            </h1>
-            <!-- <div class="text-2xl md:text-3xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
-                (AI Nüshu)
-            </div> -->
-        </div>
-
-        <!-- 副标题 -->
-        <!-- <p id="subtitle" class="text-lg md:text-xl text-center mb-10 font-light tracking-wide opacity-0">
-            Share a source to Generate an AI Nüshu character
-        </p> -->
-
-        <!-- 操作按钮 -->
-        <div id="buttons" class="flex flex-col md:flex-row gap-6 mb-12 opacity-0">
-            <a href="/see" class="action-button relative block px-4 py-4 bg-black/20 border border-dashed border-[#FFFDE9]/40  text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
-                <div class="glow-effect"></div>
-                <div class="relative z-10">
-                    <div class="text-md opacity-80 font-light tracking-wider hover-effect hover-effect--bg-south">EXPLORE</div>
+    <div id="landing-root" class="relative z-20 min-h-screen flex flex-col items-center justify-center px-6 -mt-20 max-w-6xl mx-auto">
+        <div class="w-full flex flex-col md:flex-row items-center md:items-start justify-between gap-10 lg:gap-16">
+            <div class="w-full md:w-1/2 flex justify-center md:justify-start mb-10 md:mb-0">
+                <img
+                    id="landing-hero-image"
+                    src="{{ url_for('static', filename='images/landingpageleft.png') }}"
+                    alt="Nüshu archival collage"
+                    class="max-w-xs sm:max-w-sm md:max-w-md w-full opacity-0 "
+                />
+            </div>
+            <div class="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
+                <!-- 主标题 -->
+                <div id="main-title" class="text-center md:text-left mb-6 opacity-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-3" style="font-family: 'Inknut Antiqua', serif;">
+                        AI Nüshu
+                    </h1>
+                    <!-- <div class="text-2xl md:text-3xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
+                        (AI Nüshu)
+                    </div> -->
                 </div>
-            </a>
 
-          
-        </div>
+                <!-- 副标题 -->
+                <!-- <p id="subtitle" class="text-lg md:text-xl text-center md:text-left mb-10 font-light tracking-wide opacity-0">
+                    Share a source to Generate an AI Nüshu character
+                </p> -->
 
-        <!-- 项目描述 -->
-        <div id="description" class="max-w-lg text-start bg-black/40 backdrop-blur-sm p-6 border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5">
-            <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">
-                Nüshu （女书）
-            </h2>
-            <div class="space-y-3 text-sm leading-relaxed opacity-90">
-                <p>
-                  Nüshu （女书）, Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.</p>
+                <!-- 操作按钮 -->
+                <div id="buttons" class="flex flex-col md:flex-row gap-6 mb-12 opacity-0">
+                    <a href="/see" class="action-button relative block px-4 py-4 bg-black/20 border border-dashed border-[#FFFDE9]/40  text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
+                        <div class="glow-effect"></div>
+                        <div class="relative z-10">
+                            <div class="text-md opacity-80 font-light tracking-wider hover-effect hover-effect--bg-south">EXPLORE</div>
+                        </div>
+                    </a>
 
-                <p>
-                  Can AI learn from ancient Chinese women and create their own secret language?
-                </p>
-                <p>
-                  This project trains AI agents to imitate illiterate women in pre-modern China to create a new language system, symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.
-                </p>
+                  
+                </div>
+
+                <!-- 项目描述 -->
+                <div id="description" class="w-full max-w-lg text-start md:text-left bg-black/40 backdrop-blur-sm p-6 border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5">
+                    <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">
+                        Nüshu （女书）
+                    </h2>
+                    <div class="space-y-3 text-sm leading-relaxed opacity-90">
+                        <p>
+                          Nüshu （女书）, Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.</p>
+
+                        <p>
+                          Can AI learn from ancient Chinese women and create their own secret language?
+                        </p>
+                        <p>
+                          This project trains AI agents to imitate illiterate women in pre-modern China to create a new language system, symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         // 女书字符PNG图片列表
-        const NüshuImages = [
+        const NvshuImages = [
             'combined_10-0-23_vertical_trim.png',
             'combined_16-3-22_vertical_trim.png',
             'combined_21-1-20_vertical_trim.png',
@@ -404,7 +416,7 @@
             for (let i = 0; i < length; i++) {
                 const imgElement = document.createElement('img');
                 imgElement.className = 'char-img';
-                imgElement.src = `/static/Nüshu_images/${NüshuImages[Math.floor(Math.random() * NüshuImages.length)]}`;
+                imgElement.src = `/static/nvshu_images/${NvshuImages[Math.floor(Math.random() * NvshuImages.length)]}`;
                 imgElement.style.animationDelay = (i * 0.1) + 's';
                 
                 // 直接设置这个字符的大小
@@ -508,12 +520,21 @@
       function initPageAnimations() {
         const tl = gsap.timeline();
 
-        tl.to("#main-title", {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power3.out",
-        })
+        tl.fromTo(
+          "#landing-hero-image",
+          { autoAlpha: 0, x: -40 },
+          { autoAlpha: 1, x: 0, duration: 1.4, ease: "power3.out" }
+        )
+          .to(
+            "#main-title",
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1.2,
+              ease: "power3.out",
+            },
+            "-=0.8"
+          )
           .to(
             "#subtitle",
             {
