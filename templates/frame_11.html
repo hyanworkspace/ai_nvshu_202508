@@ -101,16 +101,17 @@
                 <!-- 包裹容器：相对定位 -->
                 <div class="relative w-40 h-40 md:w-48 md:h-48 lg:-ml-24" data-component="video-wrapper">
                     <!-- 视频圆形-->
-                    <div class="absolute inset-0 z-10 rounded-full mask-radial-fading grayscale overflow-hidden" data-component="video-circle" style="background-color: #000;">
+                    <div class="absolute inset-0 z-10 rounded-full mask-radial-fading overflow-hidden bg-[#FFFDE9]/90 border border-[#FFFDE9]/40 shadow-[0_18px_45px_rgba(255,251,233,0.18)]" data-component="video-circle">
+                        <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#FFFDE9] via-[#F7EFD2] to-[#C7B680] opacity-80 mix-blend-screen"></div>
                         {% if media_url %}
                             {% if media_type == 'video' %}
-                                <video class="w-full h-full object-cover mask-image-radial-fading" data-component="video-element"
-                                    style="filter: grayscale(1);"
+                                <video class="w-full h-full object-cover mask-image-radial-fading grayscale" data-component="video-element"
+                                    style="mix-blend-multiply;"
                                     src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
                             {% else %}
                                 <img src="{{ media_url }}" alt="Uploaded media"
-                                    class="w-full h-full object-cover mask-image-radial-fading"
-                                    style="filter: grayscale(1);"
+                                    class="w-full h-full object-cover mask-image-radial-fading grayscale"
+                                    style="mix-blend-multiply;"
                                     data-component="media-image">
                             {% endif %}
                             

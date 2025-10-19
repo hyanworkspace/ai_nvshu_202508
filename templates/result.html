@@ -173,15 +173,18 @@
                                     class="w-[82%] h-auto object-contain mix-blend-difference" data-component="char-image">
                             </div>
                             <div class="px-6 pb-6 flex flex-col items-center text-center gap-3">
-                                <p class="card-translation text-lg leading-relaxed tracking-wide" data-component="char-translate">"{{ char_translate }}"</p>
-                                <div class="card-dimensions text-[0.68rem] uppercase tracking-[0.35em]">3D Dimensions</div>
-                                <div class="card-dimensions text-sm" data-component="dimensions-display">
+                                <p class="card-translation text-2xl leading-relaxed tracking-wide" data-component="char-cn-display">{{ char }}</p>
+                                {% if char_translate %}
+                                <p class="card-translation text-base leading-relaxed tracking-wide opacity-80" data-component="char-translate">{{ char_translate }}</p>
+                                {% endif %}
+                                <div class="card-dimensions text-sm font-serif" data-component="dimensions-display">
                                     {% if char_3dim %}
-                                    <p data-component="dimensions-text">{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}</p>
+                                    <p data-component="dimensions-text">（{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}）</p>
                                     {% else %}
                                     <p>No dimensions data available</p>
                                     {% endif %}
                                 </div>
+                                <div class="card-dimensions text-[0.68rem] uppercase tracking-[0.35em] font-serif">3D Dimensions</div>
                             </div>
                         </div>
                     </div>
