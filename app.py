@@ -21,6 +21,7 @@ from flask_cors import CORS
 import atexit
 import time
 from utils import *
+from urllib.parse import unquote
 
 # 设置优化的日志配置
 from logging_config import setup_optimized_logging
@@ -497,7 +498,13 @@ def get_result():
     pixelated_img_path = os.path.join(img_dir, f"pixelated_{img_filename}")
     char_value = session.get('char')
     if not char_value:
-        char_value = request.args.get('char')
+        raw_char = request.args.get('char', '')
+        if raw_char:
+            decoded_char = unquote(raw_char)
+            if decoded_char.startswith('%') and len(decoded_char) > 1:
+                decoded_char = decoded_char[1:]
+            char_value = decoded_char
+            session['char'] = char_value
     if not char_value:
         char_value = session.get('char_translate')
     return render_template(
