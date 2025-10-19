@@ -495,11 +495,16 @@ def get_result():
     img_dir = os.path.dirname(img_path)
     img_filename = os.path.basename(img_path)
     pixelated_img_path = os.path.join(img_dir, f"pixelated_{img_filename}")
+    char_value = session.get('char')
+    if not char_value:
+        char_value = request.args.get('char')
+    if not char_value:
+        char_value = session.get('char_translate')
     return render_template(
         'result.html',
         media_url=session['media_url'],
         char_translate=session.get('char_translate'),
-        char=session.get('char'),
+        char=char_value,
         char_img_path=pixelated_img_path,
         char_3dim=session.get('char_3dim'),
     )

@@ -929,7 +929,11 @@ function displayCharacterImage() {
                 .call(() => {
                     // 延迟一点时间让用户看到加载状态，然后跳转
                     setTimeout(() => {
-                        window.location.href = '/get_result';
+                        const nextUrl = new URL('/get_result', window.location.origin);
+                        if (charData && charData.char_cn) {
+                            nextUrl.searchParams.set('char', charData.char_cn);
+                        }
+                        window.location.href = nextUrl.toString();
                     }, 500);
                 });
         });

@@ -484,7 +484,11 @@ function displayCharacterImage() {
         button.textContent = 'Generate Result';
         button.addEventListener('click', () => {
             // 跳转到结果页面
-            window.location.href = '/get_result';
+            const nextUrl = new URL('/get_result', window.location.origin);
+            if (charData && charData.char_cn) {
+                nextUrl.searchParams.set('char', charData.char_cn);
+            }
+            window.location.href = nextUrl.toString();
         });
         
         // 将按钮添加到专门的按钮容器中
@@ -514,4 +518,3 @@ function showConsensusReached() {
         addGenerateResultButton();
     }, 1000);
 }
-
