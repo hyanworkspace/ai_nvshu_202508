@@ -3,6 +3,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始设置所有元素为透明
     const mainContainer = document.querySelector('[data-component="main-container"]');
     const background = document.querySelector('[data-component="background"]');
+    const urlParams = new URLSearchParams(window.location.search);
+    const charFromUrl = urlParams.get('char');
+    const charDisplay = document.getElementById('char-cn-display');
+    const decodeChar = (value) => {
+        if (!value) return '';
+        const trimmed = value.trim();
+        try {
+            return decodeURIComponent(trimmed);
+        } catch (err) {
+            return trimmed;
+        }
+    };
+    if (charDisplay && !charDisplay.textContent.trim() && charFromUrl) {
+        const decodedChar = decodeChar(charFromUrl).replace(/^%/, '');
+        charDisplay.textContent = decodedChar;
+    }
+    const translateDisplay = document.querySelector('[data-component="char-translate"]');
+    if (translateDisplay && !translateDisplay.textContent.trim() && charDisplay && charDisplay.textContent.trim()) {
+        translateDisplay.textContent = charDisplay.textContent.trim();
+    }
     
     if (mainContainer) {
         mainContainer.style.opacity = '0';
