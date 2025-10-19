@@ -105,13 +105,13 @@
                         <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#FFFDE9] via-[#F7EFD2] to-[#C7B680] opacity-80 mix-blend-screen"></div>
                         {% if media_url %}
                             {% if media_type == 'video' %}
-                                <video class="w-full h-full object-cover mask-image-radial-fading grayscale" data-component="video-element"
-                                    style="mix-blend-multiply;"
+                                <video class="w-full h-full object-cover mask-image-radial-fading" data-component="video-element"
+                                    style="filter: grayscale(0.55) sepia(0.28) hue-rotate(-12deg) saturate(1.25) contrast(1.05); mix-blend-multiply;"
                                     src="{{ media_url }}" muted playsinline preload="metadata" autoplay></video>
                             {% else %}
                                 <img src="{{ media_url }}" alt="Uploaded media"
-                                    class="w-full h-full object-cover mask-image-radial-fading grayscale"
-                                    style="mix-blend-multiply;"
+                                    class="w-full h-full object-cover mask-image-radial-fading"
+                                    style="filter: grayscale(0.55) sepia(0.28) hue-rotate(-12deg) saturate(1.25) contrast(1.05); mix-blend-multiply;"
                                     data-component="media-image">
                             {% endif %}
                             
