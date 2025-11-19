@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang or 'zh' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Language Development</title>
+    <title>{{ _('Language Development') }}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/guess.css') }}"> -->
@@ -15,13 +15,13 @@
 <body class="bg-black m-0 p-5 flex flex-col items-center justify-center min-h-screen" data-component="page-body">
     <!-- Background image container -->
     <div class="absolute inset-0 w-full h-full -z-50" data-component="background">
-        <img src="{{ url_for('static', filename='images/bg 2.png') }}" alt="Background"
+        <img src="{{ url_for('static', filename='images/bg 2.png') }}" alt="{{ _('Background') }}"
             class="w-full h-full object-cover opacity-70">
     </div>
 
     <!-- Header section with fixed height -->
     <div class="h-[100px] flex items-center justify-center" data-component="header">
-        <h1 class="text-[#FFFDE9] text-3xl hidden" id="consensus-title" data-component="consensus-title">Consensus Reached!</h1>
+        <h1 class="text-[#FFFDE9] text-3xl hidden" id="consensus-title" data-component="consensus-title">{{ _('Consensus Reached!') }}</h1>
     </div>
 
     <!-- Main content container -->
@@ -29,7 +29,7 @@
         <!-- Left Circle - Speaker -->
         <div class="flex-1 flex flex-col items-center" data-component="left-panel">
             <div class="w-[30vw] min-w-[280px] max-w-[500px]" data-component="speaker-circle-wrapper">
-                <div class="aspect-square w-full rounded-full flex items-center justify-center relative overflow-hidden" data-component="speaker-circle">
+                <div class="aspect-square w-full rounded-full flex items-center justify-center relative overflow-hidden" data-component="speaker-circle" data-tooltip="{{ _('Click to toggle between media and text') }}">
                     <!-- 默认背景层 -->
                     <div class="absolute inset-0 w-full h-full rounded-full radial-fade-small" id="speaker-default-bg" data-component="speaker-default-bg"></div>
                     
@@ -51,28 +51,28 @@
                     </div>
                 </div>
             </div>
-            <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="speaker-label">Speaker</div>
+            <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="speaker-label">{{ _('Speaker') }}</div>
         </div>
 
         <!-- Center Content -->
         <div class="flex flex-col items-center justify-center space-y-24 relative w-full max-w-[300px]" data-component="center-panel">
             <!-- Encoding text -->
             <div id="encoding-text" class="absolute left-1/4 -translate-x-1/4 top-0 animate-breathing" data-component="encoding-text">
-                <div class="text-[#FFFDE9] text-2xl" data-component="encoding-title">Encoding...</div>
+                <div class="text-[#FFFDE9] text-2xl" data-component="encoding-title">{{ _('Encoding...') }}</div>
                 <div class="text-[#FFFDE9] text-sm opacity-60" data-component="encoding-subtitle">
-                    a character into an AI Nushu Symbol
+                    {{ _('a character into an AI Nushu Symbol') }}
                 </div>
             </div>
 
             <!-- Guessing text -->
             <div id="guessing-text" class="absolute right-1/4 translate-x-1/4 bottom-0 animate-breathing" data-component="guessing-text" style="animation-delay: 1.5s;">
-                <div class="text-[#FFFDE9] text-2xl text-right" data-component="guessing-title">Guessing...</div>
+                <div class="text-[#FFFDE9] text-2xl text-right" data-component="guessing-title">{{ _('Guessing...') }}</div>
                 <div class="text-[#FFFDE9] text-sm opacity-60 text-right" data-component="guessing-subtitle">
-                    the computational meaning
+                    {{ _('the computational meaning') }}
                 </div>
             </div>
 
-            <div id="loading" class="text-[#FFFDE9] text-lg hidden" data-component="loading">Processing<br> poem...</div>
+            <div id="loading" class="text-[#FFFDE9] text-lg hidden" data-component="loading">{{ _('Processing<br> poem...')|safe }}</div>
             <div id="char-image-container" class="w-1/2 h-1/2 mb-4 flex items-center justify-center" data-component="char-image-container">
                 <!-- Character image will be displayed here -->
                 <!-- 字符信息显示 -->
@@ -100,7 +100,7 @@
                     <div class="absolute bottom-36 max-w-[200px] right-20 text-sm text-black opacity-60 text-right italic" id="listener-char-translation" data-component="listener-char-translation"></div>
                 </div>
             </div>
-            <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="listener-label">Listener</div>
+            <div class="text-[#FFFDE9] text-xl mt-4 opacity-50" data-component="listener-label">{{ _('Listener') }}</div>
             
             <!-- <div class="mt-3 text-[#FFFDE9] text-center max-w-[280px] px-4" data-component="listener-translate-panel">
                 <div class="text-base leading-relaxed opacity-80" id="listener-translate-display" data-component="listener-translate-display"></div>
@@ -265,7 +265,7 @@
         }
         
         [data-component="speaker-circle"]::after {
-            content: "Click to toggle";
+            content: attr(data-tooltip);
             position: absolute;
             bottom: -30px;
             left: 50%;
@@ -315,6 +315,20 @@
     <!-- Hidden input for media URL -->
     <input type="hidden" id="media-url" value="{{ media_url or '' }}">
     
+    {% set guess_i18n = {
+        'no_poem': _('No poem provided'),
+        'uploaded_media_alt': _('Uploaded media'),
+        'click_toggle_media': _('Click to toggle between media and text'),
+        'failed_process_poem': _('Failed to process the poem'),
+        'generate_result': _('Generate Result'),
+        'loading_overlay_title': _('Generating Result...'),
+        'loading_overlay_subtitle': _('Creating your Nüshu character'),
+        'consensus_reached': _('Consensus Reached!'),
+        'generated_character_alt': _('Generated Nüshu character')
+    } %}
+    <script>
+      window.GUESS_PAGE_I18N = {{ guess_i18n | tojson }};
+    </script>
     <script src="{{ url_for('static', filename='js/guess.js') }}"></script>
 </body>
 

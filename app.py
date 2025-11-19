@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, send_from_directory
+from flask import Flask, render_template, request, jsonify, session, send_from_directory, redirect, url_for
 import os
 import uuid
 import json
@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from dotenv import load_dotenv
 from config import Config
+from flask_babel import Babel, gettext as _
 # 隐藏 Werkzeug 的 HTTP 请求日志
 import logging
 log = logging.getLogger('werkzeug')
@@ -33,6 +34,18 @@ app = Flask(__name__)
 app.secret_key = 'a-secret-key'
 CORS(app, resources={r"/upload": {"origins": "*"}})
 
+app.config['LANGUAGES'] = ['zh', 'en']
+app.config['BABEL_DEFAULT_LOCALE'] = 'zh'
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'Asia/Shanghai'
+
+def get_locale():
+    lang = session.get('lang')
+    if lang in app.config['LANGUAGES']:
+        return lang
+    match = request.accept_languages.best_match(app.config['LANGUAGES'])
+    return match or app.config['BABEL_DEFAULT_LOCALE']
+
+babel = Babel(app, locale_selector=get_locale)
 
 
 # 使用 Config 类中的配置
@@ -42,10 +55,14 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 禁用静态资源缓存（开发环境）
 
-# 在模板中注入 DEBUG 标志（仅开发时自动刷新使用）
+# 在模板中注入 DEBUG 标志和语言信息
 @app.context_processor
 def inject_debug_flag():
-    return {"DEBUG": app.debug}
+    return {
+        "DEBUG": app.debug,
+        "current_lang": get_locale(),
+        "available_languages": app.config['LANGUAGES']
+    }
 
 # 开发环境下的文件变更版本号端点，用于前端轮询自动刷新
 def _latest_mtime(paths):
@@ -96,6 +113,20 @@ def before_request():
     # 如果用户没有session_id，创建一个新的
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
+
+@app.route('/set_language/<lang_code>', methods=['GET', 'POST'])
+def set_language(lang_code):
+    lang_code = lang_code.lower()
+    if lang_code not in app.config['LANGUAGES']:
+        return jsonify({
+            'message': _('Unsupported language.'),
+            'supported_languages': app.config['LANGUAGES']
+        }), 400
+    session['lang'] = lang_code
+    next_url = request.args.get('next') or request.referrer or url_for('index')
+    if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'message': _('Language updated.'), 'lang': lang_code})
+    return redirect(next_url)
 
 @app.route('/')
 def index():

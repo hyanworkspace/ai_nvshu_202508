@@ -20,6 +20,8 @@ const globalLoader = document.getElementById('globalLoader');
 const uploadSuccess = document.getElementById('uploadSuccess');
 const uploadPreview = document.getElementById('uploadPreview');
 const uploadVideoPreview = document.getElementById('uploadVideoPreview');
+const seeTranslations = window.SEE_PAGE_I18N || {};
+const translate = (key, fallback) => seeTranslations[key] || fallback;
 
 function showEl(el) { if (el) el.classList.remove('hidden'); }
 function hideEl(el) { if (el) el.classList.add('hidden'); }
@@ -135,24 +137,24 @@ function validateFile(file) {
     const fileType = detectFileType(file);
     
     if (!fileType) {
-        throw new Error("Unsupported file type. Please upload MP4, PNG, or JPG files.");
+        throw new Error(translate('error_unsupported_type', 'Unsupported file type. Please upload MP4, PNG, or JPG files.'));
     }
     
     // 检查文件大小
     if (file.size > 50 * 1024 * 1024) {
-        throw new Error("File size exceeds 50MB limit. Please choose a smaller file.");
+        throw new Error(translate('error_file_size', 'File size exceeds 50MB limit. Please choose a smaller file.'));
     }
     
     // 具体的文件类型验证
     if (fileType === 'image') {
         const allowedImageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (file.type && !allowedImageTypes.includes(file.type)) {
-            throw new Error("Please upload PNG or JPG images only.");
+            throw new Error(translate('error_image_type', 'Please upload PNG or JPG images only.'));
         }
     } else if (fileType === 'video') {
         const allowedVideoTypes = ['video/mp4', 'video/webm'];
         if (file.type && !allowedVideoTypes.includes(file.type)) {
-            throw new Error("Please upload MP4 videos only.");
+            throw new Error(translate('error_video_type', 'Please upload MP4 videos only.'));
         }
     }
     
@@ -172,7 +174,7 @@ recordOption.addEventListener('click', async () => {
             }
         } catch (err) {
             console.error('无法访问摄像头:', err);
-            alert('无法访问摄像头，请确保已授予摄像头权限，并且摄像头未被其他应用程序占用。');
+            alert(translate('alert_camera_access', 'Unable to access the camera. Please ensure permissions are granted and the camera is not being used by another app.'));
         }
     }
 });
@@ -216,9 +218,9 @@ function setupRecordingControls() {
             // 检查是否是 Safari
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             if (isSafari) {
-                alert('Safari 浏览器暂不支持视频录制功能，请使用上传功能或切换到 Chrome/Firefox 浏览器。');
+                alert(translate('alert_safari_not_supported', 'Safari does not support in-browser recording. Please upload a file or switch to Chrome/Firefox.'));
             } else {
-                alert('您的浏览器可能不支持视频录制功能，请尝试使用最新版本的 Chrome 或 Firefox。');
+                alert(translate('alert_browser_not_supported', 'Your browser may not support video recording. Please try the latest Chrome or Firefox.'));
             }
             return;
         }
@@ -713,14 +715,14 @@ agreeBtn.addEventListener('click', () => {
             confirm_video(video_url);
         } else {
             console.error('No video URL available');
-            alert('Error: No video URL available');
+            alert(translate('alert_no_video_url', 'Error: No video URL available'));
         }
     }, 300);
 });
 
 async function uploadRecordedVideos(effectBlob, originalBlob) {
     if (!effectBlob || !originalBlob) {
-        alert('没有可上传的视频');
+        alert(translate('alert_no_media_to_upload', 'No media available to upload'));
         return;
     }
 
@@ -767,14 +769,14 @@ async function uploadRecordedVideos(effectBlob, originalBlob) {
                 console.log(original_video_url + ' ' + video_url);
                 confirm_video(video_url, original_video_url);
             } else {
-                alert('原始视频上传失败: ' + originalResult.error);
+                alert(translate('alert_original_upload_failed_prefix', 'Original video upload failed: ') + originalResult.error);
             }
         } else {
-            alert('带特效视频上传失败: ' + effectResult.error);
+            alert(translate('alert_effect_upload_failed_prefix', 'Effect video upload failed: ') + effectResult.error);
         }
     } catch (err) {
         console.error('上传错误详情:', err);
-        alert(`上传失败: ${err.message}`);
+        alert(translate('alert_upload_failed_prefix', 'Upload failed: ') + err.message);
     }
 }
 
@@ -942,7 +944,7 @@ async function handleDrop(e) {
 function confirm_video(url_, original_url = null) {
     if (!url_) {
         console.error('No URL provided to confirm_video');
-        alert('Error: No media URL available');
+        alert(translate('alert_no_media_url', 'Error: No media URL available'));
         return;
     }
     
@@ -1090,9 +1092,11 @@ function transitionToThinkPage(redirectUrl) {
         font-family: var(--font-inknut), serif;
     `;
     
+    const processingTitle = translate('transition_processing_title', 'Processing Your Media...');
+    const processingSubtitle = translate('transition_processing_subtitle', 'AI is analyzing and thinking');
     transitionContent.innerHTML = `
-        <div style="font-size: 2rem; margin-bottom: 1rem;">Processing Your Media...</div>
-        <div style="font-size: 1.2rem; opacity: 0.8; margin-bottom: 2rem;">AI is analyzing and thinking</div>
+        <div style="font-size: 2rem; margin-bottom: 1rem;">${processingTitle}</div>
+        <div style="font-size: 1.2rem; opacity: 0.8; margin-bottom: 2rem;">${processingSubtitle}</div>
         <div class="loading-spinner" style="
             width: 40px;
             height: 40px;

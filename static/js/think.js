@@ -4,6 +4,10 @@ const MIN_DISPLAY_TIME = 5000;
 // Additional dwell time after the final poem is rendered so visitors can read it
 const POEM_POST_DISPLAY_TIME = 6000;
 let lastStepTime = 0;
+const thinkTranslations = window.THINK_PAGE_I18N || {};
+const t = (key, fallback = "") => thinkTranslations[key] || fallback;
+const formatStepLabel = (number) =>
+  t("step_label", "STEP {number}").replace("{number}", number);
 
 document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
@@ -12,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const mediaType = urlParams.get("media_type");
 
   if (!mediaUrl) {
-    alert("No media URL provided");
+    alert(t("no_media_url", "No media URL provided"));
     return;
   }
 
@@ -97,7 +101,7 @@ function initializeMediaDisplay(mediaUrl, mediaType) {
     } else if (isImage) {
       element = document.createElement("img");
       element.src = url;
-      element.alt = "Uploaded media";
+      element.alt = t("uploaded_media_alt", "Uploaded media");
     } else {
       console.error("Unsupported media type:", type, url);
       return null;
@@ -473,7 +477,8 @@ function addStatusItem(
   text,
   isActive = false,
   isCompleted = false,
-  toggleContent = null
+  toggleContent = null,
+  role = null
 ) {
   const statusTrack = document.getElementById("statusTrack");
   const statusItem = document.createElement("div");
@@ -495,6 +500,10 @@ function addStatusItem(
   statusItem.setAttribute("aria-current", isActive ? "step" : "false");
 
   const toggleId = toggleContent ? `toggle-${Date.now()}-${itemIndex}` : null;
+  if (role) {
+    statusItem.dataset.role = role;
+  }
+  const detailsLabel = t("status_details", "details");
 
   statusItem.innerHTML = `
         <div class="status-icon">${
@@ -504,7 +513,7 @@ function addStatusItem(
             <div class="status-text" data-thinking-text>${text}</div>
             ${
               toggleContent
-                ? `<button class="status-details-toggle" onclick="showFloatingDetails('${toggleId}')">details</button>`
+                ? `<button class="status-details-toggle" onclick="showFloatingDetails('${toggleId}')">${detailsLabel}</button>`
                 : ""
             }
         </div>
@@ -916,11 +925,16 @@ function updateStatusItem(
   item.innerHTML = `
         <div class="status-icon">${isCompleted ? "✓" : "◐"}</div>
         <div class="status-item-content">
-            <div class="status-step-label">STEP ${stepLabel}</div>
+            <div class="status-step-label">${formatStepLabel(
+              String(stepLabel).padStart(2, "0")
+            )}</div>
             <div class="status-text" data-thinking-text>${text}</div>
             ${
               toggleContent
-                ? `<button class="status-details-toggle" onclick="showFloatingDetails('${toggleId}')">details</button>`
+                ? `<button class="status-details-toggle" onclick="showFloatingDetails('${toggleId}')">${t(
+                    "status_details",
+                    "details"
+                  )}</button>`
                 : ""
             }
         </div>
@@ -984,9 +998,27 @@ function updateStatusItem(
 
 async function describeVideo(mediaUrl) {
   // 预先创建所有状态项
-  const analyzingItem = addStatusItem("The agent is seeing...", true);
-  addStatusItem("The agent is thinking...", false);
-  addStatusItem("The agent is reflecting...", false);
+  const analyzingItem = addStatusItem(
+    t("status_agent_seeing", "The agent is seeing..."),
+    true,
+    false,
+    null,
+    "seeing"
+  );
+  addStatusItem(
+    t("status_agent_thinking", "The agent is thinking..."),
+    false,
+    false,
+    null,
+    "thinking"
+  );
+  addStatusItem(
+    t("status_agent_reflecting", "The agent is reflecting..."),
+    false,
+    false,
+    null,
+    "reflecting"
+  );
 
   lastStepTime = Date.now();
 
@@ -1011,17 +1043,23 @@ async function describeVideo(mediaUrl) {
     // Update the status item with toggleable content
     const toggleContent = `
             <div class="language-section">
-                <div class="language-label">Chinese Description</div>
+                <div class="language-label">${t(
+                  "label_chinese_description",
+                  "Chinese Description"
+                )}</div>
                 <div class="description">${data.video_desc}</div>
             </div>
             <div class="language-section">
-                <div class="language-label">English Description</div>
+                <div class="language-label">${t(
+                  "label_english_description",
+                  "English Description"
+                )}</div>
                 <div class="description">${data.video_desc_eng}</div>
             </div>
         `;
     updateStatusItem(
       analyzingItem,
-      "Media analysis completed",
+      t("status_media_completed", "Media analysis completed"),
       true,
       toggleContent
     );
@@ -1090,7 +1128,10 @@ async function describeVideo(mediaUrl) {
       findSimilarPoems(data.video_description || data.video_desc);
     }, remainingTime);
   } catch (error) {
-    updateStatusItem(analyzingItem, `Error: ${error.message}`);
+    updateStatusItem(
+      analyzingItem,
+      `${t("error_prefix", "Error: ")}${error.message}`
+    );
     console.error("Error:", error);
 
     // Show error message to user - 使用覆盖层显示错误
@@ -1116,7 +1157,7 @@ async function describeVideo(mediaUrl) {
 
     descriptionOverlay.innerHTML = `
             <div class="error-message text-white text-lg">
-                Failed to analyze media: ${error.message}
+                ${t("error_failed_analyze_prefix", "Failed to analyze media: ")}${error.message}
             </div>
         `;
   }
@@ -1133,8 +1174,8 @@ function formatChinesePoem(text) {
 
 async function findSimilarPoems(description) {
   // Find the existing thinking item instead of creating a new one
-  const thinkingItem = statusItems.find((item) =>
-    item.querySelector(".status-text").textContent.includes("thinking")
+  const thinkingItem = statusItems.find(
+    (item) => item.dataset.role === "thinking"
   );
 
   if (thinkingItem) {
@@ -1172,11 +1213,17 @@ async function findSimilarPoems(description) {
     // Update the status item with toggleable content
     const toggleContent = `
             <div class="language-section">
-                <div class="language-label">Chinese Poems</div>
+                <div class="language-label">${t(
+                  "label_chinese_poems",
+                  "Chinese Poems"
+                )}</div>
                 <div class="poem">${data.similar_poems.join("<br><br>")}</div>
             </div>
             <div class="language-section">
-                <div class="language-label">English Translations</div>
+                <div class="language-label">${t(
+                  "label_english_translations",
+                  "English Translations"
+                )}</div>
                 <div class="poem">${data.similar_poems_eng.join(
                   "<br><br>"
                 )}</div>
@@ -1185,7 +1232,7 @@ async function findSimilarPoems(description) {
     if (thinkingItem) {
       updateStatusItem(
         thinkingItem,
-        "Found similar poems",
+        t("status_found_similar", "Found similar poems"),
         true,
         toggleContent
       );
@@ -1253,7 +1300,10 @@ async function findSimilarPoems(description) {
       generatePoem(description, data.similar_poems);
     }, remainingTime);
   } catch (error) {
-    updateStatusItem(thinkingItem, `Error: ${error.message}`);
+    updateStatusItem(
+      thinkingItem,
+      `${t("error_prefix", "Error: ")}${error.message}`
+    );
     console.error("Error:", error);
   }
 }
@@ -1261,8 +1311,8 @@ async function findSimilarPoems(description) {
 // 4. 展示新诗句
 async function generatePoem(description, poems) {
   // Find the existing reflecting item instead of creating a new one
-  const reflectingItem = statusItems.find((item) =>
-    item.querySelector(".status-text").textContent.includes("reflecting")
+  const reflectingItem = statusItems.find(
+    (item) => item.dataset.role === "reflecting"
   );
 
   if (reflectingItem) {
@@ -1303,18 +1353,24 @@ async function generatePoem(description, poems) {
     // Update the status item with toggleable content
     const toggleContent = `
             <div class="language-section">
-                <div class="language-label">Generated Chinese Poem</div>
+                <div class="language-label">${t(
+                  "label_generated_chinese_poem",
+                  "Generated Chinese Poem"
+                )}</div>
                 <div class="poem">${data.poem}</div>
             </div>
             <div class="language-section">
-                <div class="language-label">English Translation</div>
+                <div class="language-label">${t(
+                  "label_english_translation",
+                  "English Translation"
+                )}</div>
                 <div class="poem">${data.poem_eng}</div>
             </div>
         `;
     if (reflectingItem) {
       updateStatusItem(
         reflectingItem,
-        "Generated new poem",
+        t("status_generated_poem", "Generated new poem"),
         true,
         toggleContent
       );
@@ -1379,7 +1435,10 @@ async function generatePoem(description, poems) {
       transitionToGuessPage(data.poem);
     }, Math.max(remainingTime, POEM_POST_DISPLAY_TIME));
   } catch (error) {
-    updateStatusItem(reflectingItem, `Error: ${error.message}`);
+    updateStatusItem(
+      reflectingItem,
+      `${t("error_prefix", "Error: ")}${error.message}`
+    );
     console.error("Error:", error);
   }
 }
@@ -1816,8 +1875,13 @@ function transitionToGuessPage(poem) {
         text-align: center;
         font-family: var(--font-inknut), serif;
     `;
-  transitionText.innerHTML =
-    'Entering Language Development...<br><span style="font-size: 1.1rem; opacity: 0.8;">Preparing the guessing game</span>';
+  transitionText.innerHTML = `${t(
+    "transition_guess_title",
+    "Entering Language Development..."
+  )}<br><span style="font-size: 1.1rem; opacity: 0.8;">${t(
+    "transition_guess_subtitle",
+    "Preparing the guessing game"
+  )}</span>`;
 
   transitionOverlay.appendChild(transitionText);
   document.body.appendChild(transitionOverlay);

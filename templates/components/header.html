@@ -4,18 +4,37 @@
         <!-- 左侧：主页标题 -->
         <div class="flex items-center">
             <a href="/" class="text-lg font-bold hover:text-[#FFFDE9]/80 transition-colors duration-300 hover-effect hover-effect--bg-south" style="font-family: 'Inknut Antiqua', serif;">
-                AI Nüshu
+                {{ _('AI Nüshu') }}
             </a>
         </div>
 
         <!-- 右侧：导航链接 -->
         <div class="flex items-center space-x-6">
             <a href="/dictionary" class="text-sm hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light hover-effect hover-effect--bg-south">
-                DICTIONARY
+                {{ _('Dictionary') }}
             </a>
             <a href="/about" class="text-sm hover:text-[#FFFDE9]/80 transition-colors duration-300 font-light hover-effect hover-effect--bg-south">
-                ABOUT
+                {{ _('About') }}
             </a>
+            <div class="flex items-center text-xs" aria-label="{{ _('Switch language') }}">
+                {% set current = (current_lang or 'zh') %}
+                {% if current == 'zh' %}
+                    {% set label_en = '英文' %}
+                    {% set label_zh = '中文' %}
+                {% else %}
+                    {% set label_en = 'English' %}
+                    {% set label_zh = 'Chinese' %}
+                {% endif %}
+                <a href="{{ url_for('set_language', lang_code='en', next=request.path) }}"
+                   class="transition-colors duration-200 {{ 'text-[#FFFDE9]' if current == 'en' else 'text-[#FFFDE9]/60 hover:text-[#FFFDE9]/90' }}">
+                    {{ label_en }}
+                </a>
+                <span class="mx-2 text-[#FFFDE9]/50">|</span>
+                <a href="{{ url_for('set_language', lang_code='zh', next=request.path) }}"
+                   class="transition-colors duration-200 {{ 'text-[#FFFDE9]' if current == 'zh' else 'text-[#FFFDE9]/60 hover:text-[#FFFDE9]/90' }}">
+                    {{ label_zh }}
+                </a>
+            </div>
         </div>
     </div>
 </nav>
@@ -26,5 +45,3 @@
 <script src="/static/js/split-type.min.js"></script>
 <!-- Scripts for the effect -->
 <script type="module" src="/static/js/effect-4/index.js"></script>
-
-

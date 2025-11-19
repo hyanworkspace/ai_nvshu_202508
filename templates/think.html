@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang or 'zh' }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Think - AI Nvshu</title>
+    <title>{{ _('Think - AI Nvshu') }}</title>
     <link
       rel="icon"
       type="image/png"
@@ -29,7 +29,7 @@
     >
       <img
         src="{{ url_for('static', filename='images/bg 2.png') }}"
-        alt="Background"
+        alt="{{ _('Background') }}"
         class="w-full h-full object-cover opacity-70"
         style="
           filter: blur(2px);
@@ -1064,7 +1064,7 @@
             class="text-2xl font-medium mb-4 text-[rgb(255,251,233)]"
             data-component="left-title"
           >
-            Observation
+            {{ _('Observation') }}
           </div>
           <!-- 包裹容器：相对定位，增加padding确保圆形完整显示 -->
           <div
@@ -1120,6 +1120,33 @@
         </div>
       </div>
     </div>
+    {% set think_i18n = {
+      'observation_title': _('Observation'),
+      'background_alt': _('Background'),
+      'no_media_url': _('No media URL provided'),
+      'uploaded_media_alt': _('Uploaded media'),
+      'status_details': _('details'),
+      'step_label': _('STEP {number}'),
+      'status_agent_seeing': _('The agent is seeing...'),
+      'status_agent_thinking': _('The agent is thinking...'),
+      'status_agent_reflecting': _('The agent is reflecting...'),
+      'status_media_completed': _('Media analysis completed'),
+      'label_chinese_description': _('Chinese Description'),
+      'label_english_description': _('English Description'),
+      'error_failed_analyze_prefix': _('Failed to analyze media: '),
+      'error_prefix': _('Error: '),
+      'label_chinese_poems': _('Chinese Poems'),
+      'label_english_translations': _('English Translations'),
+      'status_found_similar': _('Found similar poems'),
+      'label_generated_chinese_poem': _('Generated Chinese Poem'),
+      'label_english_translation': _('English Translation'),
+      'status_generated_poem': _('Generated new poem'),
+      'transition_guess_title': _('Entering Language Development...'),
+      'transition_guess_subtitle': _('Preparing the guessing game')
+    } %}
+    <script>
+      window.THINK_PAGE_I18N = {{ think_i18n | tojson }};
+    </script>
     <script src="{{ url_for('static', filename='js/think.js') }}"></script>
   </body>
 </html>
