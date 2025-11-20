@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ _('AI 女书') }}{% endblock %}</title>  
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="preload" as="font" type="font/ttf" href="{{ url_for('static', filename='fonts/Inknut_Antiqua/InknutAntiqua-Regular.ttf') }}" crossorigin>
+    <link rel="preload" as="font" type="font/ttf" href="{{ url_for('static', filename='fonts/喜鹊燕书体(简 繁体).ttf') }}" crossorigin>
     <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     {% block extra_css %}{% endblock %}

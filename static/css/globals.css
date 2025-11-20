@@ -165,6 +165,16 @@ button {
   box-sizing: border-box;
 }
 
+/* Slightly enlarge Chinese button text without affecting other locales */
+html[lang="zh"] button,
+html[lang="zh"] [role="button"],
+html[lang="zh"] [data-component*="btn"],
+html[lang="zh"] .btn {
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  font-family: "XiQue YanShuTi", "Inknut Antiqua", system-ui, sans-serif;
+}
+
 /* Custom styles for the upload circles */
 .upload-circle {
   transition: all 0.3s ease;

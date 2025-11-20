@@ -10,6 +10,20 @@
       href="{{ url_for('static', filename='images/favicon.png') }}"
     />
     <link
+      rel="preload"
+      as="font"
+      type="font/ttf"
+      href="{{ url_for('static', filename='fonts/Inknut_Antiqua/InknutAntiqua-Regular.ttf') }}"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/ttf"
+      href="{{ url_for('static', filename='fonts/喜鹊燕书体(简 繁体).ttf') }}"
+      crossorigin
+    />
+    <link
       href="{{ url_for('static', filename='css/globals.css') }}"
       rel="stylesheet"
     />
@@ -635,8 +649,8 @@
         >
           <button
             id="agreeBtn"
-            class="w-full max-w-[8vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            style="padding: 0.1rem 0.2rem"
+            class="mx-auto flex max-w-[8vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            style="padding: 0.2rem 0.4rem"
             data-component="agree-btn"
           >
             {{ _('Yes, I agree') }}
