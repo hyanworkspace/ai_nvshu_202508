@@ -1,6 +1,8 @@
 // Get the poem from URL parameters
 const urlParams = new URLSearchParams(window.location.search);
 const poem = urlParams.get('poem');
+const guessTranslations = window.GUESS_PAGE_I18N || {};
+const translate = (key, fallback = "") => guessTranslations[key] || fallback;
 
 // Global variables
 let charData = null;
@@ -98,21 +100,7 @@ function initializeSpeakerMedia() {
     console.log('Initializing speaker media with URL:', mediaUrl);
     
     // 调试：显示媒体URL在页面上
-    if (mediaUrl) {
-        console.log('Media URL found:', mediaUrl);
-        // 临时在页面上显示URL用于调试
-        const debugDiv = document.createElement('div');
-        debugDiv.style.cssText = 'position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; z-index: 9999; font-size: 12px; max-width: 300px; word-break: break-all;';
-        debugDiv.textContent = 'Media URL: ' + mediaUrl;
-        document.body.appendChild(debugDiv);
-        
-        // 5秒后移除调试信息
-        setTimeout(() => {
-            if (debugDiv.parentNode) {
-                debugDiv.parentNode.removeChild(debugDiv);
-            }
-        }, 5000);
-    } else {
+    if (!mediaUrl) {
         console.warn('No media URL found');
         return;
     }
@@ -149,13 +137,13 @@ function initializeSpeakerMedia() {
     } else if (isImage) {
         mediaElement = document.createElement('img');
         mediaElement.src = mediaUrl;
-        mediaElement.alt = 'Uploaded media';
+        mediaElement.alt = translate('uploaded_media_alt', 'Uploaded media');
     } else {
         console.warn('Unknown media type for URL:', mediaUrl);
         // 默认尝试作为图片处理
         mediaElement = document.createElement('img');
         mediaElement.src = mediaUrl;
-        mediaElement.alt = 'Uploaded media';
+        mediaElement.alt = translate('uploaded_media_alt', 'Uploaded media');
     }
     
     // 添加错误处理
@@ -207,7 +195,7 @@ function initializeSpeakerMedia() {
     const speakerCircle = document.querySelector('[data-component="speaker-circle"]');
     if (speakerCircle) {
         speakerCircle.addEventListener('click', toggleSpeakerDisplay);
-        speakerCircle.title = 'Click to toggle between media and text';
+        speakerCircle.title = translate('click_toggle_media', 'Click to toggle between media and text');
         speakerCircle.style.cursor = 'pointer';
     }
 }
@@ -349,7 +337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeSpeakerMedia();
     
     if (!poem) {
-        alert('No poem provided');
+        alert(translate('no_poem', 'No poem provided'));
         return;
     }
     
@@ -434,7 +422,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById('loading').textContent = 'Failed to process the poem';
+        document.getElementById('loading').textContent = translate('failed_process_poem', 'Failed to process the poem');
     }
 });
 // 更新 char-image-container 中的字符信息显示
@@ -860,7 +848,7 @@ function displayCharacterImage() {
 
         const img = document.createElement('img');
         img.src = charData.char_img_path_pixelated;
-        img.alt = 'Generated Nüshu character';
+        img.alt = translate('generated_character_alt', 'Generated Nüshu character');
         img.className = 'char-image';
         container.appendChild(img);
         
@@ -877,7 +865,7 @@ function displayCharacterImage() {
         button.id = 'generate-result-btn';
         button.className = 'w-full max-w-[20vw] px-10 items-center justify-center py-2 rounded-[2px] border-[1px] border-dashed border-[rgb(255,251,233)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-inknut font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"';
         button.style.padding = '0.1rem 1rem';
-        button.textContent = 'Generate Result';
+        button.textContent = translate('generate_result', 'Generate Result');
         button.addEventListener('click', () => {
             // 添加淡出效果后跳转到结果页面
             const body = document.body;
@@ -908,7 +896,7 @@ function displayCharacterImage() {
                 text-align: center;
                 font-family: var(--font-inknut), serif;
             `;
-            loadingText.innerHTML = 'Generating Result...<br><span style="font-size: 1rem; opacity: 0.7;">Creating your Nüshu character</span>';
+            loadingText.innerHTML = `${translate('loading_overlay_title', 'Generating Result...')}<br><span style="font-size: 1rem; opacity: 0.7;">${translate('loading_overlay_subtitle', 'Creating your Nüshu character')}</span>`;
             
             loadingOverlay.appendChild(loadingText);
             body.appendChild(loadingOverlay);
@@ -957,7 +945,7 @@ function showConsensusReached() {
         circleContainer.classList.add('radial-fade-small');
     }
     
-    revealingText.textContent = "Consensus Reached!";
+    revealingText.textContent = translate('consensus_reached', 'Consensus Reached!');
     revealingText.style.display = 'block';
     
     // Add the button after a short delay

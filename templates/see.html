@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="{{ current_lang or 'zh' }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 女书</title>
+    <title>{{ _('AI 女书') }}</title>
     <link
       rel="icon"
       type="image/png"
@@ -356,7 +356,7 @@
               >
                 <img
                   src="{{ url_for('static', filename='images/cameraIcon.png') }}"
-                  alt="Camera icon"
+                  alt="{{ _('Camera icon') }}"
                   class="w-full h-full object-contain"
                 />
               </div>
@@ -364,7 +364,7 @@
                 class="text-gray-700 text-center text-[min(1.2rem,1.6vw)] leading-none font-medium"
                 data-component="recording-text"
               >
-                Click to record a video
+                {{ _('Click to record a video') }}
               </p>
 
               <!-- 录制时显示的视频预览 -->
@@ -387,14 +387,14 @@
                   class="inline-flex items-center justify-center px-6 py-2 text-sm rounded-full border-2 border-dashed border-black/60 bg-black/80 text-white font-medium cursor-pointer transition-all duration-300 hover:bg-black hover:border-black hover:-translate-y-1 focus:outline-none disabled:opacity-50"
                   data-component="start-record-btn"
                 >
-                  Start Recording
+                  {{ _('Start Recording') }}
                 </button>
                 <button
                   id="stopRecordBtn"
                   class="inline-flex items-center justify-center px-6 py-2 text-sm rounded-full border-2 border-dashed border-red-400 bg-red-500/80 text-white font-medium cursor-pointer transition-all duration-300 hover:bg-red-500 hover:border-red-300 hover:-translate-y-1 focus:outline-none disabled:opacity-50"
                   data-component="stop-record-btn"
                 >
-                  Stop Recording
+                  {{ _('Stop Recording') }}
                 </button>
               </div>
             </div>
@@ -476,7 +476,7 @@
               >
                 <img
                   src="{{ url_for('static', filename='images/uploadImageIcon.png') }}"
-                  alt="Upload icon"
+                  alt="{{ _('Upload icon') }}"
                   class="w-full h-full object-contain"
                 />
               </div>
@@ -488,7 +488,7 @@
                   class="text-gray-700 text-center text-[min(1.2rem,1.6vw)] leading-none font-medium"
                   data-component="upload-text"
                 >
-                  Drag to here or browse files
+                  {{ _('Drag here or browse files') }}
                 </p>
 
                 <!-- Tooltip -->
@@ -497,8 +497,8 @@
                   data-component="tooltip"
                 >
                   <div class="text-center">
-                    <div class="font-medium">Supported formats:</div>
-                    <div>MP4, PNG, JPG (Max 5MB each)</div>
+                    <div class="font-medium">{{ _('Supported formats:') }}</div>
+                    <div>{{ _('MP4, PNG, JPG (Max 5MB each)') }}</div>
                   </div>
                   <!-- Tooltip arrow -->
                   <div
@@ -582,7 +582,7 @@
               class="inline-flex items-center justify-center px-10 py-3 rounded-full border-2 border-dashed border-[rgba(255,251,233,0.6)] bg-[rgba(255,251,233,0.2)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.4)] hover:border-[rgba(255,251,233,0.9)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full max-w-[20vw]"
               data-component="re-upload-btn"
             >
-              Re-Upload
+              {{ _('Re-Upload') }}
             </button>
           </div>
           <div data-component="confirm-button-container">
@@ -591,7 +591,7 @@
               class="inline-flex items-center justify-center px-10 py-3 rounded-full border-2 border-dashed border-[rgba(255,251,233,0.8)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full max-w-[20vw]"
               data-component="confirm-btn"
             >
-              Confirm
+              {{ _('Confirm') }}
             </button>
           </div>
         </div>
@@ -621,16 +621,10 @@
           data-component="modal-body"
         >
           <h3 class="text-xl font-medium mb-4" data-component="modal-title">
-            Privacy & Data Usage Statement
+            {{ _('Privacy & Data Usage Statement') }}
           </h3>
           <p class="text-sm leading-relaxed" data-component="modal-text">
-            We respect your privacy and are committed to protecting your
-            personal information. When you upload an image or video for this
-            interactive experience, your content is used solely for generating
-            the artistic response. We do not store or share your content with
-            third parties, and all uploaded content is automatically deleted
-            after processing. No personal identification information is
-            collected.
+            {{ _('We respect your privacy and are committed to protecting your personal information. When you upload an image or video for this interactive experience, your content is used solely for generating the artistic response. We do not store or share your content with third parties, and all uploaded content is automatically deleted after processing. No personal identification information is collected.') }}
           </p>
         </div>
 
@@ -645,7 +639,7 @@
             style="padding: 0.1rem 1rem"
             data-component="agree-btn"
           >
-            Yes, I agree
+            {{ _('Yes, I agree') }}
           </button>
         </div>
       </div>
@@ -944,6 +938,27 @@
       PixelCanvas.register();
     </script>
 
+    {% set see_i18n = {
+      'error_unsupported_type': _('Unsupported file type. Please upload MP4, PNG, or JPG files.'),
+      'error_file_size': _('File size exceeds 50MB limit. Please choose a smaller file.'),
+      'error_image_type': _('Please upload PNG or JPG images only.'),
+      'error_video_type': _('Please upload MP4 videos only.'),
+      'alert_camera_access': _('Unable to access the camera. Please ensure permissions are granted and the camera is not being used by another app.'),
+      'alert_safari_not_supported': _('Safari does not support in-browser recording. Please upload a file or switch to Chrome/Firefox.'),
+      'alert_browser_not_supported': _('Your browser may not support video recording. Please try the latest Chrome or Firefox.'),
+      'alert_no_video_url': _('Error: No video URL available'),
+      'alert_no_media_to_upload': _('No media available to upload'),
+      'alert_original_upload_failed_prefix': _('Original video upload failed: '),
+      'alert_effect_upload_failed_prefix': _('Effect video upload failed: '),
+      'alert_upload_failed_prefix': _('Upload failed: '),
+      'alert_no_media_url': _('Error: No media URL available'),
+      'transition_processing_title': _('Processing Your Media...'),
+      'transition_processing_subtitle': _('AI is analyzing and thinking')
+    } %}
+    <script>
+      window.SEE_PAGE_I18N = {{ see_i18n | tojson }};
+    </script>
+
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/see.js') }}"></script>
     <!-- Global page loader (used during post-confirm uploads) -->
@@ -953,7 +968,7 @@
     >
       <div class="flex flex-col items-center">
         <div class="spinner"></div>
-        <div class="mt-4 text-[#FFFDE9] text-sm">Uploading...</div>
+        <div class="mt-4 text-[#FFFDE9] text-sm">{{ _('Uploading...') }}</div>
       </div>
     </div>
     <script>

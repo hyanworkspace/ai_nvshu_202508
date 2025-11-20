@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="{{ current_lang or 'zh' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AI 女书{% endblock %}</title>  
+    <title>{% block title %}{{ _('AI 女书') }}{% endblock %}</title>  
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link href="{{ url_for('static', filename='css/globals.css') }}" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>

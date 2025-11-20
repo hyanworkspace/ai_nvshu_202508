@@ -102,6 +102,53 @@ body > * {
   position: relative;
   z-index: 3;
 }
+html[lang="zh"] body {
+  font-size: calc(1rem + 4px);
+  line-height: 1.65;
+}
+
+html[lang="zh"] body :where(p) {
+  letter-spacing: 0.02em;
+  font-size: calc(0.8rem + 8px);
+}
+html[lang="zh"] body :where(a) {
+  letter-spacing: 0.02em;
+  font-size: calc(0.8rem + 8px);
+}
+
+
+
+/* 
+html[lang="zh"] body :where(p, span, div, li, button, input, textarea) {
+  letter-spacing: 0.02em;
+  font-size: calc(0.8rem + 8px);
+} */
+/* Utility classes for Chinese typography adjustments */
+/* html[lang="zh"] .zh-text-sm {
+  font-size: 1.95em;
+}
+
+html[lang="zh"] .zh-text-base {
+  font-size: 1.05em;
+}
+
+html[lang="zh"] .zh-text-lg {
+  font-size: 1.15em;
+}
+
+html[lang="zh"] .zh-text-xl {
+  font-size: 1.25em;
+}
+
+html[lang="zh"] .zh-tight {
+  letter-spacing: 0.01em;
+}
+
+html[lang="zh"] .zh-loose {
+  letter-spacing: 0.05em;
+} */
+
+
 
 a {
   color: inherit;

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const frameTranslations = window.FRAME_PAGE_I18N || {};
+    const translate = (key, fallback = '') => frameTranslations[key] || fallback;
     // 重置radio按钮状态，确保用户回退后可以重新选择
     document.querySelectorAll('input[name="storage"]').forEach(radio => {
         radio.checked = false;
@@ -92,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Create title
             const title = doc.createElement('title');
-            title.textContent = 'Share to WeChat';
+            title.textContent = translate('share_wechat_title', 'Share to WeChat');
             head.appendChild(title);
             
             // Create style
@@ -110,14 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
             container.className = 'container';
             
             const heading = doc.createElement('h2');
-            heading.textContent = 'Share to WeChat';
+            heading.textContent = translate('share_wechat_title', 'Share to WeChat');
             container.appendChild(heading);
             
             const instructions = doc.createElement('div');
             instructions.className = 'instructions';
             instructions.innerHTML = `
-                <p>In a real implementation, this would share directly to WeChat.</p>
-                <p>For now, you can save the image below and share it manually:</p>
+                <p>${translate('share_wechat_instruction1', 'In a real implementation, this would share directly to WeChat.')}</p>
+                <p>${translate('share_wechat_instruction2', 'For now, you can save the image below and share it manually:')}</p>
             `;
             container.appendChild(instructions);
             
@@ -126,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container.appendChild(imgContainer);
             
             const button = doc.createElement('button');
-            button.textContent = 'Print or Save';
+            button.textContent = translate('print_or_save', 'Print or Save');
             button.onclick = function() { shareWindow.print(); };
             container.appendChild(button);
             
@@ -144,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
             doc.close();
         }).catch(err => {
             console.error('Error creating share image:', err);
-            alert('Error creating share image. Please try again.');
+            alert(translate('share_error', 'Error creating share image. Please try again.'));
         });
     };
 
@@ -171,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Create title
             const title = doc.createElement('title');
-            title.textContent = 'Share to Instagram';
+            title.textContent = translate('share_instagram_title', 'Share to Instagram');
             head.appendChild(title);
             
             // Create style
@@ -189,15 +191,15 @@ document.addEventListener('DOMContentLoaded', function() {
             container.className = 'container';
             
             const heading = doc.createElement('h2');
-            heading.textContent = 'Share to Instagram';
+            heading.textContent = translate('share_instagram_title', 'Share to Instagram');
             container.appendChild(heading);
             
             const instructions = doc.createElement('div');
             instructions.className = 'instructions';
             instructions.innerHTML = `
-                <p>1. Save this image to your device</p>
-                <p>2. Open Instagram and create a new post</p>
-                <p>3. Select this image from your gallery</p>
+                <p>${translate('share_instagram_step1', '1. Save this image to your device')}</p>
+                <p>${translate('share_instagram_step2', '2. Open Instagram and create a new post')}</p>
+                <p>${translate('share_instagram_step3', '3. Select this image from your gallery')}</p>
             `;
             container.appendChild(instructions);
             
@@ -206,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container.appendChild(imgContainer);
             
             const button = doc.createElement('button');
-            button.textContent = 'Print or Save';
+            button.textContent = translate('print_or_save', 'Print or Save');
             button.onclick = function() { shareWindow.print(); };
             container.appendChild(button);
             
@@ -224,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
             doc.close();
         }).catch(err => {
             console.error('Error creating share image:', err);
-            alert('Error creating share image. Please try again.');
+            alert(translate('share_error', 'Error creating share image. Please try again.'));
         });
     };
 
@@ -243,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
             notification.style.borderRadius = '5px';
             notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
             notification.style.zIndex = '1000';
-            notification.textContent = 'Link copied to clipboard!';
+            notification.textContent = translate('link_copied', 'Link copied to clipboard!');
             
             document.body.appendChild(notification);
             setTimeout(() => {
@@ -251,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         }).catch(err => {
             console.error('Failed to copy: ', err);
-            alert('Failed to copy link. Please try again.');
+            alert(translate('copy_failed', 'Failed to copy link. Please try again.'));
         });
     };
 
@@ -312,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Error:', error);
                 isProcessing = false; // 出错时重置状态
-                alert('操作失败，请重试: ' + error.message);
+                alert(translate('operation_failed_prefix', 'Operation failed, please try again: ') + error.message);
             }
         });
     });

@@ -1,3 +1,17 @@
+const translations = window.RESULT_PAGE_I18N || {};
+const translate = (path, fallback) => {
+    const keys = path.split('.');
+    let current = translations;
+    for (const key of keys) {
+        if (current && typeof current === 'object' && key in current) {
+            current = current[key];
+        } else {
+            return fallback;
+        }
+    }
+    return current;
+};
+
 // 页面加载时的淡入效果
 document.addEventListener('DOMContentLoaded', () => {
     // 初始设置所有元素为透明
@@ -80,9 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('save-btn').addEventListener('click', async () => {
     const userName = document.getElementById('user-name').value.trim();
+    const defaultSaveLabel = translate('buttons.save', 'Save');
+    const savingLabel = translate('buttons.saving', 'Saving...');
 
     if (!userName) {
-        alert('Please enter your name');
+        alert(translate('alerts.enter_name', 'Please enter your name'));
         return;
     }
 
@@ -92,7 +108,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     
     // 禁用按钮防止重复点击
     saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
+    saveBtn.textContent = savingLabel;
     
     try {
         // 保存用户名到session
@@ -128,7 +144,9 @@ document.getElementById('save-btn').addEventListener('click', async () => {
                 text-align: center;
                 font-family: var(--font-inknut), serif;
             `;
-            successText.innerHTML = 'Saved Successfully!<br><span style="font-size: 1.2rem; opacity: 0.8;">Taking you to the final page...</span>';
+            const successTitle = translate('messages.saved_title', 'Saved Successfully!');
+            const successSubtitle = translate('messages.saved_subtitle', 'Taking you to the final page...');
+            successText.innerHTML = `${successTitle}<br><span style="font-size: 1.2rem; opacity: 0.8;">${successSubtitle}</span>`;
             
             successOverlay.appendChild(successText);
             document.body.appendChild(successOverlay);
@@ -161,14 +179,14 @@ document.getElementById('save-btn').addEventListener('click', async () => {
         } else {
             // 恢复按钮状态
             saveBtn.disabled = false;
-            saveBtn.textContent = 'Save';
-            alert('Failed to save your name');
+            saveBtn.textContent = defaultSaveLabel;
+            alert(translate('alerts.save_failed', 'Failed to save your name'));
         }
     } catch (error) {
         console.error('Error:', error);
         // 恢复按钮状态
         saveBtn.disabled = false;
-        saveBtn.textContent = 'Save';
-        alert('An error occurred');
+        saveBtn.textContent = defaultSaveLabel;
+        alert(translate('alerts.generic_error', 'An error occurred'));
     }
 });

@@ -8,6 +8,7 @@ itsdangerous==2.2.0
 click==8.1.8
 blinker==1.9.0
 flask-cors==4.0.0
+Flask-Babel==4.0.0
 
 # AI和机器学习核心依赖
 torch==2.5.1
@@ -22,9 +23,9 @@ scipy==1.13.1
 zhipuai==2.1.5.20250825
 
 # 网络优化
-httpx==0.25.2
-urllib3==2.0.7
-requests==2.31.0
+httpx==0.28.1
+urllib3==2.3.0
+requests==2.32.3
 
 # 图像和视频处理
 Pillow==11.2.1
@@ -39,9 +40,6 @@ jieba==0.42.1
 gensim==4.3.3
 
 # 网络请求和配置
-requests==2.32.3
-httpx==0.28.1
-urllib3==2.3.0
 python-dotenv==1.0.1
 
 # 文件处理和工具

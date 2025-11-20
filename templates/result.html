@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang or 'zh' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nüshu Character Created</title>
+    <title>{{ _('Nüshu Character Created') }}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}"> -->
@@ -161,7 +161,7 @@
                              muted playsinline autoplay>
                         </video>
                         {% else %}
-                        <p>No video available</p>
+                        <p>{{ _('No video available') }}</p>
                         {% endif %}
                     </div>
 
@@ -181,10 +181,10 @@
                                     {% if char_3dim %}
                                     <p data-component="dimensions-text">（{{ char_3dim[0] }}, {{ char_3dim[1] }}, {{ char_3dim[2] }}）</p>
                                     {% else %}
-                                    <p>No dimensions data available</p>
+                                    <p>{{ _('No dimensions data available') }}</p>
                                     {% endif %}
                                 </div>
-                                <div class="card-dimensions text-[0.68rem] uppercase tracking-[0.35em] font-serif">3D Dimensions</div>
+                                <div class="card-dimensions text-[0.68rem] uppercase tracking-[0.35em] font-serif">{{ _('3D Dimensions') }}</div>
                             </div>
                         </div>
                     </div>
@@ -195,16 +195,16 @@
         <!-- Right side - Text content -->
         <div class="w-full lg:w-auto max-w-xl text-[#FFFDE9]" data-component="right-panel">
             <div class="space-y-8" data-component="content-wrapper">
-                <h1 class="text-4xl font-semibold mb-6" data-component="congratulations-title">Congratulations!</h1>
-                <p class="text-2xl mb-6" data-component="success-message">You've created a new AI<br>Nvshu character :)</p>
+                <h1 class="text-4xl font-semibold mb-6" data-component="congratulations-title">{{ _('Congratulations!') }}</h1>
+                <p class="text-2xl mb-6" data-component="success-message">{{ _("You've created a new AI<br>Nvshu character :)")|safe }}</p>
                 <div class="space-y-4" data-component="name-input-section">
-                    <p class="text-2xl" data-component="name-prompt">Could you tell me your name?</p>
+                    <p class="text-2xl" data-component="name-prompt">{{ _('Could you tell me your name?') }}</p>
                     <div class="flex items-center space-x-16">
-                        <input type="text" id="user-name" placeholder="Enter your name" data-component="name-input"
+                        <input type="text" id="user-name" placeholder="{{ _('Enter your name') }}" data-component="name-input"
                             class="max-w-xs bg-transparent border-b-4 border-[#FFFDE9] border-opacity-50 text-[#FFFDE9] placeholder-[#FFFDE9] placeholder-opacity-50 focus:outline-none focus:border-opacity-100 px-2 py-1">
                         <button id="save-btn" data-component="save-button"
                             class="inline-flex items-center justify-center px-6 py-1 border-2 border-dashed border-[rgba(255,251,233,0.8)] bg-[rgba(255,251,233,0.4)] text-[rgb(255,251,233)] font-medium text-base cursor-pointer transition-all duration-300 hover:bg-[rgba(255,251,233,0.6)] hover:border-[rgba(255,251,233,1)] hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[rgba(255,251,233,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                            Save
+                            {{ _('Save') }}
                         </button>
                     </div>
 
@@ -215,6 +215,25 @@
 
     </div>
 
+    {% set result_i18n = {
+        'alerts': {
+            'enter_name': _('Please enter your name'),
+            'save_failed': _('Failed to save your name'),
+            'generic_error': _('An error occurred')
+        },
+        'buttons': {
+            'save': _('Save'),
+            'saving': _('Saving...')
+        },
+        'messages': {
+            'saved_title': _('Saved Successfully!'),
+            'saved_subtitle': _('Taking you to the final page...')
+        }
+    } %}
+    <script>
+        window.APP_LANG = "{{ current_lang or 'zh' }}";
+        window.RESULT_PAGE_I18N = {{ result_i18n | tojson }};
+    </script>
     <script src="{{ url_for('static', filename='js/result.js') }}"></script>
 </body>
 

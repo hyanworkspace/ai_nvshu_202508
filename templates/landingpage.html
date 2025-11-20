@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="{{ current_lang or 'zh' }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI女书 (AI Nüshu)</title>
+    <title>{{ _('AI女书 (AI Nüshu)') }}</title>
     <link
       rel="icon"
       type="image/png"
@@ -290,7 +290,7 @@
                 <!-- 主标题 -->
                 <div id="main-title" class="text-center md:text-left mb-6 opacity-0">
                     <h1 class="text-4xl md:text-5xl font-bold mb-3" style="font-family: 'Inknut Antiqua', serif;">
-                        AI Nüshu
+                        {{ _('AI Nüshu') }}
                     </h1>
                     <!-- <div class="text-2xl md:text-3xl font-light opacity-80" style="font-family: 'Inknut Antiqua', serif;">
                         (AI Nüshu)
@@ -304,10 +304,10 @@
 
                 <!-- 操作按钮 -->
                 <div id="buttons" class="flex flex-col md:flex-row gap-6 mb-12 opacity-0">
-                    <a href="/see" class="action-button relative block px-4 py-4 bg-black/20 border border-dashed border-[#FFFDE9]/40  text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
+                    <a href="/see" class="action-button relative block px-0 py-2 bg-black/20 border border-dashed border-[#FFFDE9]/40  text-[#FFFDE9] text-center min-w-[200px] group shadow-lg shadow-[#FFFDE9]/10">
                         <div class="glow-effect"></div>
                         <div class="relative z-10">
-                            <div class="text-md opacity-80 font-light tracking-wider hover-effect hover-effect--bg-south">EXPLORE</div>
+                            <div class="text-md opacity-80 font-light tracking-wider hover-effect hover-effect--bg-south">{{ _('EXPLORE') }}</div>
                         </div>
                     </a>
 
@@ -317,17 +317,17 @@
                 <!-- 项目描述 -->
                 <div id="description" class="w-full max-w-lg text-start md:text-left bg-black/40 backdrop-blur-sm p-6 border border-dashed border-[#FFFDE9]/30 opacity-0 hover:bg-black/50 hover:border-[#FFFDE9]/40 transition-all duration-500 shadow-xl shadow-[#FFFDE9]/5">
                     <h2 class="text-2xl font-semibold mb-4 text-[#FFFDE9]">
-                        AI Nüshu （AI 女书）
+                        {{ _('AI Nüshu （AI 女书）') }}
                     </h2>
                     <div class="space-y-3 text-sm leading-relaxed opacity-90">
                         <p>
-                          Nüshu （女书）, Also called "Women's Script," is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.</p>
+                          {{ _("Nüshu （女书）, Also called \"Women's Script,\" is a unique language created and used exclusively by women in Hunan Province, China, for centuries to communicate Chinese in a world where they were denied formal education.") }}</p>
 
                         <p>
-                          Can AI learn from ancient Chinese women and create their own secret language?
+                          {{ _('Can AI learn from ancient Chinese women and create their own secret language?') }}
                         </p>
                         <p>
-                          This project trains AI agents to imitate illiterate women in pre-modern China to create a new language system, symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.
+                          {{ _('This project trains AI agents to imitate illiterate women in pre-modern China to create a new language system, symbolizing the defiance of patriarchal constraints and the emergence of language in a non-Western, feminist context.') }}
                         </p>
                     </div>
                 </div>

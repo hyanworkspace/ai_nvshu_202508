@@ -1,0 +1,727 @@
+# Chinese translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-11-18 17:53+0800\n"
+"PO-Revision-Date: 2025-11-18 17:54+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: app.py:122
+msgid "Unsupported language."
+msgstr "不支持的语言。"
+
+#: app.py:128
+msgid "Language updated."
+msgstr "语言已更新。"
+
+#: templates/base.html:6
+msgid "AI 女书"
+msgstr "AI 女书"
+
+#: templates/result.html:7
+msgid "Nüshu Character Created"
+msgstr "女书字符已生成"
+
+#: templates/result.html:164
+msgid "No video available"
+msgstr "暂无可用视频"
+
+#: templates/result.html:184
+msgid "No dimensions data available"
+msgstr "暂无维度数据"
+
+#: templates/result.html:187
+msgid "3D Dimensions"
+msgstr "三维向量"
+
+#: templates/result.html:198
+msgid "Congratulations!"
+msgstr "恭喜！"
+
+#: templates/result.html:199
+msgid "You've created a new AI<br>Nvshu character :)"
+msgstr "你刚刚创造了一个新的 AI<br>女书字符 :)"
+
+#: templates/result.html:201
+msgid "Could you tell me your name?"
+msgstr "可以告诉我你的名字吗？"
+
+#: templates/result.html:203
+msgid "Enter your name"
+msgstr "输入你的名字"
+
+#: templates/result.html:207 templates/result.html:225
+msgid "Save"
+msgstr "保存"
+
+#: templates/result.html:220
+msgid "Please enter your name"
+msgstr "请输入你的名字"
+
+#: templates/result.html:221
+msgid "Failed to save your name"
+msgstr "保存名字失败"
+
+#: templates/result.html:222
+msgid "An error occurred"
+msgstr "发生错误"
+
+#: templates/result.html:226
+msgid "Saving..."
+msgstr "保存中..."
+
+#: templates/result.html:229
+msgid "Saved Successfully!"
+msgstr "保存成功！"
+
+#: templates/result.html:230
+msgid "Taking you to the final page..."
+msgstr "正在带你前往最终页面..."
+
+#: templates/components/header.html:7
+msgid "AI Nüshu"
+msgstr "AI 女书"
+
+#: templates/components/header.html:14
+msgid "Dictionary"
+msgstr "字典"
+
+#: templates/components/header.html:17
+msgid "About"
+msgstr "关于"
+
+#: templates/components/header.html:19
+msgid "Switch language"
+msgstr "切换语言"
+
+#: templates/components/header.html:24
+msgid "中文"
+msgstr "中文"
+
+#: templates/components/header.html:24
+msgid "EN"
+msgstr "英文"
+
+#: templates/landingpage.html:6
+msgid "AI女书 (AI Nüshu)"
+msgstr "AI女书（AI Nüshu）"
+
+#: templates/landingpage.html:310
+msgid "EXPLORE"
+msgstr "探索"
+
+#: templates/landingpage.html:320
+msgid "AI Nüshu （AI 女书）"
+msgstr "AI 女书（AI Nüshu）"
+
+#: templates/landingpage.html:324
+msgid ""
+"Nüshu （女书）, Also called \"Women's Script,\" is a unique language created "
+"and used exclusively by women in Hunan Province, China, for centuries to "
+"communicate Chinese in a world where they were denied formal education."
+msgstr ""
+"女书（Nüshu），又称“女子书写体系”，是一种由湖南女性创造并沿用数百年的特殊文字，用"
+"于在无法接受正式教育的社会中记录和传达汉语。"
+
+#: templates/landingpage.html:327
+msgid "Can AI learn from ancient Chinese women and create their own secret language?"
+msgstr "AI 能否向古代中国女性学习，创造属于自己的秘密语言？"
+
+#: templates/landingpage.html:330
+msgid ""
+"This project trains AI agents to imitate illiterate women in pre-modern "
+"China to create a new language system, symbolizing the defiance of "
+"patriarchal constraints and the emergence of language in a non-Western, "
+"feminist context."
+msgstr ""
+"本项目训练 AI 代理模仿前现代中国未受教育的女性，创造全新的语言体系，以象征对父权"
+"束缚的抗争，并呈现非西方语境下的女性主义语言诞生。"
+
+#: templates/about.html:6
+msgid "About - AI女书 (AI Nüshu)"
+msgstr "关于 - AI女书（AI Nüshu）"
+
+#: templates/about.html:24
+msgid "About AI Nüshu"
+msgstr "关于 AI 女书"
+
+#: templates/about.html:46
+msgid ""
+"Nüshu (女书), also called \"Women's Script,\" is a unique language created "
+"and used exclusively by women in Hunan Province, China, for centuries to "
+"communicate Chinese in a world where they were denied formal education."
+msgstr ""
+"女书（Nüshu），又称“女子文字”，由湖南女性创造并沿用数百年，用于在无法接受正规教育"
+"的环境中表达汉语。"
+
+#: templates/about.html:52
+msgid ""
+"This is the first art project to interpret Nüshu from a computational "
+"linguistics perspective. Two AI agents simulate how ancient women developed "
+"a unique language under the constraints of a patriarchal society. This "
+"cultural phenomenon resonates with the emergence of non-human machine "
+"language under human authority, both metaphorically and practically. "
+"Essentially, we integrate cultural phenomena into an AI system."
+msgstr ""
+"这是第一个以计算语言学视角解读女书的艺术项目。两个 AI 代理模拟古代女性如何在父权"
+"社会的束缚下创作出独特语言，这一文化现象与人类权威下非人机器语言的诞生彼此呼应，"
+"我们将这种文化现象注入 AI 系统。"
+
+#: templates/about.html:60
+msgid ""
+"Contrary to the predefined rules like Morse code, Markov chains, and "
+"fictional constructed languages, AI Nüshu evolves organically from the "
+"machine's environmental observations and feedback, mirroring the natural "
+"formation of human languages. The meaning of language in vector space "
+"gradually emerges into the symbols in the system."
+msgstr ""
+"不同于摩斯电码、马尔可夫链或人造语言等预设体系，AI 女书依托机器对环境的观察与反"
+"馈自发演化，映射出人类语言的自然形成过程，向量空间中的语言含义逐渐凝聚为系统符号。"
+
+#: templates/about.html:64
+msgid ""
+"As this new language is decipherable and learnable by humans, especially "
+"Chinese speakers, it inherently challenges the existing paradigm where "
+"humans are the linguistic authorities and machines are the learners."
+msgstr ""
+"当这门语言能够被人类——尤其是中文使用者——理解与学习时，它天然地挑战了“人类为语言权"
+"威、机器为学习者”的既有范式。"
+
+#: templates/about.html:75
+msgid "Awards"
+msgstr "奖项"
+
+#: templates/about.html:77
+msgid "2025 Lumen Prize, Carla Rapoport Award, winner"
+msgstr "2025 Lumen Prize Carla Rapoport 奖获奖者"
+
+#: templates/about.html:78
+msgid "2025 Red Dot Design Concept Award, winner"
+msgstr "2025 红点概念设计奖获奖者"
+
+#: templates/about.html:79
+msgid "Ars Electronica 2026, Digital Humanity Award, honorary mention"
+msgstr "2026 林茨电子艺术节数字人文奖荣誉提名"
+
+#: templates/about.html:82
+msgid "Publications"
+msgstr "出版物"
+
+#: templates/about.html:85
+msgid "Yuqian Sun, Yuying Tang, Ze Gao, Zhijun Pan, Chuyan Xu et al. 2023."
+msgstr "Yuqian Sun、Yuying Tang、Ze Gao、Zhijun Pan、Chuyan Xu 等，2023。"
+
+#: templates/about.html:86
+msgid ""
+"AI Nüshu: An Exploration of Language Emergence in Sisterhood Through the "
+"Lens of Computational Linguistics."
+msgstr "AI Nüshu：在计算语言学视角下探讨姐妹文化中的语言涌现。"
+
+#: templates/about.html:87
+msgid ""
+"In SIGGRAPH Asia 2023 Art Papers (SA '23). Association for Computing "
+"Machinery, New York, NY, USA, Article 4, 1–7."
+msgstr ""
+"收录于 SIGGRAPH Asia 2023 艺术论文（SA '23），计算机协会出版，纽约，美国，文章 4，"
+"第 1–7 页。"
+
+#: templates/about.html:92
+msgid "Credits"
+msgstr "致谢"
+
+#: templates/about.html:94
+msgid "Artist: Yuqian Sun"
+msgstr "艺术家：孙雨倩"
+
+#: templates/about.html:95
+msgid "AI language system development: Zhijun Pan, Yuqian Sun"
+msgstr "AI 语言系统开发：潘志俊、孙雨倩"
+
+#: templates/about.html:96
+msgid "Unity development: Chuyan Xu"
+msgstr "Unity 开发：徐初晗"
+
+#: templates/about.html:97
+msgid "Website development:"
+msgstr "网站开发："
+
+#: templates/about.html:98
+msgid "Research work: Yuqian Sun, Yuying Tang, Yanrang Wang"
+msgstr "研究工作：孙雨倩、唐雨莹、王延让"
+
+#: templates/about.html:99
+msgid "Advisors: Tristan Braud, Zhigang Wang, Chang Hee Lee, Ali Asadipour"
+msgstr "指导：Tristan Braud、王志刚、Chang Hee Lee、Ali Asadipour"
+
+#: templates/about.html:100
+msgid "Supported by Lumen Prize - Carla Rapoport Award."
+msgstr "由 Lumen Prize - Carla Rapoport 奖资助。"
+
+#: templates/about.html:103
+msgid "About the artist"
+msgstr "关于艺术家"
+
+#: templates/about.html:105
+msgid ""
+"Yuqian (Uchan) Sun (CN), also known as CheeseTalk, is an artist, game "
+"developer and AI researcher based in London. Yuqian aims to create \"alive\" "
+"narrative experiences that extend beyond video games and into our daily "
+"lives through conversational AI agents."
+msgstr ""
+"孙雨倩（Uchan，亦称 CheeseTalk）是常驻伦敦的艺术家、游戏开发者与 AI 研究者，致力于"
+"借助对话式 AI 代理打造超越电子游戏、融入日常生活的“鲜活”叙事体验。"
+
+#: templates/about.html:109
+msgid ""
+"Yuqian's interdisciplinary arts and research have been featured in galleries "
+"and tech conferences, including SIGGRAPH, CVPR, NeurIPS, GDC and New York "
+"Times Square. She won the Red Dot Design Award and Lumen Prize in 2024."
+msgstr ""
+"她的跨学科艺术与研究作品曾在 SIGGRAPH、CVPR、NeurIPS、GDC 及纽约时代广场等展会与科"
+"技论坛展出，并于 2024 年获得红点设计奖与 Lumen Prize。"
+
+#: templates/about.html:112
+msgid "Personal website:"
+msgstr "个人网站："
+
+#: templates/about.html:115
+msgid "IG:"
+msgstr "IG："
+
+#: templates/about.html:140
+msgid "Back to Home"
+msgstr "返回首页"
+
+#: templates/dictionary.html:4
+msgid "Nüshu Dictionary"
+msgstr "女书字典"
+
+#: templates/dictionary.html:21
+msgid "Nüshu Character Dictionary"
+msgstr "女书字符字典"
+
+#: templates/dictionary.html:23
+msgid "Explore the collection of AI-generated Nüshu characters"
+msgstr "探索 AI 生成的女书字符集"
+
+#: templates/dictionary.html:33
+msgid "Search characters..."
+msgstr "搜索字符..."
+
+#: templates/dictionary.html:43
+msgid "Previous"
+msgstr "上一页"
+
+#: templates/dictionary.html:50
+msgid "Next"
+msgstr "下一页"
+
+#: templates/dictionary.html:62 templates/dictionary.html:176
+msgid "Loading dictionary..."
+msgstr "正在加载字典..."
+
+#: templates/dictionary.html:67
+msgid "No characters found"
+msgstr "未找到字符"
+
+#: templates/dictionary.html:68
+msgid "Page {current} of {total} ({count} total)"
+msgstr "第 {current} / {total} 页（共 {count} 个）"
+
+#: templates/dictionary.html:70
+msgid "N/A"
+msgstr "无"
+
+#: templates/dictionary.html:71
+msgid "Failed to load dictionary. Please try again later."
+msgstr "字典加载失败，请稍后再试。"
+
+#: templates/dictionary.html:72
+msgid "Nüshu character for {char}"
+msgstr "{char} 对应的女书字符"
+
+#: templates/see.html:360
+msgid "Camera icon"
+msgstr "相机图标"
+
+#: templates/see.html:480
+msgid "Upload icon"
+msgstr "上传图标"
+
+#: templates/see.html:375
+msgid "Click to record a video"
+msgstr "点击开始录制视频"
+
+#: templates/see.html:389
+msgid "Start Recording"
+msgstr "开始录制"
+
+#: templates/see.html:396
+msgid "Stop Recording"
+msgstr "停止录制"
+
+#: templates/see.html:454
+msgid "Drag here or browse files"
+msgstr "拖拽到此处或浏览文件"
+
+#: templates/see.html:500
+msgid "Supported formats:"
+msgstr "支持的格式："
+
+#: templates/see.html:501
+msgid "MP4, PNG, JPG (Max 5MB each)"
+msgstr "MP4、PNG、JPG（单个文件最大 5MB）"
+
+#: templates/see.html:534
+msgid "Re-Upload"
+msgstr "重新上传"
+
+#: templates/see.html:544
+msgid "Confirm"
+msgstr "确认"
+
+#: templates/see.html:571
+msgid "Privacy & Data Usage Statement"
+msgstr "隐私与数据使用声明"
+
+#: templates/see.html:574
+msgid ""
+"We respect your privacy and are committed to protecting your personal "
+"information. When you upload an image or video for this interactive "
+"experience, your content is used solely for generating the artistic "
+"response. We do not store or share your content with third parties, and all "
+"uploaded content is automatically deleted after processing. No personal "
+"identification information is collected."
+msgstr "我们尊重并保护您的隐私。您上传的图片或视频仅用于生成艺术化回应，我们不会存储或分享您的内容，所有文件在处理完成后会自动删除。我们不会收集任何可识别个人身份的信息。"
+
+#: templates/see.html:589
+msgid "Yes, I agree"
+msgstr "同意"
+
+#: templates/see.html:956
+msgid "Uploading..."
+msgstr "正在上传..."
+
+#: static/js/see.js:138
+msgid "Unsupported file type. Please upload MP4, PNG, or JPG files."
+msgstr "不支持的文件类型，请上传 MP4、PNG 或 JPG 文件。"
+
+#: static/js/see.js:143
+msgid "File size exceeds 50MB limit. Please choose a smaller file."
+msgstr "文件大小超过 50MB 限制，请选择更小的文件。"
+
+#: static/js/see.js:150
+msgid "Please upload PNG or JPG images only."
+msgstr "请仅上传 PNG 或 JPG 图片。"
+
+#: static/js/see.js:155
+msgid "Please upload MP4 videos only."
+msgstr "请仅上传 MP4 视频。"
+
+#: static/js/see.js:175
+msgid ""
+"Unable to access the camera. Please ensure permissions are granted and the "
+"camera is not being used by another app."
+msgstr "无法访问摄像头，请确认已授予权限且摄像头未被其他应用占用。"
+
+#: static/js/see.js:219
+msgid ""
+"Safari does not support in-browser recording. Please upload a file or switch "
+"to Chrome/Firefox."
+msgstr "Safari 不支持浏览器内录制，请上传文件或改用 Chrome/Firefox。"
+
+#: static/js/see.js:221
+msgid ""
+"Your browser may not support video recording. Please try the latest Chrome "
+"or Firefox."
+msgstr "您的浏览器可能不支持视频录制，请尝试最新版本的 Chrome 或 Firefox。"
+
+#: static/js/see.js:398
+msgid "Error: No video URL available"
+msgstr "错误：没有可用的视频链接"
+
+#: static/js/see.js:402
+msgid "No media available to upload"
+msgstr "没有可上传的媒体文件"
+
+#: static/js/see.js:444
+msgid "Original video upload failed: "
+msgstr "原始视频上传失败："
+
+#: static/js/see.js:447
+msgid "Effect video upload failed: "
+msgstr "特效视频上传失败："
+
+#: static/js/see.js:451
+msgid "Upload failed: "
+msgstr "上传失败："
+
+#: static/js/see.js:470
+msgid "Error: No media URL available"
+msgstr "错误：没有可用的媒体链接"
+
+#: static/js/see.js:1113
+msgid "Processing Your Media..."
+msgstr "正在处理您的媒体..."
+
+#: static/js/see.js:1114
+msgid "AI is analyzing and thinking"
+msgstr "AI 正在分析思考"
+
+#: templates/think.html:6
+msgid "Think - AI Nvshu"
+msgstr "思考 - AI 女书"
+
+#: templates/think.html:23 templates/frame_11.html:25 templates/guess.html:18
+msgid "Background"
+msgstr "背景"
+
+#: templates/think.html:164
+msgid "Observation"
+msgstr "观察"
+
+#: static/js/think.js:15
+msgid "No media URL provided"
+msgstr "缺少媒体链接"
+
+#: static/js/think.js:101 static/js/guess.js:154 static/js/guess.js:158 static/js/guess.js:163
+msgid "Uploaded media"
+msgstr "已上传的媒体"
+
+#: static/js/think.js:64 static/js/think.js:507
+msgid "details"
+msgstr "查看详情"
+
+#: static/js/think.js:66
+msgid "STEP {number}"
+msgstr "步骤 {number}"
+
+#: static/js/think.js:990
+msgid "The agent is seeing..."
+msgstr "智能体正在观察..."
+
+#: static/js/think.js:996
+msgid "The agent is thinking..."
+msgstr "智能体正在思考..."
+
+#: static/js/think.js:1002
+msgid "The agent is reflecting..."
+msgstr "智能体正在反思..."
+
+#: static/js/think.js:1045
+msgid "Media analysis completed"
+msgstr "媒体分析完成"
+
+#: static/js/think.js:1014
+msgid "Chinese Description"
+msgstr "中文描述"
+
+#: static/js/think.js:1018
+msgid "English Description"
+msgstr "英文描述"
+
+#: static/js/think.js:1125
+msgid "Failed to analyze media: "
+msgstr "分析媒体失败："
+
+#: static/js/think.js:1128
+msgid "Error: "
+msgstr "错误："
+
+#: static/js/think.js:1201
+msgid "Chinese Poems"
+msgstr "中文诗句"
+
+#: static/js/think.js:1206
+msgid "English Translations"
+msgstr "英文翻译"
+
+#: static/js/think.js:1214
+msgid "Found similar poems"
+msgstr "找到相似诗句"
+
+#: static/js/think.js:1343
+msgid "Generated Chinese Poem"
+msgstr "生成的中文诗"
+
+#: static/js/think.js:1348
+msgid "English Translation"
+msgstr "英文翻译"
+
+#: static/js/think.js:1356
+msgid "Generated new poem"
+msgstr "生成新诗"
+
+#: static/js/think.js:1687
+msgid "Entering Language Development..."
+msgstr "进入语言生成阶段..."
+
+#: static/js/think.js:1689
+msgid "Preparing the guessing game"
+msgstr "准备猜测游戏"
+
+#: templates/guess.html:7
+msgid "Language Development"
+msgstr "语言生成"
+
+#: templates/guess.html:24
+#: templates/guess.html:961
+msgid "Consensus Reached!"
+msgstr "达成共识！"
+
+#: templates/guess.html:54
+msgid "Speaker"
+msgstr "说话者"
+
+#: templates/guess.html:61
+msgid "Encoding..."
+msgstr "编码中..."
+
+#: templates/guess.html:63
+msgid "a character into an AI Nushu Symbol"
+msgstr "将字符编码为 AI 女书符号"
+
+#: templates/guess.html:69
+msgid "Guessing..."
+msgstr "猜测中..."
+
+#: templates/guess.html:71
+msgid "the computational meaning"
+msgstr "其计算意义"
+
+#: templates/guess.html:75
+msgid "Processing<br> poem..."
+msgstr "处理<br>诗句..."
+
+#: templates/guess.html:103
+msgid "Listener"
+msgstr "聆听者"
+
+#: templates/guess.html:132
+msgid "Small Characters Strip"
+msgstr "女书字符带"
+
+#: templates/guess.html:249
+msgid "Click to toggle between media and text"
+msgstr "点击切换媒体与文字"
+
+#: templates/frame_11.html:6
+msgid "Your Nüshu Character"
+msgstr "你的女书字符"
+
+#: templates/frame_11.html:38
+msgid "This is a new AI nvshu<br>character: \"%(translation)s\""
+msgstr "这是一个新的 AI 女书字符：“%(translation)s”"
+
+#: templates/frame_11.html:39
+msgid "The original <br>character: \"%(char)s\""
+msgstr "原始字符：\"%(char)s\""
+
+#: templates/frame_11.html:44
+msgid "From this ancient<br>sentence"
+msgstr "来自这句古诗"
+
+#: templates/frame_11.html:63
+msgid "Generated character"
+msgstr "生成的字符"
+
+#: templates/frame_11.html:93
+msgid "Go Back"
+msgstr "返回"
+
+#: templates/frame_11.html:98
+msgid "Do you want to store it in a public dictionary?"
+msgstr "要将它存入公共字典吗？"
+
+#: templates/frame_11.html:103
+msgid "Yes :)"
+msgstr "是 :)"
+
+#: templates/frame_11.html:106
+msgid "No :("
+msgstr "否 :("
+
+#: static/js/guess.js:352
+msgid "No poem provided"
+msgstr "缺少诗句"
+
+#: static/js/guess.js:210
+msgid "Failed to process the poem"
+msgstr "处理诗句失败"
+
+#: static/js/guess.js:880
+msgid "Generate Result"
+msgstr "生成结果"
+
+#: static/js/guess.js:911
+msgid "Generating Result..."
+msgstr "正在生成结果..."
+
+#: static/js/guess.js:911
+msgid "Creating your Nüshu character"
+msgstr "正在创造你的女书字符"
+
+#: static/js/guess.js:863
+msgid "Generated Nüshu character"
+msgstr "生成的女书字符"
+
+#: templates/frame_11.html:120
+msgid "Share to WeChat"
+msgstr "分享到微信"
+
+#: templates/frame_11.html:122
+msgid "In a real implementation, this would share directly to WeChat."
+msgstr "在正式版本中，这里会直接分享至微信。"
+
+#: templates/frame_11.html:123
+msgid "For now, you can save the image below and share it manually:"
+msgstr "目前你可以保存下方图片并手动分享："
+
+#: templates/frame_11.html:124
+#: templates/frame_11.html:136
+msgid "Print or Save"
+msgstr "打印或保存"
+
+#: templates/frame_11.html:126
+msgid "Share to Instagram"
+msgstr "分享到 Instagram"
+
+#: templates/frame_11.html:128
+msgid "1. Save this image to your device"
+msgstr "1. 将此图片保存到你的设备"
+
+#: templates/frame_11.html:129
+msgid "2. Open Instagram and create a new post"
+msgstr "2. 打开 Instagram 并创建新帖子"
+
+#: templates/frame_11.html:130
+msgid "3. Select this image from your gallery"
+msgstr "3. 从相册中选择此图片"
+
+#: static/js/frame 11.js:148 static/js/frame 11.js:228
+msgid "Error creating share image. Please try again."
+msgstr "生成分享图片失败，请重试。"
+
+#: static/js/frame 11.js:214
+msgid "Link copied to clipboard!"
+msgstr "链接已复制到剪贴板！"
+
+#: static/js/frame 11.js:218
+msgid "Failed to copy link. Please try again."
+msgstr "复制链接失败，请重试。"
+
+#: static/js/frame 11.js:263
+msgid "Operation failed, please try again: "
+msgstr "操作失败，请重试："

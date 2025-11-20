@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang or 'zh' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Nüshu Character</title>
+    <title>{{ _('Your Nüshu Character') }}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}">
     <!-- 引入html2canvas用于截图 -->
@@ -55,7 +55,7 @@
 <body class="bg-black min-h-screen flex flex-col items-center justify-center gap-8 p-4 md:p-8" data-component="page-body">
     <!-- Background image container -->
     <div class="absolute inset-0 w-full h-full -z-50" data-component="background">
-        <img src="{{ url_for('static', filename='images/bg 2.png') }}" alt="Background"
+        <img src="{{ url_for('static', filename='images/bg 2.png') }}" alt="{{ _('Background') }}"
             class="w-full h-full object-cover opacity-70">
     </div>
 
@@ -73,14 +73,14 @@
             <!-- Left column - Text content -->
             <div class="w-full lg:flex-[0.4] text-[#FFFDE9] space-y-4 md:space-y-6 " data-component="left-column">
                 <div data-component="character-info">
-                    <h1 class="text-xl md:text-2xl" data-component="character-title">This is a new AI nvshu<br>character: "{{ char_translate }}"</h1>
-                    <h1 class="text-xl md:text-2xl mt-4" data-component="character-title">The original <br>character: "{{ char }}"</h1>
+                    <h1 class="text-xl md:text-2xl" data-component="character-title">{{ _('This is a new AI nvshu<br>character: "%(translation)s"', translation=char_translate)|safe }}</h1>
+                    <h1 class="text-xl md:text-2xl mt-4" data-component="character-title">{{ _('The original <br>character: "%(char)s"', char=char)|safe }}</h1>
                 </div>
                 <!-- <div data-component="creator-info">
                     <p class="text-lg md:text-xl" data-component="creator-text">Created by "{{ username }}"</p>
                 </div> -->
                 <div data-component="poem-info mt-4">
-                    <p class="text-lg md:text-xl" data-component="poem-label">From this ancient<br>sentence</p>
+                    <p class="text-lg md:text-xl" data-component="poem-label">{{ _('From this ancient<br>sentence')|safe }}</p>
                     <p class="text-xs md:text-lg mt-2" data-component="poem-text">{{ highlighted_poem | safe }}</p>
                     <p class="text-xs md:text-sm mt-1" data-component="poem-eng-text">{{ poem_eng }}</p>
                 </div>
@@ -93,7 +93,7 @@
                     <div class="w-full h-full rounded-full bg-[#FFFDE9] flex items-center justify-center relative" data-component="character-background">
                     </div>
                     {% if char_img_path %}
-                    <img src="{{ char_img_path }}" alt="Generated character" data-component="character-image"
+                    <img src="{{ char_img_path }}" alt="{{ _('Generated character') }}" data-component="character-image"
                         class="absolute w-[140%] h-[140%] object-contain mix-blend-difference" style="top: -20%; left: -10%;">
                     {% endif %}
                 </div>
@@ -144,21 +144,19 @@
                 <button type="button"
                     class="px-6 md:px-8 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.25)] hover:bg-[rgba(255,251,233,0.4)] text-sm md:text-base text-[#FFFDE9] transition"
                     onclick="window.location.href='{{ url_for('dictionary') }}'">
-                    Go Back
+                    {{ _('Go Back') }}
                 </button>
             </div>
             {% else %}
             <div class="flex flex-col md:flex-row items-center justify-between md:justify-left gap-4 md:gap-8 text-[#FFFDE9] text-lg md:text-xl" data-component="storage-question">
-                <p data-component="question-text">Do you want to store it in a public dictionary?</p>
+                <p data-component="question-text">{{ _('Do you want to store it in a public dictionary?') }}</p>
                 <div class="flex gap-4" data-component="storage-options">
                     <input type="radio" name="storage" value="yes" class="hidden" id="storage-yes">
                     <label for="storage-yes" data-component="yes-option"
-                        class="px-4 md:px-6 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] cursor-pointer text-sm md:text-base">Yes
-                        :)</label>
+                        class="px-4 md:px-6 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] cursor-pointer text-sm md:text-base">{{ _('Yes :)') }}</label>
                     <input type="radio" name="storage" value="no" class="hidden" id="storage-no">
                     <label for="storage-no" data-component="no-option"
-                        class="px-4 md:px-6 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] cursor-pointer text-sm md:text-base">No
-                        :(</label>
+                        class="px-4 md:px-6 py-2 rounded-full border-2 border-dashed border-[#FFFDE9] bg-[rgba(255,251,233,0.4)] hover:bg-[rgba(255,251,233,0.6)] cursor-pointer text-sm md:text-base">{{ _('No :(') }}</label>
                 </div>
             </div>
             {% endif %}
@@ -189,6 +187,23 @@
         </div>
     </div>
 
+    {% set frame_i18n = {
+        'share_wechat_title': _('Share to WeChat'),
+        'share_wechat_instruction1': _('In a real implementation, this would share directly to WeChat.'),
+        'share_wechat_instruction2': _('For now, you can save the image below and share it manually:'),
+        'print_or_save': _('Print or Save'),
+        'share_instagram_title': _('Share to Instagram'),
+        'share_instagram_step1': _('1. Save this image to your device'),
+        'share_instagram_step2': _('2. Open Instagram and create a new post'),
+        'share_instagram_step3': _('3. Select this image from your gallery'),
+        'share_error': _('Error creating share image. Please try again.'),
+        'link_copied': _('Link copied to clipboard!'),
+        'copy_failed': _('Failed to copy link. Please try again.'),
+        'operation_failed_prefix': _('Operation failed, please try again: ')
+    } %}
+    <script>
+      window.FRAME_PAGE_I18N = {{ frame_i18n | tojson }};
+    </script>
     <script src="{{ url_for('static', filename='js/frame 11.js') }}"></script>
 </body>
 
