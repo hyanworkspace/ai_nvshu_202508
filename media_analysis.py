@@ -9,7 +9,7 @@ from io import BytesIO
 from config import Config
 from process_video import convert_webm_to_mp4
 from dotenv import load_dotenv
-# from zhipuai import ZhipuAI
+from zhipuai import ZhipuAI
 from logging_config import get_optimized_logger
 
 # 配置日志
