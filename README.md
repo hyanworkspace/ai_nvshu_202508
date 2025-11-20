@@ -888,3 +888,12 @@ ai_nvshu/
 | `media_url` | 媒体文件URL | `/think?media_url=/uploads/xxx.mp4` |
 | `original_media_url` | 原始媒体URL | `/think?original_media_url=/uploads/xxx.mp4` |
 | `poem` | 诗歌内容 | `/guess?poem=江永女书奇` |
+
+
+# Server
+sudo systemctl restart flask
+
+# 翻译
+
+在虚拟环境里到项目根目录执行：pybabel compile -d translations（若新增了 msgid 还需先 pybabel extract -F babel.cfg -o messages.pot . 再 pybabel update -i messages.pot -d translations）。
+重启 Flask 服务让它重新加载生成的 messages.mo。
