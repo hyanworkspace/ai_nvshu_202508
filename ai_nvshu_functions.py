@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 from PIL import Image
 import time
-# from zhipuai import ZhipuAI
+from zhipuai import ZhipuAI
 from utils import *
 from dict_io import *
 from word_vector_manager import word_vectors
@@ -17,8 +17,8 @@ from googletrans import Translator
 # variables --------------------
 load_dotenv()  # 加载 .env 文件中的环境变量
 
-# ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
-# nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
+ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
+nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
 
 # 简单的重试装饰器
 def retry_on_network_error(max_retries=3, backoff_factor=0.5):

@@ -17,8 +17,8 @@ logger = get_optimized_logger(__name__)
 
 # 加载 .env 文件中的环境变量
 load_dotenv()
-# ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
-# nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
+ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY')
+nvshu_ai = ZhipuAI(api_key=ZHIPU_API_KEY)
 
 
 class MediaAnalyzer:
